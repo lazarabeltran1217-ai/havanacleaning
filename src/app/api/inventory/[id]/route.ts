@@ -58,6 +58,7 @@ export async function PATCH(
       ...(body.minStock !== undefined && { minStock: body.minStock }),
       ...(body.costPerUnit !== undefined && { costPerUnit: body.costPerUnit }),
       ...(body.supplier !== undefined && { supplier: body.supplier }),
+      ...(body.assignedToId !== undefined && { assignedToId: body.assignedToId || null }),
       ...(body.isActive !== undefined && { isActive: body.isActive }),
     },
   });

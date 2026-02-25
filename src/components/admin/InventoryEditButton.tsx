@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface ItemData {
@@ -12,12 +12,19 @@ interface ItemData {
   minStock: number;
   costPerUnit: number;
   supplier: string | null;
+  assignedToId: string | null;
+}
+
+interface Employee {
+  id: string;
+  name: string;
 }
 
 export function InventoryEditButton({ item }: { item: ItemData }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [employees, setEmployees] = useState<Employee[]>([]);
 
   const [name, setName] = useState(item.name);
   const [sku, setSku] = useState(item.sku || "");
@@ -26,6 +33,16 @@ export function InventoryEditButton({ item }: { item: ItemData }) {
   const [minStock, setMinStock] = useState(String(item.minStock));
   const [costPerUnit, setCostPerUnit] = useState(String(item.costPerUnit));
   const [supplier, setSupplier] = useState(item.supplier || "");
+  const [assignedToId, setAssignedToId] = useState(item.assignedToId || "");
+
+  useEffect(() => {
+    if (open) {
+      fetch("/api/employees")
+        .then((r) => r.json())
+        .then((d) => setEmployees(d.employees || []))
+        .catch(() => {});
+    }
+  }, [open]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -40,6 +57,7 @@ export function InventoryEditButton({ item }: { item: ItemData }) {
         minStock: Number(minStock) || 0,
         costPerUnit: Number(costPerUnit) || 0,
         supplier: supplier || null,
+        assignedToId: assignedToId || null,
       }),
     });
     setSaving(false);
@@ -93,6 +111,19 @@ export function InventoryEditButton({ item }: { item: ItemData }) {
               <div>
                 <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Supplier</label>
                 <input value={supplier} onChange={(e) => setSupplier(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm" />
+              </div>
+              <div>
+                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Assigned Employee</label>
+                <select
+                  value={assignedToId}
+                  onChange={(e) => setAssignedToId(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg text-sm"
+                >
+                  <option value="">— None —</option>
+                  {employees.map((emp) => (
+                    <option key={emp.id} value={emp.id}>{emp.name}</option>
+                  ))}
+                </select>
               </div>
             </div>
 

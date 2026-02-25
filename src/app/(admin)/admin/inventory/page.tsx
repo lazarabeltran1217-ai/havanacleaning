@@ -8,6 +8,9 @@ export default async function AdminInventoryPage() {
   const items = await prisma.inventoryItem.findMany({
     where: { isActive: true },
     orderBy: [{ category: "asc" }, { name: "asc" }],
+    include: {
+      assignedTo: { select: { id: true, name: true } },
+    },
   });
 
   const lowStockCount = items.filter((i) => i.currentStock <= i.minStock).length;
@@ -37,6 +40,7 @@ export default async function AdminInventoryPage() {
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Min</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Cost/Unit</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Supplier</th>
+              <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Assigned To</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Status</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium"></th>
             </tr>
@@ -55,6 +59,13 @@ export default async function AdminInventoryPage() {
                   <td className="px-4 py-3 text-gray-400">{item.minStock}</td>
                   <td className="px-4 py-3">{formatCurrency(item.costPerUnit)}</td>
                   <td className="px-4 py-3 text-gray-500">{item.supplier || "—"}</td>
+                  <td className="px-4 py-3">
+                    {item.assignedTo ? (
+                      <span className="text-[0.78rem] font-medium text-teal">{item.assignedTo.name}</span>
+                    ) : (
+                      <span className="text-gray-400">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     <span
                       className={`text-[0.7rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${
@@ -75,6 +86,7 @@ export default async function AdminInventoryPage() {
                         minStock: item.minStock,
                         costPerUnit: item.costPerUnit,
                         supplier: item.supplier,
+                        assignedToId: item.assignedToId,
                       }} />
                       <Link
                         href={`/admin/inventory/${item.id}`}

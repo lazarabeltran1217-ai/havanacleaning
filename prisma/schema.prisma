@@ -115,6 +115,7 @@ model User {
   notifications     Notification[]
   referralsGiven    Referral[]        @relation("ReferrerUser")
   referralsReceived Referral[]        @relation("RefereeUser")
+  assignedInventory InventoryItem[]   @relation("AssignedInventory")
 
   @@index([role])
   @@index([email])
@@ -321,13 +322,16 @@ model InventoryItem {
   minStock     Float    @default(5)
   costPerUnit  Float    @default(0)
   supplier     String?
+  assignedToId String?
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  assignedTo   User?    @relation("AssignedInventory", fields: [assignedToId], references: [id])
   transactions InventoryTransaction[]
 
   @@index([category])
+  @@index([assignedToId])
 }
 
 model InventoryTransaction {
