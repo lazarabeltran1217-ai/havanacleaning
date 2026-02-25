@@ -6,6 +6,8 @@ import { JsonLd } from "@/components/website/JsonLd";
 import { localBusinessSchema, organizationSchema, websiteSchema } from "@/lib/schema";
 import "./globals.css";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: {
     default: "Havana Cleaning — Where Spotless Meets Soul",

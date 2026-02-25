@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 // GET — List FAQs (public if pageType/pageId specified, otherwise admin)
 export async function GET(req: NextRequest) {
   const pageType = req.nextUrl.searchParams.get("pageType");

@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { generateBookingNumber } from "@/lib/booking-number";
 import { calculatePrice } from "@/lib/pricing";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) {
