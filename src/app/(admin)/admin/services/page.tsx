@@ -7,7 +7,6 @@ export default async function AdminServicesPage() {
     include: {
       addOns: { where: { isActive: true } },
       pricingRules: { orderBy: [{ bedroomsMin: "asc" }] },
-      _count: { select: { bookings: true } },
     },
     orderBy: { sortOrder: "asc" },
   });
@@ -24,12 +23,9 @@ export default async function AdminServicesPage() {
                 <span className="text-3xl">{service.icon}</span>
                 <div>
                   <h3 className="font-display text-lg">{service.name}</h3>
-                  <div className="text-gray-400 text-[0.78rem]">
-                    /{service.slug} &middot; {service._count.bookings} bookings
-                    {!service.isActive && (
-                      <span className="ml-2 text-red">INACTIVE</span>
-                    )}
-                  </div>
+                  {!service.isActive && (
+                    <span className="text-red text-[0.78rem]">INACTIVE</span>
+                  )}
                 </div>
               </div>
               <div className="flex items-start gap-4">
