@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/website/JsonLd";
+import { serviceSchema, breadcrumbSchema } from "@/lib/schema";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -30,8 +32,17 @@ export default async function ServiceDetailPage({ params }: Props) {
 
   if (!service || !service.isActive) notFound();
 
+  const breadcrumbs = [
+    { name: "Home", url: "/" },
+    { name: "Services", url: "/services" },
+    { name: service.name, url: `/services/${service.slug}` },
+  ];
+
   return (
     <>
+      <JsonLd data={serviceSchema(service)} />
+      <JsonLd data={breadcrumbSchema(breadcrumbs)} />
+
       {/* HERO */}
       <section className="bg-tobacco pt-36 pb-16 px-6 md:px-20">
         <div className="max-w-4xl mx-auto">

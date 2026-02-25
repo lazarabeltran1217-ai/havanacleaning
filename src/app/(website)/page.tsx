@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { SERVICE_AREAS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
+import { JsonLd } from "@/components/website/JsonLd";
+import { aggregateRatingSchema, reviewSchema } from "@/lib/schema";
 
 export default async function HomePage() {
   const services = await prisma.service.findMany({
@@ -15,8 +17,22 @@ export default async function HomePage() {
     orderBy: { createdAt: "desc" },
   });
 
+  // Aggregate rating from all approved testimonials
+  const allTestimonials = await prisma.testimonial.findMany({
+    where: { isApproved: true },
+    select: { rating: true, customerName: true, content: true, location: true },
+  });
+  const avgRating = allTestimonials.length > 0
+    ? allTestimonials.reduce((sum, t) => sum + t.rating, 0) / allTestimonials.length
+    : 5;
+
   return (
     <>
+      <JsonLd data={aggregateRatingSchema(Math.round(avgRating * 10) / 10, allTestimonials.length)} />
+      {allTestimonials.slice(0, 3).map((t, i) => (
+        <JsonLd key={i} data={reviewSchema({ author: t.customerName, content: t.content, rating: t.rating, location: t.location || undefined })} />
+      ))}
+
       {/* HERO */}
       <section className="min-h-screen bg-tobacco flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.04]" style={{
