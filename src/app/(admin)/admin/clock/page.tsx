@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { formatDate, formatTime } from "@/lib/utils";
+import { ClockEditButton } from "@/components/admin/ClockEditButton";
 
 export default async function AdminClockPage() {
   const entries = await prisma.timeEntry.findMany({
@@ -47,6 +48,7 @@ export default async function AdminClockPage() {
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Clock Out</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Hours</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Job</th>
+              <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
@@ -60,10 +62,20 @@ export default async function AdminClockPage() {
                 <td className="px-4 py-3 text-gray-500">
                   {e.booking ? `${e.booking.bookingNumber}` : "—"}
                 </td>
+                <td className="px-4 py-3">
+                  <ClockEditButton entry={{
+                    id: e.id,
+                    employeeName: e.employee.name,
+                    clockIn: e.clockIn.toISOString(),
+                    clockOut: e.clockOut?.toISOString() || null,
+                    hoursWorked: e.hoursWorked,
+                    notes: e.notes,
+                  }} />
+                </td>
               </tr>
             ))}
             {entries.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-12 text-center text-gray-400">No time entries yet.</td></tr>
+              <tr><td colSpan={7} className="px-4 py-12 text-center text-gray-400">No time entries yet.</td></tr>
             )}
           </tbody>
         </table>

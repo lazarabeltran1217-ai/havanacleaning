@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
+import { AddCustomerButton } from "@/components/admin/AddCustomerButton";
 
 export default async function AdminClientsPage() {
   const customers = await prisma.user.findMany({
@@ -13,7 +14,10 @@ export default async function AdminClientsPage() {
 
   return (
     <div>
-      <h2 className="font-display text-xl mb-6">Customers</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="font-display text-xl">Customers</h2>
+        <AddCustomerButton />
+      </div>
 
       <div className="bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
         <table className="w-full text-left text-[0.85rem]">

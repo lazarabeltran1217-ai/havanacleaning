@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import Link from "next/link";
+import { QuickBookForm } from "@/components/admin/QuickBookForm";
 
 export default async function AdminBookingsPage() {
   const bookings = await prisma.booking.findMany({
@@ -27,6 +28,7 @@ export default async function AdminBookingsPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-display text-xl">All Bookings</h2>
+        <QuickBookForm />
       </div>
 
       <div className="bg-white rounded-xl border border-[#ece6d9] overflow-hidden">

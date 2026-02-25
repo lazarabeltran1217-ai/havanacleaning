@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 interface Service {
   id: string;
@@ -15,10 +16,11 @@ interface Employee {
 }
 
 interface Props {
-  onCreated: () => void;
+  onCreated?: () => void;
 }
 
 export function QuickBookForm({ onCreated }: Props) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [services, setServices] = useState<Service[]>([]);
@@ -93,7 +95,8 @@ export function QuickBookForm({ onCreated }: Props) {
       setSaving(false);
       setOpen(false);
       resetForm();
-      onCreated();
+      if (onCreated) onCreated();
+      else router.refresh();
     } else {
       setSaving(false);
       alert("Failed to create booking. Please try again.");

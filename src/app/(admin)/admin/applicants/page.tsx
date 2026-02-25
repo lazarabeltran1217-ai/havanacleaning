@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
+import { AddApplicationButton } from "@/components/admin/AddApplicationButton";
 
 export default async function AdminApplicantsPage() {
   const applications = await prisma.jobApplication.findMany({
@@ -21,7 +22,10 @@ export default async function AdminApplicantsPage() {
 
   return (
     <div>
-      <h2 className="font-display text-xl mb-6">Job Applications</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="font-display text-xl">Job Applications</h2>
+        <AddApplicationButton />
+      </div>
 
       <div className="bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
         <table className="w-full text-left text-[0.85rem]">

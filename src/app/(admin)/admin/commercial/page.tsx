@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
+import { AddCommercialButton } from "@/components/admin/AddCommercialButton";
 
 export default async function AdminCommercialPage() {
   const inquiries = await prisma.commercialInquiry.findMany({
@@ -20,7 +21,10 @@ export default async function AdminCommercialPage() {
 
   return (
     <div>
-      <h2 className="font-display text-xl mb-6">Commercial Inquiries</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="font-display text-xl">Commercial Inquiries</h2>
+        <AddCommercialButton />
+      </div>
 
       <div className="bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
         <table className="w-full text-left text-[0.85rem]">

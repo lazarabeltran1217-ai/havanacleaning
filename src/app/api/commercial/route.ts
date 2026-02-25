@@ -28,9 +28,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Business email validation
+  // Business email validation (skip for admin-submitted entries)
+  const isAdminSubmission = body.jsToken === "admin-manual";
   const emailDomain = body.contactEmail.split("@")[1]?.toLowerCase();
-  if (FREE_EMAIL_DOMAINS.includes(emailDomain)) {
+  if (!isAdminSubmission && FREE_EMAIL_DOMAINS.includes(emailDomain)) {
     return NextResponse.json(
       { error: "Please use a business email address for commercial inquiries" },
       { status: 400 }
