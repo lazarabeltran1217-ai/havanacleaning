@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatDate, formatCurrency } from "@/lib/utils";
 import Link from "next/link";
+import { StaffEditButton } from "@/components/admin/StaffEditButton";
 
 export default async function AdminStaffPage() {
   const employees = await prisma.user.findMany({
@@ -49,7 +50,14 @@ export default async function AdminStaffPage() {
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <Link href={`/admin/staff/${emp.id}`} className="text-green text-[0.78rem] hover:underline">Edit</Link>
+                  <StaffEditButton employee={{
+                    id: emp.id,
+                    name: emp.name,
+                    email: emp.email,
+                    phone: emp.phone,
+                    hourlyRate: emp.hourlyRate,
+                    isActive: emp.isActive,
+                  }} />
                 </td>
               </tr>
             ))}
