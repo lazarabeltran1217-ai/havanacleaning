@@ -1,10 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface Props {
   items: { id: string; name: string }[];
+}
+
+interface BookingOption {
+  id: string;
+  bookingNumber: string;
+  scheduledDate: string;
+  service: { name: string; icon: string | null };
+  customer: { name: string };
 }
 
 export function InventoryActions({ items }: Props) {
@@ -25,9 +33,20 @@ export function InventoryActions({ items }: Props) {
 
   // Transaction form
   const [txItemId, setTxItemId] = useState("");
-  const [txType, setTxType] = useState("PURCHASE");
+  const [txType, setTxType] = useState("USAGE");
   const [txQuantity, setTxQuantity] = useState("");
   const [txNotes, setTxNotes] = useState("");
+  const [txBookingId, setTxBookingId] = useState("");
+  const [bookings, setBookings] = useState<BookingOption[]>([]);
+
+  // Fetch upcoming bookings when transaction modal opens
+  useEffect(() => {
+    if (!showTransaction) return;
+    fetch("/api/bookings?status=CONFIRMED")
+      .then((r) => r.json())
+      .then((d) => setBookings(d.bookings || []))
+      .catch(() => {});
+  }, [showTransaction]);
 
   const handleAddItem = async () => {
     if (!name) return;
@@ -61,12 +80,17 @@ export function InventoryActions({ items }: Props) {
         type: txType,
         quantity: Number(txQuantity),
         notes: txNotes || null,
+        bookingId: txBookingId || null,
       }),
     });
     setSaving(false);
     setShowTransaction(false);
-    setTxItemId(""); setTxType("PURCHASE"); setTxQuantity(""); setTxNotes("");
+    setTxItemId(""); setTxType("USAGE"); setTxQuantity(""); setTxNotes(""); setTxBookingId("");
     router.refresh();
+  };
+
+  const formatDate = (d: string) => {
+    return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
   };
 
   return (
@@ -75,7 +99,7 @@ export function InventoryActions({ items }: Props) {
         onClick={() => setShowTransaction(true)}
         className="px-4 py-2 bg-teal text-white text-sm rounded-lg font-medium hover:bg-teal/90"
       >
-        Log Transaction
+        Assign to Job
       </button>
       <button
         onClick={() => setShowAdd(true)}
@@ -115,35 +139,74 @@ export function InventoryActions({ items }: Props) {
         </div>
       )}
 
-      {/* Log Transaction Modal */}
+      {/* Assign to Job / Log Transaction Modal */}
       {showTransaction && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowTransaction(false)}>
           <div className="bg-white rounded-xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-display text-lg mb-4">Log Inventory Transaction</h3>
+            <h3 className="font-display text-lg mb-4">Assign Items to Job</h3>
             <div className="space-y-3">
-              <select value={txItemId} onChange={(e) => setTxItemId(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm">
-                <option value="">Select Item *</option>
-                {items.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
-              </select>
-              <select value={txType} onChange={(e) => setTxType(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm">
-                <option value="PURCHASE">Purchase (add stock)</option>
-                <option value="USAGE">Usage (deduct stock)</option>
-                <option value="DAMAGED">Damaged (deduct stock)</option>
-                <option value="ADJUSTMENT">Adjustment (set stock to value)</option>
-              </select>
-              <input
-                placeholder={txType === "ADJUSTMENT" ? "New stock level *" : "Quantity *"}
-                type="number"
-                value={txQuantity}
-                onChange={(e) => setTxQuantity(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg text-sm"
-              />
-              <input placeholder="Notes (optional)" value={txNotes} onChange={(e) => setTxNotes(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm" />
+              {/* Item selector */}
+              <div>
+                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Item *</label>
+                <select value={txItemId} onChange={(e) => setTxItemId(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm">
+                  <option value="">Select item...</option>
+                  {items.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
+                </select>
+              </div>
+
+              {/* Booking/Job selector */}
+              <div>
+                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Assign to Job</label>
+                <select value={txBookingId} onChange={(e) => setTxBookingId(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm">
+                  <option value="">No job (general stock change)</option>
+                  {bookings.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.bookingNumber} — {b.service.icon} {b.service.name} — {b.customer.name} ({formatDate(b.scheduledDate)})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Transaction type */}
+              <div>
+                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Type</label>
+                <select value={txType} onChange={(e) => setTxType(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm">
+                  <option value="USAGE">Usage (deduct from stock)</option>
+                  <option value="PURCHASE">Purchase (add to stock)</option>
+                  <option value="DAMAGED">Damaged (deduct from stock)</option>
+                  <option value="ADJUSTMENT">Adjustment (set stock level)</option>
+                </select>
+              </div>
+
+              {/* Quantity */}
+              <div>
+                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">
+                  {txType === "ADJUSTMENT" ? "New Stock Level *" : "Quantity *"}
+                </label>
+                <input
+                  type="number"
+                  value={txQuantity}
+                  onChange={(e) => setTxQuantity(e.target.value)}
+                  placeholder={txType === "ADJUSTMENT" ? "e.g. 20" : "e.g. 3"}
+                  className="w-full px-3 py-2 border rounded-lg text-sm"
+                />
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Notes</label>
+                <input
+                  placeholder="Optional"
+                  value={txNotes}
+                  onChange={(e) => setTxNotes(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg text-sm"
+                />
+              </div>
             </div>
             <div className="flex gap-2 mt-5">
               <button onClick={() => setShowTransaction(false)} className="flex-1 px-4 py-2 border rounded-lg text-sm">Cancel</button>
               <button onClick={handleTransaction} disabled={saving || !txItemId || !txQuantity} className="flex-1 px-4 py-2 bg-teal text-white rounded-lg text-sm font-medium disabled:opacity-50">
-                {saving ? "Logging..." : "Log Transaction"}
+                {saving ? "Saving..." : txBookingId ? "Assign to Job" : "Log Transaction"}
               </button>
             </div>
           </div>
