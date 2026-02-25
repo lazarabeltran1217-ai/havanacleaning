@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 import { InventoryActions } from "@/components/admin/InventoryActions";
+import { InventoryEditButton } from "@/components/admin/InventoryEditButton";
 
 export default async function AdminInventoryPage() {
   const items = await prisma.inventoryItem.findMany({
@@ -64,12 +65,24 @@ export default async function AdminInventoryPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <Link
-                      href={`/admin/inventory/${item.id}`}
-                      className="text-teal text-[0.78rem] font-medium hover:underline"
-                    >
-                      History
-                    </Link>
+                    <div className="flex items-center gap-3">
+                      <InventoryEditButton item={{
+                        id: item.id,
+                        name: item.name,
+                        sku: item.sku,
+                        category: item.category,
+                        unit: item.unit,
+                        minStock: item.minStock,
+                        costPerUnit: item.costPerUnit,
+                        supplier: item.supplier,
+                      }} />
+                      <Link
+                        href={`/admin/inventory/${item.id}`}
+                        className="text-teal text-[0.78rem] font-medium hover:underline"
+                      >
+                        History
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               );

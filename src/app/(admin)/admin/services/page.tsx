@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
+import { ServiceEditButton } from "@/components/admin/ServiceEditor";
 
 export default async function AdminServicesPage() {
   const services = await prisma.service.findMany({
@@ -31,11 +32,26 @@ export default async function AdminServicesPage() {
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-lg font-semibold text-green">
-                  {service.basePrice > 0 ? formatCurrency(service.basePrice) : "Custom"}
+              <div className="flex items-start gap-4">
+                <div className="text-right">
+                  <div className="text-lg font-semibold text-green">
+                    {service.basePrice > 0 ? formatCurrency(service.basePrice) : "Custom"}
+                  </div>
+                  <div className="text-gray-400 text-[0.78rem]">~{service.estimatedHours}h</div>
                 </div>
-                <div className="text-gray-400 text-[0.78rem]">~{service.estimatedHours}h</div>
+                <ServiceEditButton service={{
+                  id: service.id,
+                  name: service.name,
+                  nameEs: service.nameEs,
+                  description: service.description,
+                  descriptionEs: service.descriptionEs,
+                  icon: service.icon,
+                  basePrice: service.basePrice,
+                  estimatedHours: service.estimatedHours,
+                  isActive: service.isActive,
+                  isFeatured: service.isFeatured,
+                  sortOrder: service.sortOrder,
+                }} />
               </div>
             </div>
 
