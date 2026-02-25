@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Providers } from "@/components/Providers";
+import { JsonLd } from "@/components/website/JsonLd";
+import { localBusinessSchema, organizationSchema, websiteSchema } from "@/lib/schema";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -36,6 +38,11 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className="scroll-smooth">
+      <head>
+        <JsonLd data={localBusinessSchema()} />
+        <JsonLd data={organizationSchema()} />
+        <JsonLd data={websiteSchema()} />
+      </head>
       <body className="font-body antialiased bg-ivory text-tobacco">
         <Providers>
           <NextIntlClientProvider messages={messages}>
