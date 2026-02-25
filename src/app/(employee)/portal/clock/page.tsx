@@ -34,7 +34,7 @@ export default function ClockPage() {
       return;
     }
     const interval = setInterval(() => {
-      const diff = Date.now() - clockInTime.getTime();
+      const diff = Math.max(0, Date.now() - clockInTime.getTime());
       const hrs = Math.floor(diff / 3600000);
       const mins = Math.floor((diff % 3600000) / 60000);
       const secs = Math.floor((diff % 60000) / 1000);
@@ -118,7 +118,7 @@ export default function ClockPage() {
             : "bg-green hover:bg-green/90"
         }`}
       >
-        {loading ? "..." : isClockedIn ? "CLOCK\nOUT" : "CLOCK\nIN"}
+        {loading ? "..." : isClockedIn ? <><span>CLOCK</span><br /><span>OUT</span></> : <><span>CLOCK</span><br /><span>IN</span></>}
       </button>
 
       {/* GPS INDICATOR */}
