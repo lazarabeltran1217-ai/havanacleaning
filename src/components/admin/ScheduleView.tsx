@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { QuickBookForm } from "./QuickBookForm";
 
 interface Employee {
   id: string;
@@ -141,6 +142,7 @@ export function ScheduleView() {
           <button onClick={nextWeek} className="px-3 py-1.5 border rounded-lg text-sm hover:bg-ivory">
             Next →
           </button>
+          <QuickBookForm onCreated={fetchSchedule} />
         </div>
         <div className="font-display text-lg">
           {formatShortDate(weekStart)} — {formatShortDate(weekEndDate)},{" "}
