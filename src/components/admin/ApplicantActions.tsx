@@ -19,15 +19,29 @@ export function ApplicantActions({ applicationId, currentStatus, reviewNotes: in
   const [status, setStatus] = useState(currentStatus);
   const [notes, setNotes] = useState(initialNotes);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   async function handleSave() {
     setLoading(true);
-    await fetch(`/api/applications/${applicationId}`, {
+    setMessage("");
+    const res = await fetch(`/api/applications/${applicationId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status, reviewNotes: notes }),
     });
+    const data = await res.json();
     setLoading(false);
+
+    if (!res.ok) {
+      setMessage(data.error || "Failed to save");
+      return;
+    }
+
+    if (data.employeeCreated) {
+      setMessage(`Saved! Employee account created for ${data.employeeName}.`);
+    } else {
+      setMessage("Saved successfully!");
+    }
     router.refresh();
   }
 
@@ -58,6 +72,14 @@ export function ApplicantActions({ applicationId, currentStatus, reviewNotes: in
           className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-[0.85rem] resize-none"
         />
       </div>
+
+      {message && (
+        <div className={`text-[0.82rem] px-3 py-2 rounded-lg ${
+          message.includes("Failed") ? "bg-red/10 text-red" : "bg-green/10 text-green"
+        }`}>
+          {message}
+        </div>
+      )}
 
       <button
         onClick={handleSave}
