@@ -112,11 +112,8 @@ export default function ClockPage() {
       <button
         onClick={handleClock}
         disabled={loading}
-        className={`w-48 h-48 rounded-full text-white font-display text-xl font-bold shadow-lg transition-all active:scale-95 disabled:opacity-50 ${
-          isClockedIn
-            ? "bg-red hover:bg-red/90"
-            : "bg-green hover:bg-green/90"
-        }`}
+        className="w-48 h-48 rounded-full text-white font-display text-2xl font-bold shadow-lg transition-all active:scale-95 disabled:opacity-50"
+        style={{ backgroundColor: isClockedIn ? "#C0392B" : "#2D6A4F" }}
       >
         {loading ? "..." : isClockedIn ? <><span>CLOCK</span><br /><span>OUT</span></> : <><span>CLOCK</span><br /><span>IN</span></>}
       </button>
