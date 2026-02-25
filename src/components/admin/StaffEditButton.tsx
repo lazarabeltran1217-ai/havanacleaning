@@ -16,6 +16,8 @@ export function StaffEditButton({ employee }: { employee: EmployeeData }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [message, setMessage] = useState("");
 
   const [name, setName] = useState(employee.name);
@@ -50,6 +52,23 @@ export function StaffEditButton({ employee }: { employee: EmployeeData }) {
       setMessage("");
       router.refresh();
     }, 800);
+  };
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    setMessage("");
+    const res = await fetch(`/api/employees/${employee.id}`, { method: "DELETE" });
+    setDeleting(false);
+
+    if (!res.ok) {
+      const data = await res.json();
+      setMessage(data.error || "Failed to delete");
+      setConfirmDelete(false);
+      return;
+    }
+
+    setOpen(false);
+    router.refresh();
   };
 
   return (
@@ -106,12 +125,31 @@ export function StaffEditButton({ employee }: { employee: EmployeeData }) {
               </div>
             )}
 
-            <div className="flex gap-2 mt-5">
-              <button onClick={() => setOpen(false)} className="flex-1 px-4 py-2 border rounded-lg text-sm">Cancel</button>
-              <button onClick={handleSave} disabled={saving || !name} className="flex-1 px-4 py-2 bg-green text-white rounded-lg text-sm font-medium disabled:opacity-50">
-                {saving ? "Saving..." : "Save Changes"}
-              </button>
-            </div>
+            {confirmDelete ? (
+              <div className="mt-5 border border-red/30 rounded-lg p-3 bg-red/5">
+                <p className="text-[0.82rem] text-red font-medium mb-3">
+                  Delete {employee.name}? This cannot be undone.
+                </p>
+                <div className="flex gap-2">
+                  <button onClick={() => setConfirmDelete(false)} className="flex-1 px-4 py-2 border rounded-lg text-sm">
+                    Cancel
+                  </button>
+                  <button onClick={handleDelete} disabled={deleting} className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white disabled:opacity-50" style={{ backgroundColor: "#C0392B" }}>
+                    {deleting ? "Deleting..." : "Yes, Delete"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-2 mt-5">
+                <button onClick={() => setConfirmDelete(true)} className="px-4 py-2 border border-red/30 text-red rounded-lg text-sm hover:bg-red/5">
+                  Delete
+                </button>
+                <button onClick={() => setOpen(false)} className="flex-1 px-4 py-2 border rounded-lg text-sm">Cancel</button>
+                <button onClick={handleSave} disabled={saving || !name} className="flex-1 px-4 py-2 bg-green text-white rounded-lg text-sm font-medium disabled:opacity-50">
+                  {saving ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

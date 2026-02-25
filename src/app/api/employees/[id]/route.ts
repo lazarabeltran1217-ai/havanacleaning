@@ -29,3 +29,24 @@ export async function PATCH(
 
   return NextResponse.json({ employee });
 }
+
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== "OWNER") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+
+  // Prevent deleting yourself
+  if (id === session.user.id) {
+    return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 });
+  }
+
+  await prisma.user.delete({ where: { id } });
+
+  return NextResponse.json({ success: true });
+}
