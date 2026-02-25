@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
   if (existingPayment?.stripePaymentIntentId) {
     // Retrieve existing intent
-    const intent = await stripe.paymentIntents.retrieve(
+    const intent = await getStripe().paymentIntents.retrieve(
       existingPayment.stripePaymentIntentId
     );
     return NextResponse.json({ clientSecret: intent.client_secret });
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
   // Create Stripe PaymentIntent
   const amountInCents = Math.round(booking.total * 100);
 
-  const paymentIntent = await stripe.paymentIntents.create({
+  const paymentIntent = await getStripe().paymentIntents.create({
     amount: amountInCents,
     currency: "usd",
     metadata: {
