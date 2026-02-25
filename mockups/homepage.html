@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Havana Cleaning — Where Spotless Meets Soul</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Libre+Baskerville:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tobacco: #2C1810;
+    --rum: #5C2E00;
+    --gold: #C9941A;
+    --amber: #E8A820;
+    --teal: #1A7A6E;
+    --caribbean: #23A99A;
+    --green: #2D6A4F;
+    --green-light: #52B788;
+    --green-mint: #D8F3DC;
+    --cream: #F5EDD8;
+    --ivory: #FAF6ED;
+    --red: #C0392B;
+    --sand: #D4B896;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--ivory); color: var(--tobacco); overflow-x: hidden; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    background: rgba(44, 24, 16, 0.97);
+    backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 60px;
+    border-bottom: 2px solid var(--gold);
+  }
+  .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; color: var(--amber); letter-spacing: 0.02em; }
+  .logo span { color: var(--green-light); font-style: italic; }
+  nav ul { list-style: none; display: flex; gap: 28px; align-items: center; }
+  nav ul a {
+    color: var(--cream); text-decoration: none; font-size: 0.82rem;
+    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; transition: color 0.2s;
+  }
+  nav ul a:hover { color: var(--amber); }
+  .nav-cta {
+    background: var(--gold); color: var(--tobacco) !important;
+    padding: 10px 22px; border-radius: 3px; font-weight: 600 !important;
+  }
+  .nav-cta:hover { background: var(--amber) !important; }
+  .nav-careers {
+    background: var(--green); color: white !important;
+    padding: 10px 22px; border-radius: 3px; font-weight: 600 !important;
+  }
+  .nav-careers:hover { background: var(--green-light) !important; color: var(--tobacco) !important; }
+  .lang-toggle {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: var(--cream); padding: 6px 12px; border-radius: 3px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 0.78rem; letter-spacing: 0.05em;
+  }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh; background: var(--tobacco);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; position: relative;
+  }
+  .hero-pattern {
+    position: absolute; inset: 0; opacity: 0.04;
+    background-image: repeating-linear-gradient(45deg, var(--gold) 0, var(--gold) 1px, transparent 0, transparent 50%);
+    background-size: 20px 20px;
+  }
+  .hero-left { padding: 140px 80px 80px; max-width: 800px; position: relative; z-index: 2; text-align: center; margin: 0 auto; }
+  .hero-eyebrow {
+    font-size: 0.75rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--green-light); margin-bottom: 24px;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+  }
+  .hero-eyebrow::before { content: ''; width: 40px; height: 1px; background: var(--green-light); }
+  .hero-eyebrow::after { content: ''; width: 40px; height: 1px; background: var(--green-light); }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 6vw, 5.5rem);
+    line-height: 1.0; color: var(--cream); margin-bottom: 28px;
+  }
+  .hero-title em { color: var(--amber); font-style: italic; }
+  .hero-title .green-accent { color: var(--green-light); }
+  .hero-sub {
+    font-size: 1.05rem; color: var(--sand); line-height: 1.7;
+    max-width: 500px; margin: 0 auto 48px;
+  }
+  .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .btn-primary {
+    background: var(--gold); color: var(--tobacco);
+    padding: 16px 36px; font-size: 0.9rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    border: none; cursor: pointer; border-radius: 3px;
+    text-decoration: none; display: inline-block;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { background: var(--amber); transform: translateY(-2px); }
+  .btn-green {
+    background: var(--green); color: white;
+    padding: 16px 36px; font-size: 0.9rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    border: none; cursor: pointer; border-radius: 3px;
+    text-decoration: none; display: inline-block;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-green:hover { background: var(--green-light); color: var(--tobacco); transform: translateY(-2px); }
+  .btn-outline {
+    background: transparent; color: var(--cream);
+    padding: 16px 36px; font-size: 0.9rem; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    border: 1.5px solid rgba(245,237,216,0.3); cursor: pointer;
+    border-radius: 3px; text-decoration: none; display: inline-block;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--cream); color: var(--cream); }
+
+  .hero-stats {
+    display: flex; gap: 48px; margin-top: 48px; padding-top: 40px;
+    border-top: 1px solid rgba(245,237,216,0.12); justify-content: center;
+  }
+  .hero-stat-num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: var(--amber); line-height: 1; }
+  .hero-stat-label { color: var(--sand); font-size: 0.75rem; letter-spacing: 0.1em; margin-top: 6px; text-transform: uppercase; }
+
+  /* ── TRUST BAR ── */
+  .trust-bar {
+    background: linear-gradient(135deg, var(--green) 0%, var(--teal) 100%);
+    padding: 20px 80px;
+    display: flex; align-items: center; justify-content: space-evenly;
+    gap: 40px; flex-wrap: wrap;
+  }
+  .trust-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.85rem; font-weight: 500; color: white;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .trust-item svg { width: 20px; height: 20px; }
+
+  /* ── SECTION BASE ── */
+  section { padding: 100px 80px; }
+  .section-label {
+    font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--green); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::before { content: ''; width: 32px; height: 1px; background: var(--green); }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    line-height: 1.15; margin-bottom: 20px;
+  }
+
+  /* ── ABOUT ── */
+  #about {
+    background: var(--cream);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+  }
+  .about-text p { color: #5a4535; line-height: 1.8; font-size: 1.02rem; margin-bottom: 20px; }
+  .about-visual {
+    background: var(--tobacco); border-radius: 6px; padding: 60px 40px;
+    color: var(--cream); text-align: center; position: relative; overflow: hidden;
+  }
+  .about-visual::before {
+    content: ''; position: absolute; top: 0; right: 0;
+    width: 120px; height: 120px; background: var(--green); opacity: 0.15;
+    border-radius: 0 0 0 100%;
+  }
+  .about-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-style: italic; line-height: 1.5;
+    color: var(--amber); margin-bottom: 20px;
+  }
+  .about-sig { color: var(--sand); font-size: 0.85rem; letter-spacing: 0.1em; }
+
+  /* ── SERVICES ── */
+  #services { background: var(--tobacco); }
+  #services .section-title { color: var(--cream); }
+  #services .section-label { color: var(--green-light); }
+  #services .section-label::before { background: var(--green-light); }
+  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 60px; }
+  .service-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,148,26,0.15);
+    padding: 40px 32px; transition: background 0.25s, border-color 0.25s; cursor: pointer;
+  }
+  .service-card:hover { background: rgba(82,183,136,0.1); border-color: var(--green-light); }
+  .service-card.eco { border-left: 3px solid var(--green-light); }
+  .service-icon { font-size: 2.2rem; margin-bottom: 18px; display: block; }
+  .service-name { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--cream); margin-bottom: 10px; }
+  .service-desc { color: var(--sand); font-size: 0.88rem; line-height: 1.7; margin-bottom: 18px; }
+  .service-price { color: var(--amber); font-size: 0.85rem; font-weight: 500; letter-spacing: 0.05em; }
+  .eco-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--green); color: white;
+    padding: 3px 10px; border-radius: 20px; font-size: 0.68rem;
+    font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  /* ── PRICING ── */
+  #pricing { background: var(--ivory); }
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 60px; }
+  .price-card {
+    border: 1.5px solid rgba(44,24,16,0.12); border-radius: 6px;
+    padding: 44px 36px; position: relative; transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .price-card:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(44,24,16,0.1); }
+  .price-card.featured {
+    background: var(--tobacco); color: var(--cream); border-color: var(--green-light); transform: scale(1.04);
+  }
+  .price-card.featured:hover { transform: scale(1.04) translateY(-4px); }
+  .price-badge {
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    background: var(--green); color: white;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 5px 16px; border-radius: 20px;
+  }
+  .price-tier { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 8px; }
+  .price-tier-sub { font-size: 0.85rem; opacity: 0.6; margin-bottom: 28px; }
+  .price-amount {
+    font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 900;
+    color: var(--gold); line-height: 1; margin-bottom: 4px;
+  }
+  .price-amount sup { font-size: 1.2rem; vertical-align: super; }
+  .price-freq { font-size: 0.8rem; opacity: 0.6; margin-bottom: 28px; }
+  .price-features { list-style: none; margin-bottom: 36px; }
+  .price-features li {
+    padding: 9px 0; border-bottom: 1px solid rgba(0,0,0,0.06);
+    font-size: 0.9rem; display: flex; align-items: center; gap: 10px;
+  }
+  .price-card.featured .price-features li { border-color: rgba(255,255,255,0.1); }
+  .price-features li::before { content: '\2713'; color: var(--green); font-weight: 700; }
+  .price-card.featured .price-features li::before { color: var(--green-light); }
+  .btn-book {
+    width: 100%; padding: 14px; border: 2px solid var(--green);
+    background: transparent; color: var(--tobacco); font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; cursor: pointer; border-radius: 3px; transition: all 0.2s;
+  }
+  .btn-book:hover { background: var(--green); color: white; }
+  .price-card.featured .btn-book {
+    background: var(--green); color: white; border-color: var(--green);
+  }
+  .price-card.featured .btn-book:hover { background: var(--green-light); color: var(--tobacco); }
+
+  /* ── ADD-ONS ── */
+  #addons { background: var(--cream); }
+  .addons-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 48px; }
+  .addon-item {
+    background: white; border: 1px solid rgba(44,24,16,0.1);
+    border-radius: 4px; padding: 24px 20px; text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s; cursor: pointer;
+  }
+  .addon-item:hover { border-color: var(--green); box-shadow: 0 4px 20px rgba(45,106,79,0.15); }
+  .addon-icon { font-size: 1.8rem; margin-bottom: 10px; }
+  .addon-name { font-weight: 500; font-size: 0.9rem; margin-bottom: 4px; }
+  .addon-price { color: var(--green); font-size: 0.85rem; font-weight: 600; }
+
+  /* ── COMMERCIAL CTA ── */
+  #commercial {
+    background: linear-gradient(135deg, var(--green) 0%, var(--teal) 100%);
+    text-align: center; padding: 80px;
+  }
+  #commercial .section-label { color: var(--green-mint); justify-content: center; }
+  #commercial .section-label::before { background: var(--green-mint); }
+  #commercial .section-title { color: white; }
+  #commercial p { color: rgba(255,255,255,0.85); font-size: 1.1rem; max-width: 600px; margin: 0 auto 40px; line-height: 1.7; }
+  .commercial-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn-white {
+    background: white; color: var(--green);
+    padding: 16px 36px; font-size: 0.9rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    border: none; cursor: pointer; border-radius: 3px;
+    text-decoration: none; display: inline-block; transition: all 0.2s;
+  }
+  .btn-white:hover { background: var(--green-mint); transform: translateY(-2px); }
+  .btn-outline-white {
+    background: transparent; color: white;
+    padding: 16px 36px; font-size: 0.9rem; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    border: 1.5px solid rgba(255,255,255,0.4); cursor: pointer;
+    border-radius: 3px; text-decoration: none; display: inline-block; transition: all 0.2s;
+  }
+  .btn-outline-white:hover { border-color: white; }
+
+  /* ── CAREERS CTA ── */
+  #careers {
+    background: var(--tobacco); padding: 80px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+  }
+  .careers-text .section-label { color: var(--green-light); }
+  .careers-text .section-label::before { background: var(--green-light); }
+  .careers-text .section-title { color: var(--cream); }
+  .careers-text p { color: var(--sand); line-height: 1.8; margin-bottom: 24px; }
+  .careers-perks { list-style: none; margin-bottom: 32px; }
+  .careers-perks li {
+    padding: 10px 0; color: var(--cream); font-size: 0.92rem;
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .careers-perks li::before {
+    content: '\2713'; background: var(--green); color: white;
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
+  }
+  .careers-visual {
+    background: var(--green); border-radius: 8px; padding: 48px 36px;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .careers-visual::before {
+    content: ''; position: absolute; inset: 0; opacity: 0.1;
+    background-image: repeating-linear-gradient(45deg, white 0, white 1px, transparent 0, transparent 50%);
+    background-size: 16px 16px;
+  }
+  .careers-stat { position: relative; z-index: 1; margin-bottom: 24px; }
+  .careers-stat-num { font-family: 'Playfair Display', serif; font-size: 3rem; color: white; font-weight: 900; }
+  .careers-stat-label { color: var(--green-mint); font-size: 0.85rem; letter-spacing: 0.1em; }
+
+  /* ── BOOKING ── */
+  #booking {
+    background: var(--tobacco);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
+    padding: 100px 80px;
+  }
+  .booking-info .section-title { color: var(--cream); }
+  .booking-info .section-label { color: var(--green-light); }
+  .booking-info .section-label::before { background: var(--green-light); }
+  .booking-info p { color: var(--sand); line-height: 1.8; margin-top: 20px; }
+  .booking-form-wrap { background: var(--cream); border-radius: 6px; padding: 44px; }
+  .form-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 28px; color: var(--tobacco); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block; font-size: 0.75rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #7a6555; margin-bottom: 7px; font-weight: 500;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 12px 16px;
+    border: 1.5px solid rgba(44,24,16,0.18); border-radius: 4px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    background: white; color: var(--tobacco); transition: border-color 0.2s; outline: none;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--green); }
+  .total-display {
+    background: var(--tobacco); color: var(--cream);
+    padding: 16px 20px; border-radius: 4px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; font-size: 0.9rem;
+  }
+  .total-amount { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--green-light); }
+  #card-element {
+    padding: 14px 16px; border: 1.5px solid rgba(44,24,16,0.18);
+    border-radius: 4px; background: white; margin-bottom: 18px;
+  }
+  .stripe-badge {
+    display: flex; align-items: center; gap: 4px; justify-content: center;
+    font-size: 0.65rem; color: #b0a090; margin-top: 12px; opacity: 0.7;
+  }
+  .stripe-badge svg { width: 28px; height: 12px; }
+
+  /* ── TESTIMONIALS ── */
+  #testimonials { background: var(--ivory); text-align: center; }
+  .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 60px; }
+  .testi-card {
+    background: white; border: 1px solid rgba(44,24,16,0.1);
+    border-radius: 6px; padding: 36px 28px; text-align: left; position: relative;
+  }
+  .testi-card::before {
+    content: '\201C'; font-family: 'Playfair Display', serif; font-size: 5rem;
+    color: var(--green); opacity: 0.2;
+    position: absolute; top: 10px; left: 20px; line-height: 1;
+  }
+  .testi-text {
+    font-family: 'Libre Baskerville', serif; font-style: italic;
+    line-height: 1.7; color: #5a4535; margin-bottom: 24px; font-size: 0.95rem;
+  }
+  .testi-author { font-weight: 600; font-size: 0.85rem; }
+  .testi-loc { color: var(--green); font-size: 0.78rem; }
+  .stars { color: var(--gold); font-size: 1rem; margin-bottom: 12px; }
+
+  /* ── AREAS ── */
+  #areas { background: var(--cream); }
+  .areas-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 40px; }
+  .area-tag {
+    background: white; border: 1px solid rgba(44,24,16,0.1);
+    padding: 10px 20px; border-radius: 30px; font-size: 0.85rem;
+    color: var(--tobacco); cursor: pointer; transition: all 0.2s;
+    text-decoration: none;
+  }
+  .area-tag:hover { background: var(--green); color: white; border-color: var(--green); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--tobacco); padding: 70px 80px 40px;
+    border-top: 3px solid var(--green);
+  }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 50px; }
+  .footer-brand .logo { font-size: 1.6rem; display: block; margin-bottom: 16px; }
+  .footer-brand p { color: var(--sand); font-size: 0.88rem; line-height: 1.7; }
+  .footer-col h4 {
+    color: var(--green-light); font-size: 0.72rem; letter-spacing: 0.2em;
+    text-transform: uppercase; margin-bottom: 20px; font-weight: 600;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 10px; }
+  .footer-col ul a { color: var(--sand); text-decoration: none; font-size: 0.88rem; transition: color 0.2s; }
+  .footer-col ul a:hover { color: var(--cream); }
+  .footer-col ul a.green-link { color: var(--green-light); }
+  .footer-col ul a.green-link:hover { color: white; }
+  .footer-socials { display: flex; gap: 12px; margin-top: 20px; }
+  .footer-socials a {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .footer-socials a:hover { background: var(--green); border-color: var(--green); }
+  .footer-socials a svg { width: 16px; height: 16px; fill: var(--sand); transition: fill 0.2s; }
+  .footer-socials a:hover svg { fill: white; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 28px; display: flex; justify-content: space-between;
+    color: rgba(212,184,150,0.5); font-size: 0.8rem;
+  }
+  .footer-lang { display: flex; gap: 12px; align-items: center; }
+  .footer-lang a { color: var(--sand); text-decoration: none; font-size: 0.82rem; }
+  .footer-lang a:hover { color: white; }
+  .footer-lang a.active { color: var(--green-light); font-weight: 600; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-left > * { animation: fadeUp 0.7s ease both; }
+  .hero-eyebrow { animation-delay: 0.1s; }
+  .hero-title { animation-delay: 0.2s; }
+  .hero-sub { animation-delay: 0.3s; }
+  .hero-btns { animation-delay: 0.4s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1024px) {
+    .hero-stats { gap: 32px; }
+    #about, #booking, #careers { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: 1fr 1fr; }
+    .pricing-grid { grid-template-columns: 1fr 1fr; }
+    .addons-grid { grid-template-columns: 1fr 1fr; }
+    section { padding: 70px 32px; }
+    nav { padding: 16px 24px; }
+    nav ul { gap: 16px; }
+    .hero-left { padding: 120px 32px 60px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+  }
+  @media (max-width: 640px) {
+    .services-grid, .pricing-grid, .footer-grid, .testimonials-grid { grid-template-columns: 1fr; }
+    nav ul { display: none; }
+    .price-card.featured { transform: none; }
+    .addons-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Havana <span>Cleaning</span></div>
+  <ul>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#commercial">Commercial</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#careers" class="nav-careers">We're Hiring</a></li>
+    <li><a href="#booking" class="nav-cta">Book Now</a></li>
+    <li><select class="lang-toggle"><option>EN</option><option>ES</option></select></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-pattern"></div>
+  <div class="hero-left">
+    <div class="hero-eyebrow">Miami's Premier Cleaning Service</div>
+    <h1 class="hero-title">
+      Clean Homes,<br>
+      <em>Cuban</em><br>
+      <span class="green-accent">Soul.</span>
+    </h1>
+    <p class="hero-sub">
+      Family-owned and rooted in the heart of Cuban-American pride.
+      We treat every home like our own — with care, passion, and the kind of clean
+      your abuela would approve of.
+    </p>
+    <div class="hero-btns">
+      <a href="#booking" class="btn-primary">Book a Cleaning</a>
+      <a href="#pricing" class="btn-outline">View Pricing</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="hero-stat-num">500+</div><div class="hero-stat-label">Homes Cleaned</div></div>
+      <div><div class="hero-stat-num">4.9&#9733;</div><div class="hero-stat-label">Average Rating</div></div>
+      <div><div class="hero-stat-num">100%</div><div class="hero-stat-label">Eco-Friendly</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Fully Insured & Bonded
+  </div>
+  <div class="trust-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    Background-Checked Staff
+  </div>
+  <div class="trust-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    Same-Day Availability
+  </div>
+  <div class="trust-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+    Eco-Friendly Products
+  </div>
+  <div class="trust-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    Satisfaction Guaranteed
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-text">
+    <div class="section-label">Our Story</div>
+    <h2 class="section-title">Born in Havana,<br>Built in Miami.</h2>
+    <p>Havana Cleaning was founded by two sisters who brought their Cuban heritage — and their grandmother's relentless standards for cleanliness — to every home they touch.</p>
+    <p>We're not just a cleaning company. We're a family business with deep roots, and we bring that warmth and dedication into every space we clean. Every product we use is eco-friendly, every technician is trained and vetted, and every clean comes with our personal guarantee.</p>
+    <p>From Kendall to Coral Gables, from Brickell condos to Hialeah family homes — we bring the same Cuban pride to every address.</p>
+  </div>
+  <div class="about-visual">
+    <div class="about-quote">"Limpio como los chorros del oro."<br>(Clean as streams of gold.)</div>
+    <div class="about-sig">— Abuela's Blessing on Every Clean</div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-label">What We Do</div>
+  <h2 class="section-title" style="color:var(--cream)">Our Services</h2>
+  <div class="services-grid">
+    <div class="service-card">
+      <span class="service-icon">&#127968;</span>
+      <div class="service-name">Residential Cleaning</div>
+      <p class="service-desc">Your everyday clean — bathrooms, kitchen, floors, dusting, vacuuming. We tackle the whole house so you can relax.</p>
+      <div class="service-price">Starting at $120</div>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">&#10024;</span>
+      <div class="service-name">Deep Clean</div>
+      <p class="service-desc">A thorough top-to-bottom scrub including inside appliances, baseboards, ceiling fans, window sills and all the forgotten corners.</p>
+      <div class="service-price">Starting at $220</div>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">&#128230;</span>
+      <div class="service-name">Move-In / Move-Out</div>
+      <p class="service-desc">Start fresh or leave spotless. We prepare homes for new residents or help you get that security deposit back.</p>
+      <div class="service-price">Starting at $280</div>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">&#127970;</span>
+      <div class="service-name">Commercial Cleaning</div>
+      <p class="service-desc">Offices, retail spaces, waiting rooms — we keep your business looking professional and hygienic for staff and clients.</p>
+      <div class="service-price">Custom Quote</div>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">&#128296;</span>
+      <div class="service-name">Post-Construction</div>
+      <p class="service-desc">Construction leaves a mess — dust, debris, residue. We handle the heavy-duty cleanup so your space is move-in ready.</p>
+      <div class="service-price">Starting at $350</div>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">&#127968;</span>
+      <div class="service-name">Airbnb Turnover</div>
+      <p class="service-desc">Quick, thorough turnover cleans between guests. Linen change, restock, photo-ready staging. Same-day turnaround.</p>
+      <div class="service-price">Starting at $150</div>
+    </div>
+    <div class="service-card eco">
+      <span class="eco-badge">&#127793; Eco-Friendly</span>
+      <span class="service-icon">&#127807;</span>
+      <div class="service-name">Green Clean</div>
+      <p class="service-desc">100% non-toxic, plant-based products. Perfect for families with kids, pets, or allergies. Same great clean, zero harsh chemicals.</p>
+      <div class="service-price">+15% premium</div>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">&#128260;</span>
+      <div class="service-name">Recurring Plans</div>
+      <p class="service-desc">Weekly, bi-weekly, or monthly scheduled cleans. Save up to 20% with a recurring plan and the same trusted team every visit.</p>
+      <div class="service-price">Save up to 20%</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-label">Transparent Pricing</div>
+  <h2 class="section-title">Simple, Honest Rates</h2>
+  <p style="color:#7a6555; max-width:500px; line-height:1.7;">No hidden fees, no surprises. Priced by your home size — choose the plan that fits.</p>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-tier">Basic Clean</div>
+      <div class="price-tier-sub">Perfect for maintenance</div>
+      <div class="price-amount"><sup>$</sup>120</div>
+      <div class="price-freq">per visit &middot; up to 2BR / 2BA</div>
+      <ul class="price-features">
+        <li>Kitchen surfaces & sink</li>
+        <li>Bathroom scrub & sanitize</li>
+        <li>Vacuum & mop all floors</li>
+        <li>Dust all surfaces</li>
+        <li>Empty trash cans</li>
+        <li>Make beds (linens provided)</li>
+      </ul>
+      <button class="btn-book">Book This Plan</button>
+    </div>
+    <div class="price-card featured">
+      <div class="price-badge">Most Popular</div>
+      <div class="price-tier">Standard Clean</div>
+      <div class="price-tier-sub">Our best value clean</div>
+      <div class="price-amount"><sup>$</sup>185</div>
+      <div class="price-freq">per visit &middot; up to 3BR / 2BA</div>
+      <ul class="price-features">
+        <li>Everything in Basic</li>
+        <li>Inside microwave & stovetop</li>
+        <li>Window sills & tracks</li>
+        <li>Baseboards & ceiling fans</li>
+        <li>Inside fridge (exterior)</li>
+        <li>Laundry room wipe-down</li>
+      </ul>
+      <button class="btn-book">Book This Plan</button>
+    </div>
+    <div class="price-card">
+      <div class="price-tier">Deep Clean</div>
+      <div class="price-tier-sub">For a full reset</div>
+      <div class="price-amount"><sup>$</sup>280</div>
+      <div class="price-freq">per visit &middot; up to 4BR / 3BA</div>
+      <ul class="price-features">
+        <li>Everything in Standard</li>
+        <li>Inside oven & fridge</li>
+        <li>Cabinets inside & out</li>
+        <li>Grout scrubbing</li>
+        <li>Behind appliances</li>
+        <li>Full interior window clean</li>
+      </ul>
+      <button class="btn-book">Book This Plan</button>
+    </div>
+  </div>
+</section>
+
+<!-- ADD-ONS -->
+<section id="addons">
+  <div class="section-label">Extras</div>
+  <h2 class="section-title">Add-On Services</h2>
+  <p style="color:#7a6555; max-width:500px; line-height:1.7;">Customize your clean with any of the extras below.</p>
+  <div class="addons-grid">
+    <div class="addon-item"><div class="addon-icon">&#129695;</div><div class="addon-name">Interior Windows</div><div class="addon-price">+ $40</div></div>
+    <div class="addon-item"><div class="addon-icon">&#129514;</div><div class="addon-name">Laundry & Fold</div><div class="addon-price">+ $35</div></div>
+    <div class="addon-item"><div class="addon-icon">&#128715;</div><div class="addon-name">Upholstery Vacuum</div><div class="addon-price">+ $25</div></div>
+    <div class="addon-item"><div class="addon-icon">&#129529;</div><div class="addon-name">Oven Deep Clean</div><div class="addon-price">+ $45</div></div>
+    <div class="addon-item"><div class="addon-icon">&#10052;&#65039;</div><div class="addon-name">Fridge Clean-Out</div><div class="addon-price">+ $35</div></div>
+    <div class="addon-item"><div class="addon-icon">&#129716;</div><div class="addon-name">Patio / Balcony</div><div class="addon-price">+ $50</div></div>
+    <div class="addon-item"><div class="addon-icon">&#129476;</div><div class="addon-name">Cabinet Interior</div><div class="addon-price">+ $55</div></div>
+    <div class="addon-item"><div class="addon-icon">&#128062;</div><div class="addon-name">Pet Hair Treatment</div><div class="addon-price">+ $30</div></div>
+  </div>
+</section>
+
+<!-- COMMERCIAL CTA -->
+<section id="commercial">
+  <div class="section-label">For Businesses</div>
+  <h2 class="section-title">Commercial Cleaning Services</h2>
+  <p>Offices, medical practices, restaurants, retail — we keep your business spotless and professional. Custom plans, dedicated teams, and reliable scheduling.</p>
+  <div class="commercial-btns">
+    <a href="#" class="btn-white">Request a Quote</a>
+    <a href="#" class="btn-outline-white">Call (305) 555-CLEAN</a>
+  </div>
+</section>
+
+<!-- CAREERS CTA -->
+<section id="careers">
+  <div class="careers-text">
+    <div class="section-label">Join the Family</div>
+    <h2 class="section-title">We're Hiring Cleaners</h2>
+    <p>Join a team that values hard work, respect, and Cuban pride. We offer competitive pay, flexible hours, and a family atmosphere. No paperwork — apply 100% online.</p>
+    <ul class="careers-perks">
+      <li>Competitive hourly pay ($15-$25/hr)</li>
+      <li>Flexible scheduling (Full-time & Part-time)</li>
+      <li>Paid training provided</li>
+      <li>Mileage reimbursement</li>
+      <li>Growth opportunities</li>
+      <li>Eco-friendly products (safe for you)</li>
+    </ul>
+    <a href="#" class="btn-green">Apply Now — 100% Online</a>
+  </div>
+  <div class="careers-visual">
+    <div class="careers-stat">
+      <div class="careers-stat-num">$15-$25</div>
+      <div class="careers-stat-label">Per Hour Starting Pay</div>
+    </div>
+    <div class="careers-stat">
+      <div class="careers-stat-num">Flexible</div>
+      <div class="careers-stat-label">Choose Your Schedule</div>
+    </div>
+    <div class="careers-stat">
+      <div class="careers-stat-num">100%</div>
+      <div class="careers-stat-label">Paperless Application</div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING + STRIPE -->
+<section id="booking">
+  <div class="booking-info">
+    <div class="section-label">Reserve Your Clean</div>
+    <h2 class="section-title" style="color:var(--cream)">Book Online.<br>Pay Securely.</h2>
+    <p>Fill out the form, choose your service, and we'll confirm your appointment within the hour. Payment is processed securely via Stripe.</p>
+    <p style="margin-top:30px;">&#128222; Questions? Call us at <strong style="color:var(--green-light)">(305) 555-CLEAN</strong></p>
+    <p>&#128231; <strong style="color:var(--green-light)">hello@havanacleaning.com</strong></p>
+  </div>
+  <div class="booking-form-wrap">
+    <div class="form-title">Schedule Your Cleaning</div>
+    <form id="payment-form">
+      <div class="form-row">
+        <div class="form-group"><label>First Name</label><input type="text" placeholder="Maria"></div>
+        <div class="form-group"><label>Last Name</label><input type="text" placeholder="Garcia"></div>
+      </div>
+      <div class="form-group"><label>Email Address</label><input type="email" placeholder="maria@email.com"></div>
+      <div class="form-group"><label>Phone Number</label><input type="tel" placeholder="(305) 555-0100"></div>
+      <div class="form-group"><label>Service Address</label><input type="text" placeholder="123 Calle Ocho, Miami, FL"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Service Type</label>
+          <select id="service-select">
+            <option value="120">Basic Clean - $120</option>
+            <option value="185" selected>Standard Clean - $185</option>
+            <option value="280">Deep Clean - $280</option>
+            <option value="350">Move-In/Out - $350</option>
+            <option value="0">Commercial - Quote</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Preferred Date</label><input type="date"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Bedrooms</label>
+          <select><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5+</option></select>
+        </div>
+        <div class="form-group">
+          <label>Bathrooms</label>
+          <select><option>1</option><option selected>2</option><option>3</option><option>4+</option></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Preferred Time</label>
+        <select>
+          <option>Morning (8am - 11am)</option>
+          <option>Midday (11am - 2pm)</option>
+          <option>Afternoon (2pm - 5pm)</option>
+        </select>
+      </div>
+      <div class="total-display">
+        <span>Estimated Total</span>
+        <span class="total-amount">$185</span>
+      </div>
+      <label style="font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; color:#7a6555; font-weight:500; display:block; margin-bottom:8px;">Card Details</label>
+      <div id="card-element" style="min-height:44px; display:flex; align-items:center; color:#b0a090; font-size:0.9rem; padding-left:16px;">
+        &#128179; Card number &nbsp;&nbsp; MM/YY &nbsp;&nbsp; CVC &nbsp;&nbsp; ZIP
+      </div>
+      <button type="button" class="btn-primary" style="width:100%; text-align:center; font-size:0.9rem; padding:16px; margin-top:18px;">
+        Confirm & Pay Securely
+      </button>
+      <div class="stripe-badge">
+        <svg viewBox="0 0 60 25" fill="none" width="28" height="12"><text x="0" y="18" font-family="sans-serif" font-size="14" fill="#6b7cff">stripe</text></svg>
+        Secured by Stripe
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-label" style="justify-content:center">Happy Clients</div>
+  <h2 class="section-title">What Miami Is Saying</h2>
+  <div class="testimonials-grid">
+    <div class="testi-card">
+      <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <p class="testi-text">These ladies are absolutely incredible. My apartment has never been this clean. They went above and beyond on everything — even organized my pantry without being asked!</p>
+      <div class="testi-author">Sofia Reyes</div>
+      <div class="testi-loc">Brickell, Miami</div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <p class="testi-text">We used Havana Cleaning for our move-out clean and got our full deposit back — $2,800! The team was professional, on time, and thorough. Worth every penny.</p>
+      <div class="testi-author">Marco & Lucia Torres</div>
+      <div class="testi-loc">Coral Gables, Miami</div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <p class="testi-text">I've had many cleaning services over the years. Havana Cleaning is by far the most detail-oriented and trustworthy. The bi-weekly plan is the best decision I've made for my home.</p>
+      <div class="testi-author">Dr. Amanda Chen</div>
+      <div class="testi-loc">Kendall, Miami</div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICE AREAS -->
+<section id="areas">
+  <div class="section-label">Where We Clean</div>
+  <h2 class="section-title">Serving All of Miami-Dade</h2>
+  <p style="color:#7a6555; max-width:500px; line-height:1.7; margin-bottom:0;">Click an area to see local pricing and availability.</p>
+  <div class="areas-grid">
+    <a href="#" class="area-tag">Brickell</a>
+    <a href="#" class="area-tag">Coral Gables</a>
+    <a href="#" class="area-tag">Kendall</a>
+    <a href="#" class="area-tag">Doral</a>
+    <a href="#" class="area-tag">Hialeah</a>
+    <a href="#" class="area-tag">Miami Beach</a>
+    <a href="#" class="area-tag">Wynwood</a>
+    <a href="#" class="area-tag">Coconut Grove</a>
+    <a href="#" class="area-tag">Little Havana</a>
+    <a href="#" class="area-tag">Homestead</a>
+    <a href="#" class="area-tag">Pinecrest</a>
+    <a href="#" class="area-tag">Aventura</a>
+    <a href="#" class="area-tag">Key Biscayne</a>
+    <a href="#" class="area-tag">Palmetto Bay</a>
+    <a href="#" class="area-tag">South Miami</a>
+    <a href="#" class="area-tag">North Miami</a>
+    <a href="#" class="area-tag">Miami Lakes</a>
+    <a href="#" class="area-tag">Cutler Bay</a>
+    <a href="#" class="area-tag">Sweetwater</a>
+    <a href="#" class="area-tag">Westchester</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="logo">Havana <span>Cleaning</span></span>
+      <p>Family-owned cleaning service rooted in Cuban-American pride. Serving all of Miami-Dade County.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></a>
+        <a href="#" aria-label="Yelp"><svg viewBox="0 0 24 24"><path d="M20.16 12.594l-4.995 1.433c-.96.276-1.74-.8-1.176-1.63l2.905-4.308a1.072 1.072 0 011.596-.206 7.26 7.26 0 011.91 3.063c.238.702-.024 1.178-.24 1.648zm-1.283 5.2a7.285 7.285 0 01-2.122 2.857c-.588.45-1.214.107-1.558-.48l-2.452-4.56c-.5-.93.416-1.9 1.388-1.465l4.982 2.128c.57.243.35 1.073-.238 1.52zM12.87 3.026c.093-2.142-1.384-2.79-2.293-2.988C9.682-.16 8.32.205 8.32.205c-.68.18-.82.96-.82 1.385V11.2c0 1.19 1.392 1.575 2.02.875L12.87 3.026zM7.42 14.5l-4.533-2.89c-.604-.384-1.065.103-1.254.653a7.3 7.3 0 00-.266 3.596c.134.7.696.953 1.328.706l4.706-2.054c.97-.424.99-1.51.02-2.011zm.136 3.85l-3.07 3.872c-.452.57-.017 1.238.548 1.574a7.262 7.262 0 003.436.984c.747.015 1.11-.502 1.178-1.14l.28-5.166c.06-1.062-1.31-1.466-2.372-.124z"/></svg></a>
+        <a href="#" aria-label="Google"><svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#">Residential</a></li>
+        <li><a href="#">Deep Clean</a></li>
+        <li><a href="#">Move-In/Out</a></li>
+        <li><a href="#">Commercial</a></li>
+        <li><a href="#">Post-Construction</a></li>
+        <li><a href="#">Airbnb Turnover</a></li>
+        <li><a href="#" class="green-link">Green Clean</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Our Team</a></li>
+        <li><a href="#">Reviews</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Service Areas</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Careers</h4>
+      <ul>
+        <li><a href="#" class="green-link">Apply Now</a></li>
+        <li><a href="#">Why Work With Us</a></li>
+        <li><a href="#">Benefits</a></li>
+        <li><a href="#">Open Positions</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="#">(305) 555-CLEAN</a></li>
+        <li><a href="#">hello@havanacleaning.com</a></li>
+        <li><a href="#">Miami, FL</a></li>
+        <li><a href="#">Book Online</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2025 Havana Cleaning. All rights reserved.</span>
+    <div class="footer-lang">
+      <a href="#" class="active">English</a>
+      <span style="opacity:0.3">|</span>
+      <a href="#">Espanol</a>
+    </div>
+    <span>Made with love by the family, for your family.</span>
+  </div>
+</footer>
+
+</body>
+</html>

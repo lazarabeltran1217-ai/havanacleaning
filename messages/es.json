@@ -1,0 +1,112 @@
+{
+  "nav": {
+    "services": "Servicios",
+    "pricing": "Precios",
+    "commercial": "Comercial",
+    "about": "Nosotros",
+    "reviews": "Reseñas",
+    "hiring": "Estamos Contratando",
+    "bookNow": "Reservar",
+    "login": "Iniciar Sesión",
+    "myAccount": "Mi Cuenta"
+  },
+  "hero": {
+    "eyebrow": "El Mejor Servicio de Limpieza de Miami",
+    "title1": "Hogares Limpios,",
+    "title2": "Alma",
+    "title3": "Cubana.",
+    "subtitle": "Un negocio familiar arraigado en el orgullo cubano-americano. Tratamos cada hogar como el nuestro — con cariño, pasión y la limpieza que tu abuela aprobaría.",
+    "bookCta": "Reservar Limpieza",
+    "pricingCta": "Ver Precios",
+    "homesCleaned": "Hogares Limpiados",
+    "avgRating": "Calificación Promedio",
+    "ecoFriendly": "Ecológico"
+  },
+  "trust": {
+    "insured": "Totalmente Asegurado",
+    "background": "Personal Verificado",
+    "sameDay": "Disponibilidad el Mismo Día",
+    "eco": "Productos Ecológicos",
+    "guaranteed": "Satisfacción Garantizada"
+  },
+  "about": {
+    "label": "Nuestra Historia",
+    "title": "Nacidos en La Habana, Hechos en Miami.",
+    "p1": "Havana Cleaning fue fundada por dos hermanas que trajeron su herencia cubana — y los estándares implacables de su abuela — a cada hogar que tocan.",
+    "p2": "No somos solo una empresa de limpieza. Somos un negocio familiar con raíces profundas, y llevamos esa calidez a cada espacio que limpiamos.",
+    "p3": "De Kendall a Coral Gables, de condos en Brickell a hogares en Hialeah — llevamos el mismo orgullo cubano a cada dirección."
+  },
+  "services": {
+    "label": "Lo Que Hacemos",
+    "title": "Nuestros Servicios"
+  },
+  "pricing": {
+    "label": "Precios Transparentes",
+    "title": "Tarifas Simples y Honestas",
+    "subtitle": "Sin cargos ocultos, sin sorpresas. Precio por tamaño de hogar.",
+    "perVisit": "por visita",
+    "bookPlan": "Reservar Este Plan",
+    "mostPopular": "Más Popular"
+  },
+  "booking": {
+    "label": "Reserva Tu Limpieza",
+    "title": "Reserva en Línea. Paga Seguro.",
+    "subtitle": "Llena el formulario, elige tu servicio y confirmaremos tu cita dentro de la hora.",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "email": "Correo Electrónico",
+    "phone": "Teléfono",
+    "address": "Dirección del Servicio",
+    "service": "Tipo de Servicio",
+    "date": "Fecha Preferida",
+    "time": "Hora Preferida",
+    "bedrooms": "Habitaciones",
+    "bathrooms": "Baños",
+    "estimatedTotal": "Total Estimado",
+    "cardDetails": "Datos de Tarjeta",
+    "confirmPay": "Confirmar y Pagar",
+    "securedByStripe": "Protegido por Stripe"
+  },
+  "testimonials": {
+    "label": "Clientes Felices",
+    "title": "Lo Que Dice Miami"
+  },
+  "areas": {
+    "label": "Dónde Limpiamos",
+    "title": "Sirviendo Todo Miami-Dade",
+    "subtitle": "Haz clic en un área para ver precios y disponibilidad local."
+  },
+  "careers": {
+    "label": "Únete a la Familia",
+    "title": "Estamos Contratando",
+    "subtitle": "Únete a un equipo que valora el trabajo duro, el respeto y el orgullo cubano. Sin papeleo — aplica 100% en línea.",
+    "applyCta": "Aplicar Ahora — 100% En Línea"
+  },
+  "footer": {
+    "tagline": "Servicio de limpieza familiar arraigado en el orgullo cubano-americano. Sirviendo todo el condado de Miami-Dade.",
+    "servicesTitle": "Servicios",
+    "companyTitle": "Compañía",
+    "careersTitle": "Carreras",
+    "contactTitle": "Contacto",
+    "copyright": "© {year} Havana Cleaning. Todos los derechos reservados.",
+    "madeWith": "Hecho con amor por la familia, para tu familia."
+  },
+  "login": {
+    "title": "Bienvenido",
+    "subtitle": "Inicia sesión en tu cuenta",
+    "email": "Correo",
+    "password": "Contraseña",
+    "signIn": "Iniciar Sesión",
+    "error": "Correo o contraseña inválidos"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "submit": "Enviar"
+  }
+}

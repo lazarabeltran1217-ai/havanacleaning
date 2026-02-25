@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Havana Cleaning - Employee Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--tobacco:#2C1810;--gold:#C9941A;--amber:#E8A820;--teal:#1A7A6E;--caribbean:#23A99A;--green:#2D6A4F;--green-light:#52B788;--green-mint:#D8F3DC;--cream:#F5EDD8;--ivory:#FAF6ED;--red:#C0392B;--sand:#D4B896}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:DM Sans,sans-serif;background:#e8e8e8;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:12px 0}
+h1,h2,h3,h4{font-family:Playfair Display,serif}
+.phone-frame{width:100%;max-width:430px;height:780px;background:var(--ivory);border-radius:28px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.18);position:relative}
+.top-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--tobacco);flex-shrink:0}
+.logo-area{display:flex;align-items:center;gap:8px}
+.logo-icon{width:28px;height:28px;background:var(--gold);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--tobacco);font-size:14px}
+.logo-text{color:var(--cream);font-family:Playfair Display,serif;font-size:15px;font-weight:600}
+.user-area{display:flex;align-items:center;gap:10px}
+.user-name{color:var(--sand);font-size:13px;font-weight:500}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--caribbean),var(--teal));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;border:2px solid var(--gold)}
+.content-area{flex:1;overflow-y:auto;padding:18px 16px 24px;scroll-behavior:smooth}
+.content-area::-webkit-scrollbar{width:0}
+.panel{display:none}.panel.active{display:block;animation:fadeUp 0.25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.bottom-nav{display:flex;align-items:flex-end;justify-content:space-around;height:68px;background:#fff;border-top:1px solid #e5e0d5;flex-shrink:0;padding:0 6px 6px}
+.nav-tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px 4px;border:none;background:none;cursor:pointer;font-family:DM Sans,sans-serif;font-size:10px;color:#999;transition:color 0.2s;min-width:56px}
+.nav-tab svg{width:22px;height:22px;stroke:#999;fill:none;stroke-width:1.8;transition:stroke 0.2s}
+.nav-tab.active{color:var(--green)}.nav-tab.active svg{stroke:var(--green)}
+.nav-tab.clock-tab{position:relative;top:-14px;background:var(--green);width:60px;height:60px;border-radius:50%;justify-content:center;gap:0;box-shadow:0 4px 14px rgba(45,106,79,0.35)}
+.nav-tab.clock-tab svg{stroke:#fff;width:26px;height:26px}
+.nav-tab.clock-tab span{color:#fff;font-size:9px;font-weight:600}
+.nav-tab.clock-tab.active{background:var(--green-light)}
+.card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:14px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:var(--green-mint);color:var(--green)}
+.badge-amber{background:#FFF3D0;color:#B8860B}
+.badge-blue{background:#E0F0FF;color:#1A6DB5}
+.badge-red{background:#FFE5E5;color:var(--red)}
+.badge-gray{background:#F0EDEA;color:#777}
+.section-title{font-family:Playfair Display,serif;font-size:17px;color:var(--tobacco);margin-bottom:12px}
+.greeting{font-size:21px;color:var(--tobacco);margin-bottom:2px}
+.date-sub{font-size:13px;color:#888;margin-bottom:16px}
+.clock-status-card{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.clock-status-left p{font-size:13px;color:#888}
+.clock-status-left .hours-today{font-size:22px;font-weight:700;color:var(--tobacco)}
+.btn{border:none;border-radius:10px;padding:12px 22px;font-family:DM Sans,sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s}
+.btn:active{transform:scale(0.96)}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 3px 10px rgba(45,106,79,0.3)}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 3px 10px rgba(192,57,43,0.3)}
+.job-card{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f0ece6}
+.job-card:last-child{border-bottom:none}
+.job-time{font-size:13px;font-weight:600;color:var(--teal);min-width:58px;text-align:center}
+.job-info{flex:1}.job-client{font-weight:600;color:var(--tobacco);font-size:14px}
+.job-meta{font-size:12px;color:#999;margin-top:2px}
+.job-badges{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.nav-btn{background:var(--cream);border:none;border-radius:8px;padding:8px 10px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tobacco);font-weight:500}
+.nav-btn svg{width:14px;height:14px;stroke:var(--teal)}
+.week-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.week-stat{text-align:center}.week-stat .val{font-size:20px;font-weight:700;color:var(--green)}
+.week-stat .lbl{font-size:11px;color:#999}
+.jobs-filter{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px}
+.filter-pill{padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:12px;font-weight:500;cursor:pointer;background:#fff;white-space:nowrap;font-family:DM Sans,sans-serif}
+.filter-pill.active{background:var(--green);color:#fff;border-color:var(--green)}
+.full-job-card{background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:10px;cursor:pointer;border-left:4px solid var(--green-light);transition:transform 0.15s}
+.full-job-card:active{transform:scale(0.98)}
+.full-job-card .fj-date{font-size:11px;color:#999;margin-bottom:4px}
+.full-job-card .fj-header{display:flex;justify-content:space-between;align-items:center}
+.full-job-card .fj-client{font-weight:600;font-size:15px;color:var(--tobacco)}
+.full-job-card .fj-time{font-weight:600;font-size:13px;color:var(--teal)}
+.full-job-card .fj-address{font-size:12px;color:#888;margin:4px 0 8px}
+.full-job-card .fj-footer{display:flex;gap:6px}
+.big-clock{text-align:center;font-size:52px;font-weight:700;color:var(--tobacco);letter-spacing:2px;font-variant-numeric:tabular-nums;margin-bottom:2px}
+.big-date{text-align:center;font-size:13px;color:#999;margin-bottom:16px}
+.clock-badge-wrap{text-align:center;margin-bottom:20px}
+.clock-badge{display:inline-block;padding:6px 18px;border-radius:20px;font-size:13px;font-weight:600}
+.clock-badge.out{background:#FFE5E5;color:var(--red)}
+.clock-badge.in{background:var(--green-mint);color:var(--green)}
+.mega-btn{width:100%;height:200px;border:none;border-radius:22px;font-family:DM Sans,sans-serif;font-size:28px;font-weight:700;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:transform 0.2s,box-shadow 0.2s;margin-bottom:16px}
+.mega-btn:active{transform:scale(0.97)}
+.mega-btn.clock-in-btn{background:linear-gradient(145deg,var(--green-light),var(--green));box-shadow:0 8px 30px rgba(45,106,79,0.35)}
+.mega-btn.clock-out-btn{background:linear-gradient(145deg,#E74C3C,var(--red));box-shadow:0 8px 30px rgba(192,57,43,0.35)}
+.mega-btn svg{width:44px;height:44px;stroke:#fff;fill:none;stroke-width:1.8}
+.mega-btn .timer{font-size:16px;font-weight:500;opacity:0.85}
+.gps-status{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;color:#888;margin-bottom:20px}
+.gps-dot{width:8px;height:8px;border-radius:50%;background:var(--green-light);display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.log-entry{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0ece6;font-size:13px}
+.log-entry:last-child{border-bottom:none}
+.log-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.log-dot.in{background:var(--green-light)}.log-dot.out{background:var(--red)}
+.log-time{font-weight:600;color:var(--tobacco);min-width:72px}.log-label{color:#888}
+.day-pills{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px}
+.day-pills::-webkit-scrollbar{height:0}
+.day-pill{min-width:52px;text-align:center;padding:10px 6px;border-radius:14px;cursor:pointer;border:none;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.06);font-family:DM Sans,sans-serif;transition:background 0.2s}
+.day-pill .dow{font-size:11px;color:#999;font-weight:500}
+.day-pill .dom{font-size:18px;font-weight:700;color:var(--tobacco);margin-top:2px}
+.day-pill.active{background:var(--green)}
+.day-pill.active .dow,.day-pill.active .dom{color:#fff}
+.sched-job{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #f0ece6}
+.sched-job:last-child{border-bottom:none}
+.sched-time{font-size:12px;font-weight:600;color:var(--teal);min-width:62px;padding-top:2px}
+.sched-detail{flex:1}.sched-client{font-weight:600;color:var(--tobacco);font-size:14px}
+.sched-addr{font-size:12px;color:#888;margin-top:2px}.sched-type{margin-top:6px}
+.pay-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.pay-range{font-size:12px;color:#888;margin-bottom:14px}
+.pay-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center}
+.pay-stat .val{font-size:24px;font-weight:700;color:var(--green)}
+.pay-stat .lbl{font-size:11px;color:#999}
+.hours-table{width:100%;border-collapse:collapse;font-size:12px}
+.hours-table th{text-align:left;font-weight:600;color:#999;font-size:11px;padding:8px 4px;border-bottom:2px solid #f0ece6;text-transform:uppercase}
+.hours-table td{padding:10px 4px;border-bottom:1px solid #f5f0ea;color:var(--tobacco)}
+.hours-table .total-row td{font-weight:700;border-top:2px solid var(--green-mint)}
+</style>
+</head>
+<body>
+<div class="phone-frame">
+  <div class="top-header">
+    <div class="logo-area"><div class="logo-icon">H</div><span class="logo-text">Havana Cleaning</span></div>
+    <div class="user-area"><span class="user-name">Maria G.</span><div class="avatar">MG</div></div>
+  </div>
+  <div class="content-area">
+    <div id="panel-today" class="panel active">
+      <h2 class="greeting">Buenos dias, Maria</h2>
+      <p class="date-sub" id="today-date"></p>
+      <div class="card"><div class="clock-status-card">
+        <div class="clock-status-left"><p id="today-clock-msg">You&#8217;re not clocked in</p><div class="hours-today" id="today-hours">0h 0m</div></div>
+        <button class="btn btn-green" id="today-clock-btn" onclick="quickClock()">Clock In</button>
+      </div></div>
+      <h3 class="section-title">Today&#8217;s Jobs</h3>
+      <div class="card">
+        <div class="job-card"><div class="job-time">8:00 AM</div><div class="job-info"><div class="job-client">Sofia R. - Brickell</div><div class="job-meta">2 bed / 2 bath apartment</div><div class="job-badges"><span class="badge badge-blue">Standard Clean</span><span class="badge badge-green">Completed</span></div></div><button class="nav-btn"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
+        <div class="job-card"><div class="job-time">11:00 AM</div><div class="job-info"><div class="job-client">Carlos M. - Wynwood</div><div class="job-meta">1 bed / 1 bath studio</div><div class="job-badges"><span class="badge badge-blue">Standard Clean</span><span class="badge badge-amber">In Progress</span></div></div><button class="nav-btn"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
+        <div class="job-card"><div class="job-time">2:30 PM</div><div class="job-info"><div class="job-client">Elena T. - Coral Gables</div><div class="job-meta">3 bed / 2 bath house</div><div class="job-badges"><span class="badge badge-amber">Deep Clean</span><span class="badge badge-gray">Upcoming</span></div></div><button class="nav-btn"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
+      </div>
+      <h3 class="section-title">This Week</h3>
+      <div class="card"><div class="week-summary">
+        <div class="week-stat"><div class="val">24h 30m</div><div class="lbl">Hours Worked</div></div>
+        <div class="week-stat"><div class="val">8</div><div class="lbl">Jobs Done</div></div>
+        <div class="week-stat"><div class="val">2:30 PM</div><div class="lbl">Next Job</div></div>
+      </div></div>
+    </div>
+    <div id="panel-jobs" class="panel">
+      <h2 class="section-title" style="margin-bottom:4px;">Assigned Jobs</h2>
+      <p class="date-sub">Upcoming &amp; recent</p>
+      <div class="jobs-filter"><button class="filter-pill active">All</button><button class="filter-pill">Upcoming</button><button class="filter-pill">Completed</button><button class="filter-pill">Cancelled</button></div>
+      <div class="full-job-card"><div class="fj-date">Today - Feb 25, 2026</div><div class="fj-header"><span class="fj-client">Sofia R.</span><span class="fj-time">8:00 AM</span></div><div class="fj-address">1420 S Miami Ave, Brickell</div><div class="fj-footer"><span class="badge badge-blue">Standard Clean</span><span class="badge badge-green">Completed</span></div></div>
+      <div class="full-job-card"><div class="fj-date">Today - Feb 25, 2026</div><div class="fj-header"><span class="fj-client">Carlos M.</span><span class="fj-time">11:00 AM</span></div><div class="fj-address">318 NW 25th St, Wynwood</div><div class="fj-footer"><span class="badge badge-blue">Standard Clean</span><span class="badge badge-amber">In Progress</span></div></div>
+      <div class="full-job-card"><div class="fj-date">Today - Feb 25, 2026</div><div class="fj-header"><span class="fj-client">Elena T.</span><span class="fj-time">2:30 PM</span></div><div class="fj-address">742 Navarre Ave, Coral Gables</div><div class="fj-footer"><span class="badge badge-amber">Deep Clean</span><span class="badge badge-gray">Upcoming</span></div></div>
+      <div class="full-job-card"><div class="fj-date">Wed, Feb 26, 2026</div><div class="fj-header"><span class="fj-client">Ana L.</span><span class="fj-time">9:00 AM</span></div><div class="fj-address">5500 Collins Ave, Miami Beach</div><div class="fj-footer"><span class="badge badge-blue">Standard Clean</span><span class="badge badge-gray">Upcoming</span></div></div>
+      <div class="full-job-card" style="border-left-color:var(--amber);"><div class="fj-date">Thu, Feb 27, 2026</div><div class="fj-header"><span class="fj-client">Roberto D.</span><span class="fj-time">10:00 AM</span></div><div class="fj-address">1000 Brickell Ave #3102</div><div class="fj-footer"><span class="badge badge-amber">Move-Out Clean</span><span class="badge badge-gray">Upcoming</span></div></div>
+    </div>
+    <div id="panel-clock" class="panel">
+      <div class="big-clock" id="live-clock">00:00:00</div>
+      <div class="big-date" id="clock-date"></div>
+      <div class="clock-badge-wrap"><span class="clock-badge out" id="clock-status-badge">Not Clocked In</span></div>
+      <button class="mega-btn clock-in-btn" id="mega-clock-btn" onclick="toggleClock()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>CLOCK IN</span><span class="timer" id="mega-timer"></span></button>
+      <div class="gps-status"><span class="gps-dot"></span> Location: Enabled</div>
+      <h3 class="section-title">Today&#8217;s Log</h3>
+      <div class="card" id="clock-log">
+        <div class="log-entry"><div class="log-dot in"></div><div class="log-time">8:00 AM</div><div class="log-label">Clocked In (Brickell)</div></div>
+        <div class="log-entry"><div class="log-dot out"></div><div class="log-time">10:45 AM</div><div class="log-label">Clocked Out (Brickell)</div></div>
+        <div class="log-entry"><div class="log-dot in"></div><div class="log-time">11:05 AM</div><div class="log-label">Clocked In (Wynwood)</div></div>
+        <div class="log-entry"><div class="log-dot out"></div><div class="log-time">12:15 PM</div><div class="log-label">Clocked Out (Wynwood)</div></div>
+      </div>
+    </div>
+    <div id="panel-schedule" class="panel">
+      <h2 class="section-title" style="margin-bottom:4px;">Weekly Schedule</h2>
+      <p class="date-sub" style="margin-bottom:14px;">Feb 24 - Mar 1, 2026</p>
+      <div class="day-pills" id="day-pills">
+        <button class="day-pill" data-day="0"><div class="dow">Mon</div><div class="dom">24</div></button>
+        <button class="day-pill active" data-day="1"><div class="dow">Tue</div><div class="dom">25</div></button>
+        <button class="day-pill" data-day="2"><div class="dow">Wed</div><div class="dom">26</div></button>
+        <button class="day-pill" data-day="3"><div class="dow">Thu</div><div class="dom">27</div></button>
+        <button class="day-pill" data-day="4"><div class="dow">Fri</div><div class="dom">28</div></button>
+        <button class="day-pill" data-day="5"><div class="dow">Sat</div><div class="dom">1</div></button>
+        <button class="day-pill" data-day="6"><div class="dow">Sun</div><div class="dom">2</div></button>
+      </div>
+      <div class="card" id="sched-list"></div>
+    </div>
+    <div id="panel-hours" class="panel">
+      <div class="pay-header"><h2 class="section-title" style="margin:0;">This Pay Period</h2></div>
+      <p class="pay-range">Feb 17 - Mar 1, 2026</p>
+      <div class="card"><div class="pay-grid">
+        <div class="pay-stat"><div class="val">38h 15m</div><div class="lbl">Total Hours</div></div>
+        <div class="pay-stat"><div class="val">$688</div><div class="lbl">Est. Pay</div></div>
+        <div class="pay-stat"><div class="val">14</div><div class="lbl">Jobs</div></div>
+      </div></div>
+      <div class="card" style="padding:10px;">
+        <table class="hours-table">
+          <thead><tr><th>Date</th><th>In</th><th>Out</th><th>Hrs</th><th>Jobs</th></tr></thead>
+          <tbody>
+            <tr><td>Mon 2/17</td><td>8:00a</td><td>4:30p</td><td>8h 0m</td><td>3</td></tr>
+            <tr><td>Tue 2/18</td><td>8:15a</td><td>4:00p</td><td>7h 15m</td><td>3</td></tr>
+            <tr><td>Wed 2/19</td><td>9:00a</td><td>5:00p</td><td>7h 30m</td><td>2</td></tr>
+            <tr><td>Thu 2/20</td><td>8:00a</td><td>4:15p</td><td>7h 45m</td><td>3</td></tr>
+            <tr><td>Fri 2/21</td><td>8:00a</td><td>3:45p</td><td>7h 45m</td><td>3</td></tr>
+            <tr><td>Mon 2/24</td><td>8:00a</td><td>4:00p</td><td>7h 30m</td><td>3</td></tr>
+            <tr><td>Tue 2/25</td><td>8:00a</td><td>--</td><td>--</td><td>1</td></tr>
+            <tr class="total-row"><td colspan="3" style="text-align:right;">Total</td><td>38h 15m</td><td>14</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <button class="nav-tab active" data-panel="today" onclick="switchTab(this)"><svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/></svg><span>Today</span></button>
+    <button class="nav-tab" data-panel="jobs" onclick="switchTab(this)"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg><span>Jobs</span></button>
+    <button class="nav-tab clock-tab" data-panel="clock" onclick="switchTab(this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>Clock</span></button>
+    <button class="nav-tab" data-panel="schedule" onclick="switchTab(this)"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>Schedule</span></button>
+    <button class="nav-tab" data-panel="hours" onclick="switchTab(this)"><svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg><span>Hours</span></button>
+  </div>
+</div>
+<script>
+var clockedIn=false,clockStartTime=null,timerInterval=null;
+function switchTab(el){document.querySelectorAll(".nav-tab").forEach(function(t){t.classList.remove("active")});document.querySelectorAll(".panel").forEach(function(p){p.classList.remove("active")});el.classList.add("active");document.getElementById("panel-"+el.dataset.panel).classList.add("active")}
+function updateLiveClock(){var now=new Date();var h=String(now.getHours()).padStart(2,"0");var m=String(now.getMinutes()).padStart(2,"0");var s=String(now.getSeconds()).padStart(2,"0");document.getElementById("live-clock").textContent=h+":"+m+":"+s}
+setInterval(updateLiveClock,1000);updateLiveClock();
+function formatDate(d){return d.toLocaleDateString("en-US",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}
+document.getElementById("today-date").textContent=formatDate(new Date());
+document.getElementById("clock-date").textContent=formatDate(new Date());
+function toggleClock(){var btn=document.getElementById("mega-clock-btn");var badge=document.getElementById("clock-status-badge");var log=document.getElementById("clock-log");var now=new Date();var timeStr=now.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});if(!clockedIn){clockedIn=true;clockStartTime=now;btn.className="mega-btn clock-out-btn";btn.querySelector("span:not(.timer)").textContent="CLOCK OUT";badge.className="clock-badge in";badge.textContent="Clocked In Since "+timeStr;updateTodayStatus();startTimer();var entry=document.createElement("div");entry.className="log-entry";entry.innerHTML="<div class=\"log-dot in\"></div><div class=\"log-time\">"+timeStr+"</div><div class=\"log-label\">Clocked In (Current)</div>";log.appendChild(entry)}else{clockedIn=false;clearInterval(timerInterval);btn.className="mega-btn clock-in-btn";btn.querySelector("span:not(.timer)").textContent="CLOCK IN";document.getElementById("mega-timer").textContent="";badge.className="clock-badge out";badge.textContent="Not Clocked In";updateTodayStatus();var entry2=document.createElement("div");entry2.className="log-entry";entry2.innerHTML="<div class=\"log-dot out\"></div><div class=\"log-time\">"+timeStr+"</div><div class=\"log-label\">Clocked Out</div>";log.appendChild(entry2);clockStartTime=null}}
+function quickClock(){toggleClock();switchTab(document.querySelector("[data-panel=\"clock\"]"))}
+function updateTodayStatus(){var msg=document.getElementById("today-clock-msg");var btn=document.getElementById("today-clock-btn");if(clockedIn){msg.textContent="You’re clocked in";btn.textContent="Clock Out";btn.className="btn btn-red"}else{msg.textContent="You’re not clocked in";btn.textContent="Clock In";btn.className="btn btn-green"}}
+function startTimer(){var timerEl=document.getElementById("mega-timer");var hoursEl=document.getElementById("today-hours");timerInterval=setInterval(function(){if(!clockStartTime)return;var diff=Date.now()-clockStartTime.getTime();var hrs=Math.floor(diff/3600000);var mins=Math.floor((diff%3600000)/60000);var secs=Math.floor((diff%60000)/1000);timerEl.textContent=pad(hrs)+":"+pad(mins)+":"+pad(secs);hoursEl.textContent=hrs+"h "+mins+"m"},1000)}
+function pad(n){return n<10?"0"+n:n}
+var scheduleData={0:[{time:"8:30 AM",client:"Maria V.",addr:"200 SE 15th Rd, Brickell",type:"Standard Clean"},{time:"11:00 AM",client:"Luis P.",addr:"1560 Lenox Ave, Miami Beach",type:"Standard Clean"},{time:"2:00 PM",client:"Isabella G.",addr:"3801 Collins Ave, Miami Beach",type:"Deep Clean"}],1:[{time:"8:00 AM",client:"Sofia R.",addr:"1420 S Miami Ave, Brickell",type:"Standard Clean"},{time:"11:00 AM",client:"Carlos M.",addr:"318 NW 25th St, Wynwood",type:"Standard Clean"},{time:"2:30 PM",client:"Elena T.",addr:"742 Navarre Ave, Coral Gables",type:"Deep Clean"}],2:[{time:"9:00 AM",client:"Ana L.",addr:"5500 Collins Ave, Miami Beach",type:"Standard Clean"},{time:"1:00 PM",client:"Jorge S.",addr:"250 Catalonia Ave, Coral Gables",type:"Standard Clean"}],3:[{time:"10:00 AM",client:"Roberto D.",addr:"1000 Brickell Ave #3102",type:"Move-Out Clean"},{time:"2:00 PM",client:"Paula F.",addr:"1901 Collins Ave, Miami Beach",type:"Standard Clean"}],4:[{time:"8:00 AM",client:"Diana C.",addr:"777 Brickell Ave #1208",type:"Standard Clean"},{time:"11:00 AM",client:"Marco R.",addr:"420 Lincoln Rd, Miami Beach",type:"Deep Clean"},{time:"3:00 PM",client:"Lucia A.",addr:"90 SW 3rd St, Downtown",type:"Standard Clean"}],5:[],6:[]};
+function renderSchedule(day){var list=document.getElementById("sched-list");var jobs=scheduleData[day]||[];if(jobs.length===0){list.innerHTML="<p style=\"text-align:center;color:#999;padding:20px 0;font-size:14px;\">Day off - No jobs scheduled</p>";return}list.innerHTML=jobs.map(function(j){return"<div class=\"sched-job\"><div class=\"sched-time\">"+j.time+"</div><div class=\"sched-detail\"><div class=\"sched-client\">"+j.client+"</div><div class=\"sched-addr\">"+j.addr+"</div><div class=\"sched-type\"><span class=\"badge badge-blue\">"+j.type+"</span></div></div></div>"}).join("")}
+document.getElementById("day-pills").addEventListener("click",function(e){var pill=e.target.closest(".day-pill");if(!pill)return;document.querySelectorAll(".day-pill").forEach(function(p){p.classList.remove("active")});pill.classList.add("active");renderSchedule(parseInt(pill.dataset.day))});
+renderSchedule(1);
+document.querySelector(".jobs-filter").addEventListener("click",function(e){if(!e.target.classList.contains("filter-pill"))return;document.querySelectorAll(".filter-pill").forEach(function(p){p.classList.remove("active")});e.target.classList.add("active")});
+</script>
+</body>
+</html>

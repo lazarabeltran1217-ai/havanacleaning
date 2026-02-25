@@ -1,0 +1,697 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── ENUMS ──
+
+enum UserRole {
+  OWNER
+  EMPLOYEE
+  CUSTOMER
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  STRIPE
+  CASH
+  CHECK
+  ZELLE
+  OTHER
+}
+
+enum RecurrenceType {
+  ONCE
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+}
+
+enum InventoryTransactionType {
+  PURCHASE
+  USAGE
+  ADJUSTMENT
+  DAMAGED
+}
+
+enum PayrollStatus {
+  DRAFT
+  APPROVED
+  PAID
+}
+
+enum ApplicationStatus {
+  NEW
+  UNDER_REVIEW
+  PHONE_SCREEN
+  INTERVIEW
+  BACKGROUND_CHECK
+  HIRED
+  REJECTED
+}
+
+enum CommercialInquiryStatus {
+  NEW
+  CONTACTED
+  QUOTE_SENT
+  NEGOTIATING
+  WON
+  LOST
+}
+
+enum CommercialQuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+}
+
+// ── CORE MODELS ──
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  password          String
+  role              UserRole  @default(CUSTOMER)
+  name              String
+  phone             String?
+  avatar            String?
+  hourlyRate        Float?
+  hireDate          DateTime?
+  stripeCustomerId  String?
+  locale            String    @default("en")
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  addresses         Address[]
+  bookings          Booking[]         @relation("CustomerBookings")
+  jobAssignments    JobAssignment[]
+  timeEntries       TimeEntry[]       @relation("EmployeeTimeEntries")
+  editedTimeEntries TimeEntry[]       @relation("EditedByUser")
+  payments          Payment[]
+  inventoryLogs     InventoryTransaction[] @relation("LoggedByUser")
+  payrolls          Payroll[]
+  notifications     Notification[]
+  referralsGiven    Referral[]        @relation("ReferrerUser")
+  referralsReceived Referral[]        @relation("RefereeUser")
+
+  @@index([role])
+  @@index([email])
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  label     String   @default("Home")
+  street    String
+  unit      String?
+  city      String
+  state     String   @default("FL")
+  zipCode   String
+  lat       Float?
+  lng       Float?
+  notes     String?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@index([userId])
+}
+
+model Service {
+  id             String   @id @default(cuid())
+  name           String
+  nameEs         String?
+  slug           String   @unique
+  description    String?
+  descriptionEs  String?
+  icon           String?
+  basePrice      Float
+  estimatedHours Float    @default(2)
+  isActive       Boolean  @default(true)
+  isFeatured     Boolean  @default(false)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  addOns       ServiceAddOn[]
+  pricingRules PricingRule[]
+  bookings     Booking[]
+
+  @@index([slug])
+  @@index([isActive])
+}
+
+model ServiceAddOn {
+  id        String  @id @default(cuid())
+  serviceId String?
+  name      String
+  nameEs    String?
+  price     Float
+  isActive  Boolean @default(true)
+
+  service       Service?       @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  bookingAddOns BookingAddOn[]
+
+  @@index([serviceId])
+}
+
+model PricingRule {
+  id           String @id @default(cuid())
+  serviceId    String
+  bedroomsMin  Int
+  bedroomsMax  Int
+  bathroomsMin Int
+  bathroomsMax Int
+  price        Float
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@index([serviceId])
+}
+
+model Booking {
+  id                String         @id @default(cuid())
+  bookingNumber     String         @unique
+  customerId        String
+  serviceId         String
+  addressId         String?
+  status            BookingStatus  @default(PENDING)
+  scheduledDate     DateTime
+  scheduledTime     String
+  estimatedHours    Float?
+  actualHours       Float?
+  bedrooms          Int?
+  bathrooms         Int?
+  recurrence        RecurrenceType @default(ONCE)
+  recurringParentId String?
+  subtotal          Float
+  discount          Float          @default(0)
+  tax               Float          @default(0)
+  total             Float
+  customerNotes     String?
+  internalNotes     String?
+  completedAt       DateTime?
+  rating            Int?
+  review            String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  customer          User            @relation("CustomerBookings", fields: [customerId], references: [id])
+  service           Service         @relation(fields: [serviceId], references: [id])
+  address           Address?        @relation(fields: [addressId], references: [id])
+  recurringParent   Booking?        @relation("RecurringBookings", fields: [recurringParentId], references: [id])
+  recurringChildren Booking[]       @relation("RecurringBookings")
+  addOns            BookingAddOn[]
+  assignments       JobAssignment[]
+  payments          Payment[]
+  timeEntries       TimeEntry[]
+  inventoryUsage    InventoryTransaction[]
+
+  @@index([customerId])
+  @@index([serviceId])
+  @@index([status])
+  @@index([scheduledDate])
+  @@index([bookingNumber])
+}
+
+model BookingAddOn {
+  id        String @id @default(cuid())
+  bookingId String
+  addOnId   String
+  price     Float
+
+  booking Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  addOn   ServiceAddOn @relation(fields: [addOnId], references: [id])
+
+  @@index([bookingId])
+}
+
+model JobAssignment {
+  id         String  @id @default(cuid())
+  bookingId  String
+  employeeId String
+  isPrimary  Boolean @default(false)
+
+  booking  Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  employee User    @relation(fields: [employeeId], references: [id])
+
+  @@unique([bookingId, employeeId])
+  @@index([employeeId])
+}
+
+model TimeEntry {
+  id           String    @id @default(cuid())
+  employeeId   String
+  bookingId    String?
+  clockIn      DateTime
+  clockOut     DateTime?
+  clockInLat   Float?
+  clockInLng   Float?
+  clockOutLat  Float?
+  clockOutLng  Float?
+  hoursWorked  Float?
+  breakMinutes Int       @default(0)
+  notes        String?
+  isEdited     Boolean   @default(false)
+  editedById   String?
+  editReason   String?
+  createdAt    DateTime  @default(now())
+
+  employee User     @relation("EmployeeTimeEntries", fields: [employeeId], references: [id])
+  editedBy User?    @relation("EditedByUser", fields: [editedById], references: [id])
+  booking  Booking? @relation(fields: [bookingId], references: [id])
+
+  @@index([employeeId])
+  @@index([clockIn])
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  bookingId             String?
+  customerId            String
+  amount                Float
+  status                PaymentStatus @default(PENDING)
+  method                PaymentMethod @default(STRIPE)
+  stripePaymentIntentId String?
+  referenceNumber       String?
+  paidAt                DateTime?
+  refundedAt            DateTime?
+  notes                 String?
+  createdAt             DateTime      @default(now())
+
+  booking  Booking? @relation(fields: [bookingId], references: [id])
+  customer User     @relation(fields: [customerId], references: [id])
+
+  @@index([bookingId])
+  @@index([customerId])
+  @@index([status])
+}
+
+model InventoryItem {
+  id           String   @id @default(cuid())
+  name         String
+  sku          String?  @unique
+  category     String?
+  unit         String   @default("each")
+  currentStock Float    @default(0)
+  minStock     Float    @default(5)
+  costPerUnit  Float    @default(0)
+  supplier     String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  transactions InventoryTransaction[]
+
+  @@index([category])
+}
+
+model InventoryTransaction {
+  id              String                   @id @default(cuid())
+  inventoryItemId String
+  type            InventoryTransactionType
+  quantity        Float
+  previousStock   Float
+  newStock        Float
+  bookingId       String?
+  loggedById      String
+  notes           String?
+  createdAt       DateTime                 @default(now())
+
+  inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id])
+  booking       Booking?      @relation(fields: [bookingId], references: [id])
+  loggedBy      User          @relation("LoggedByUser", fields: [loggedById], references: [id])
+
+  @@index([inventoryItemId])
+  @@index([createdAt])
+}
+
+model Payroll {
+  id                   String        @id @default(cuid())
+  employeeId           String
+  periodStart          DateTime
+  periodEnd            DateTime
+  totalHours           Float
+  hourlyRate           Float
+  grossPay             Float
+  deductions           Float         @default(0)
+  netPay               Float
+  bonuses              Float         @default(0)
+  mileageReimbursement Float         @default(0)
+  tips                 Float         @default(0)
+  status               PayrollStatus @default(DRAFT)
+  paidAt               DateTime?
+  paidVia              String?
+  createdAt            DateTime      @default(now())
+
+  employee User @relation(fields: [employeeId], references: [id])
+
+  @@index([employeeId])
+  @@index([periodStart])
+}
+
+model Testimonial {
+  id             String   @id @default(cuid())
+  customerName   String
+  customerNameEs String?
+  content        String
+  contentEs      String?
+  rating         Int      @default(5)
+  location       String?
+  isApproved     Boolean  @default(false)
+  isFeatured     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+}
+
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value Json
+
+  @@index([key])
+}
+
+model Content {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  dataEn    Json
+  dataEs    Json?
+  published Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
+
+model Referral {
+  id           String    @id @default(cuid())
+  referrerId   String
+  refereeId    String?
+  referralCode String    @unique
+  creditAmount Float     @default(50)
+  status       String    @default("PENDING")
+  convertedAt  DateTime?
+  createdAt    DateTime  @default(now())
+
+  referrer User  @relation("ReferrerUser", fields: [referrerId], references: [id])
+  referee  User? @relation("RefereeUser", fields: [refereeId], references: [id])
+
+  @@index([referralCode])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  titleEs   String?
+  message   String
+  messageEs String?
+  isRead    Boolean  @default(false)
+  data      Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+// ── EMPLOYMENT APPLICATION ──
+
+model JobApplication {
+  id                     String            @id @default(cuid())
+  firstName              String
+  middleName             String?
+  lastName               String
+  dob                    DateTime?
+  ssnLast4               String?
+  phone                  String
+  email                  String
+  street                 String
+  city                   String
+  state                  String            @default("FL")
+  zip                    String
+  photoUrl               String?
+  authorizedToWork       Boolean           @default(false)
+  requiresSponsorship    Boolean           @default(false)
+  felonyConviction       Boolean           @default(false)
+  felonyExplanation      String?
+  hasDriversLicense      Boolean           @default(false)
+  licenseNumber          String?
+  licenseState           String?
+  hasTransportation      Boolean           @default(false)
+  yearsExperience        String?
+  cleaningTypes          Json?
+  certifications         String?
+  languages              Json?
+  ecoExperience          Boolean           @default(false)
+  specialSkills          String?
+  employmentType         String?
+  availableDays          Json?
+  availableHours         Json?
+  earliestStartDate      DateTime?
+  desiredRate            String?
+  willingToTravel        Boolean           @default(false)
+  maxTravelDistance       String?
+  resumeUrl              String?
+  electronicSignature    String?
+  consentBackgroundCheck Boolean           @default(false)
+  consentDrugScreen      Boolean           @default(false)
+  status                 ApplicationStatus @default(NEW)
+  reviewNotes            String?
+  reviewedBy             String?
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+
+  references ApplicationReference[]
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ApplicationReference {
+  id            String @id @default(cuid())
+  applicationId String
+  name          String
+  phone         String?
+  email         String?
+  relationship  String?
+
+  application JobApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+}
+
+// ── COMMERCIAL INQUIRIES ──
+
+model CommercialInquiry {
+  id                  String                  @id @default(cuid())
+  companyName         String
+  industry            String?
+  website             String?
+  employeeCount       String?
+  taxId               String?
+  contactName         String
+  contactTitle        String?
+  contactEmail        String
+  contactPhone        String
+  preferredContact    String?
+  propertyAddress     String
+  squareFootage       String?
+  floors              Int?
+  serviceTypes        Json?
+  areas               Json?
+  hasCurrentProvider  Boolean                  @default(false)
+  switchReason        String?
+  desiredStartDate   DateTime?
+  budgetRange         String?
+  specialRequirements String?
+  spamScore           Float                    @default(0)
+  status              CommercialInquiryStatus  @default(NEW)
+  assignedTo          String?
+  notes               String?
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+
+  quotes CommercialQuote[]
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model CommercialQuote {
+  id           String                @id @default(cuid())
+  inquiryId    String
+  monthlyPrice Float
+  setupFee     Float                 @default(0)
+  terms        String?
+  validUntil   DateTime?
+  status       CommercialQuoteStatus @default(DRAFT)
+  sentAt       DateTime?
+  createdAt    DateTime              @default(now())
+
+  inquiry CommercialInquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+
+  @@index([inquiryId])
+}
+
+// ── SEO / AEO / GEO / CRO ──
+
+model AreaPage {
+  id                String   @id @default(cuid())
+  slug              String   @unique
+  name              String
+  nameEs            String?
+  title             String?
+  titleEs           String?
+  description       String?
+  descriptionEs     String?
+  metaTitle         String?
+  metaTitleEs       String?
+  metaDescription   String?
+  metaDescriptionEs String?
+  content           String?
+  contentEs         String?
+  heroImage         String?
+  lat               Float?
+  lng               Float?
+  isPublished       Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([slug])
+}
+
+model FAQ {
+  id          String  @id @default(cuid())
+  pageType    String
+  pageId      String?
+  question    String
+  questionEs  String?
+  answer      String
+  answerEs    String?
+  sortOrder   Int     @default(0)
+  isPublished Boolean @default(true)
+
+  @@index([pageType, pageId])
+}
+
+model BlogPost {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  titleEs         String?
+  content         String?
+  contentEs       String?
+  excerpt         String?
+  excerptEs       String?
+  metaTitle       String?
+  metaDescription String?
+  author          String?
+  featuredImage   String?
+  tags            Json?
+  isPublished     Boolean   @default(false)
+  publishedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([isPublished])
+}
+
+model TargetKeyword {
+  id           String    @id @default(cuid())
+  keyword      String
+  keywordEs    String?
+  pageUrl      String?
+  searchVolume Int?
+  difficulty   Int?
+  currentRank  Int?
+  previousRank Int?
+  intent       String?
+  lastChecked  DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([keyword])
+}
+
+model PageSeoConfig {
+  id                  String    @id @default(cuid())
+  pageUrl             String    @unique
+  metaTitle           String?
+  metaTitleEs         String?
+  metaDescription     String?
+  metaDescriptionEs   String?
+  ogImage             String?
+  canonicalUrl        String?
+  noIndex             Boolean   @default(false)
+  structuredDataTypes Json?
+  wordCount           Int?
+  lastAudited         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([pageUrl])
+}
+
+model DirectoryListing {
+  id            String    @id @default(cuid())
+  platform      String
+  listingUrl    String?
+  status        String    @default("unclaimed")
+  napConsistent Boolean   @default(false)
+  lastVerified  DateTime?
+  notes         String?
+  createdAt     DateTime  @default(now())
+
+  @@index([platform])
+}
+
+model Redirect {
+  id         String   @id @default(cuid())
+  fromPath   String   @unique
+  toPath     String
+  statusCode Int      @default(301)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  @@index([fromPath])
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  eventType String
+  pageUrl   String?
+  sessionId String?
+  referrer  String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([eventType])
+  @@index([createdAt])
+  @@index([sessionId])
+}
