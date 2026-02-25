@@ -30,3 +30,23 @@ export async function POST(req: NextRequest, context: RouteContext) {
 
   return NextResponse.json({ assignment });
 }
+
+export async function DELETE(req: NextRequest, context: RouteContext) {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== "OWNER") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await context.params;
+  const { employeeId } = await req.json();
+
+  if (!employeeId) {
+    return NextResponse.json({ error: "Employee ID required" }, { status: 400 });
+  }
+
+  await prisma.jobAssignment.delete({
+    where: { bookingId_employeeId: { bookingId: id, employeeId } },
+  });
+
+  return NextResponse.json({ ok: true });
+}
