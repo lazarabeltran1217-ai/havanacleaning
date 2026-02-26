@@ -22,14 +22,28 @@ const navItems = [
   { label: "Settings", href: "/admin/settings", icon: "⚙️" },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed top-0 left-0 w-60 h-screen bg-tobacco border-r-[3px] border-gold flex flex-col z-50 overflow-y-auto">
-      <div className="px-5 py-6 text-center border-b border-gold/20">
-        <h2 className="font-display text-gold text-xl tracking-wide">Havana Cleaning</h2>
-        <span className="text-[11px] text-sand tracking-[2px] uppercase">Admin Portal</span>
+    <aside
+      className={`fixed top-0 left-0 w-60 h-screen bg-tobacco border-r-[3px] border-gold flex flex-col z-50 overflow-y-auto transition-transform duration-300 ${
+        open ? "translate-x-0" : "-translate-x-full"
+      } md:translate-x-0`}
+    >
+      <div className="px-5 py-6 text-center border-b border-gold/20 flex items-center justify-between md:justify-center">
+        <div>
+          <h2 className="font-display text-gold text-xl tracking-wide">Havana Cleaning</h2>
+          <span className="text-[11px] text-sand tracking-[2px] uppercase">Admin Portal</span>
+        </div>
+        <button onClick={onClose} className="md:hidden text-sand hover:text-white text-2xl leading-none" aria-label="Close menu">
+          &times;
+        </button>
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1">
@@ -39,6 +53,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13.5px] font-medium transition-colors ${
                 isActive
                   ? "bg-gold text-tobacco"
