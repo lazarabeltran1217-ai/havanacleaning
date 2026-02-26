@@ -9,7 +9,7 @@ export function localBusinessSchema() {
     "@id": "https://havanacleaning.com/#business",
     name: BUSINESS.name,
     description:
-      "Miami's premier family-owned cleaning service. Residential, deep clean, commercial, and eco-friendly cleaning.",
+      "Miami's premier family-owned cleaning service. Residential, deep clean, commercial, and specialty cleaning.",
     url: "https://havanacleaning.com",
     address: {
       "@type": "PostalAddress",
@@ -56,7 +56,7 @@ export function localBusinessSchema() {
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "Deep Cleaning" } },
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "Commercial Cleaning" } },
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "Move-In/Move-Out Cleaning" } },
-        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Eco-Friendly Cleaning" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Airbnb Turnover Cleaning" } },
       ],
     },
   };

@@ -15,8 +15,8 @@ const faqs = [
   },
   {
     pageType: "general",
-    question: "Are you licensed and insured?",
-    answer: "Yes. Havana Cleaning is fully licensed and insured in the state of Florida. All of our cleaning professionals are background-checked and trained to our high standards.",
+    question: "How do you vet your cleaning staff?",
+    answer: "All of our cleaning professionals are background-checked and trained to our high standards before they join a team. We take trust seriously — you can feel confident having our team in your home.",
     sortOrder: 2,
   },
   {
@@ -28,7 +28,7 @@ const faqs = [
   {
     pageType: "general",
     question: "Do you bring your own cleaning supplies and equipment?",
-    answer: "Yes, we bring all necessary cleaning supplies, equipment, and products. We use high-quality, professional-grade products. If you prefer eco-friendly products, choose our Green Clean service.",
+    answer: "Yes, we bring all necessary cleaning supplies, equipment, and products. We use high-quality, professional-grade products to get the job done right.",
     sortOrder: 4,
   },
   {
@@ -59,8 +59,8 @@ const faqs = [
   },
   {
     pageType: "service",
-    question: "Do you offer eco-friendly or green cleaning?",
-    answer: "Absolutely! Our Green Clean service uses 100% non-toxic, plant-based cleaning products. It's perfect for families with children, pets, or anyone with allergies or sensitivities. Same great results, zero harsh chemicals.",
+    question: "Can I request specific products or supplies?",
+    answer: "Of course! If you have preferences for certain cleaning products or need us to avoid specific chemicals due to allergies or sensitivities, just let us know when you book and we'll accommodate your needs.",
     sortOrder: 4,
   },
   {

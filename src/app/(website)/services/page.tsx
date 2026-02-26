@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Our Services | Havana Cleaning",
   description:
-    "Professional cleaning services in Miami-Dade: residential, deep clean, move-in/out, commercial, post-construction, Airbnb turnover, eco-friendly, and recurring plans.",
+    "Professional cleaning services in Miami-Dade: residential, deep clean, move-in/out, commercial, post-construction, Airbnb turnover, and recurring plans.",
   alternates: { canonical: "/services" },
 };
 

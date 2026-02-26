@@ -15,13 +15,13 @@ export const metadata: Metadata = {
     template: "%s | Havana Cleaning",
   },
   description:
-    "Miami's premier family-owned cleaning service. Residential, deep clean, commercial, and eco-friendly cleaning. Book online with instant pricing.",
+    "Miami's premier family-owned cleaning service. Residential, deep clean, commercial, and specialty cleaning. Book online with instant pricing.",
   keywords: [
     "cleaning service miami",
     "house cleaning miami",
     "maid service miami",
     "deep cleaning miami",
-    "eco friendly cleaning miami",
+    "professional cleaning miami",
     "havana cleaning",
     "cuban cleaning service miami",
     "house cleaning near me miami",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     siteName: "Havana Cleaning",
     title: "Havana Cleaning — Miami's Premier Cleaning Service",
-    description: "Family-owned cleaning service rooted in Cuban-American pride. Residential, deep clean, commercial, and eco-friendly cleaning in Miami-Dade.",
+    description: "Family-owned cleaning service rooted in Cuban-American pride. Residential, deep clean, commercial, and specialty cleaning in Miami-Dade.",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Havana Cleaning — Where Spotless Meets Soul" }],
   },
   twitter: {

@@ -35,7 +35,7 @@ export default function CommercialPage() {
       <section className="bg-green py-8 px-6 md:px-20">
         <div className="max-w-4xl mx-auto flex flex-wrap justify-center gap-10 text-white text-[0.85rem] font-medium">
           {[
-            "Fully Licensed & Insured",
+            "Professional-Grade Cleaning",
             "Flexible Scheduling",
             "Custom Plans Available",
             "Background-Checked Staff",

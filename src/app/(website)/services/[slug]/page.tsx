@@ -145,11 +145,11 @@ export default async function ServiceDetailPage({ params }: Props) {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green mt-0.5">✓</span>
-                  Background-checked, insured professionals
+                  Background-checked, trained professionals
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green mt-0.5">✓</span>
-                  Eco-friendly, non-toxic products available
+                  Professional-grade products and equipment
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green mt-0.5">✓</span>
