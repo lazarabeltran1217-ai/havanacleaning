@@ -46,6 +46,10 @@ function formatDayLabel(date: Date): string {
   return date.toLocaleDateString("en-US", { weekday: "short" });
 }
 
+function formatFullDayLabel(date: Date): string {
+  return date.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+}
+
 function isSameDay(a: Date, b: Date): boolean {
   return (
     a.getFullYear() === b.getFullYear() &&
@@ -60,6 +64,125 @@ const statusColors: Record<string, string> = {
   IN_PROGRESS: "border-l-teal",
   COMPLETED: "border-l-green/50",
 };
+
+const statusBadgeColors: Record<string, string> = {
+  PENDING: "bg-amber/10 text-amber",
+  CONFIRMED: "bg-green/10 text-green",
+  IN_PROGRESS: "bg-teal/10 text-teal",
+  COMPLETED: "bg-green/20 text-green",
+  CANCELLED: "bg-red/10 text-red",
+};
+
+function BookingCard({
+  b,
+  employees,
+  assigning,
+  assignEmployee,
+  unassignEmployee,
+  compact,
+}: {
+  b: BookingItem;
+  employees: Employee[];
+  assigning: string | null;
+  assignEmployee: (bookingId: string, employeeId: string) => void;
+  unassignEmployee: (bookingId: string, employeeId: string) => void;
+  compact?: boolean;
+}) {
+  return (
+    <div
+      className={`rounded-lg border-l-4 bg-ivory/50 p-2 text-[0.75rem] ${
+        statusColors[b.status] || "border-l-gray-300"
+      }`}
+    >
+      <div className="font-medium truncate">
+        {b.service.icon} {b.service.name}
+      </div>
+      <div className="text-gray-500 truncate">{b.customer.name}</div>
+      <div className="text-gray-400 text-[0.68rem]">
+        {TIME_LABELS[b.scheduledTime] || b.scheduledTime}
+      </div>
+      {b.address && (
+        <div className="text-gray-400 text-[0.68rem] truncate">
+          {b.address.street}
+        </div>
+      )}
+
+      {/* Mobile-only extra info */}
+      {!compact && (
+        <div className="flex items-center gap-2 mt-1">
+          <span className={`text-[0.65rem] uppercase tracking-wider px-1.5 py-0.5 rounded-full font-medium ${statusBadgeColors[b.status] || "bg-gray-100 text-gray-500"}`}>
+            {b.status.replace(/_/g, " ")}
+          </span>
+          {b.customer.phone && (
+            <span className="text-gray-400 text-[0.65rem]">{b.customer.phone}</span>
+          )}
+        </div>
+      )}
+
+      {/* Assigned employees */}
+      {b.assignments.length > 0 && (
+        <div className="mt-1 flex flex-wrap gap-1">
+          {b.assignments.map((a) => {
+            const empIdx = employees.findIndex(
+              (e) => e.id === a.employee.id
+            );
+            return (
+              <span
+                key={a.employee.id}
+                className={`inline-flex items-center gap-1 text-[0.65rem] px-1.5 py-0.5 rounded-full text-white ${
+                  empIdx === 0
+                    ? "bg-teal"
+                    : empIdx === 1
+                    ? "bg-gold"
+                    : "bg-green"
+                }`}
+              >
+                {a.employee.name.split(" ")[0]}
+                <button
+                  onClick={() => unassignEmployee(b.id, a.employee.id)}
+                  className="hover:opacity-70 ml-0.5"
+                  title="Remove"
+                >
+                  ×
+                </button>
+              </span>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Assign dropdown */}
+      {employees.length > 0 && (
+        <div className="mt-1">
+          <select
+            className="w-full text-[0.68rem] border rounded px-1 py-0.5 bg-white text-gray-500"
+            value=""
+            disabled={assigning === b.id}
+            onChange={(e) => {
+              if (e.target.value) assignEmployee(b.id, e.target.value);
+            }}
+          >
+            <option value="">
+              {assigning === b.id ? "Saving..." : "+ Assign"}
+            </option>
+            {employees
+              .filter(
+                (emp) =>
+                  !b.assignments.some(
+                    (a) => a.employee.id === emp.id
+                  )
+              )
+              .map((emp) => (
+                <option key={emp.id} value={emp.id}>
+                  {emp.name}
+                </option>
+              ))}
+          </select>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function ScheduleView() {
   const [weekStart, setWeekStart] = useState(() => getMondayOfWeek(new Date()));
@@ -134,13 +257,13 @@ export function ScheduleView() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
         <div className="flex items-center gap-2 flex-wrap">
           <button onClick={prevWeek} className="px-3 py-1.5 border rounded-lg text-sm hover:bg-ivory">
-            ← Prev
+            ←
           </button>
           <button onClick={goToday} className="px-3 py-1.5 border rounded-lg text-sm hover:bg-ivory font-medium">
             Today
           </button>
           <button onClick={nextWeek} className="px-3 py-1.5 border rounded-lg text-sm hover:bg-ivory">
-            Next →
+            →
           </button>
           <QuickBookForm onCreated={fetchSchedule} />
         </div>
@@ -172,127 +295,102 @@ export function ScheduleView() {
           Loading schedule...
         </div>
       ) : (
-        /* Weekly grid */
-        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <div className="grid grid-cols-7 gap-2 min-w-[700px]">
-          {days.map((day) => {
-            const isToday = isSameDay(day, today);
-            const dayBookings = bookings.filter((b) =>
-              isSameDay(new Date(b.scheduledDate), day)
-            );
+        <>
+          {/* Mobile: vertical day list */}
+          <div className="md:hidden space-y-3">
+            {days.map((day) => {
+              const isToday = isSameDay(day, today);
+              const dayBookings = bookings.filter((b) =>
+                isSameDay(new Date(b.scheduledDate), day)
+              );
 
-            return (
-              <div key={day.toISOString()} className="min-h-[180px]">
-                {/* Day header */}
-                <div
-                  className={`text-center py-2 rounded-t-lg text-sm font-medium ${
-                    isToday
-                      ? "bg-green text-white"
-                      : "bg-ivory border border-[#ece6d9]"
-                  }`}
-                >
-                  <div className="text-[0.72rem] uppercase tracking-wider">
-                    {formatDayLabel(day)}
+              return (
+                <div key={day.toISOString()} className="bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
+                  <div
+                    className={`px-4 py-2.5 flex items-center justify-between ${
+                      isToday
+                        ? "bg-green text-white"
+                        : "bg-ivory/50 border-b border-[#ece6d9]"
+                    }`}
+                  >
+                    <span className="font-medium text-[0.88rem]">
+                      {formatFullDayLabel(day)}
+                    </span>
+                    <span className={`text-[0.75rem] ${isToday ? "text-white/80" : "text-gray-400"}`}>
+                      {dayBookings.length} job{dayBookings.length !== 1 ? "s" : ""}
+                    </span>
                   </div>
-                  <div className="text-lg">{day.getDate()}</div>
-                </div>
-
-                {/* Day body */}
-                <div className="bg-white border border-t-0 border-[#ece6d9] rounded-b-lg p-1.5 space-y-1.5 min-h-[140px]">
-                  {dayBookings.length === 0 && (
-                    <div className="text-gray-300 text-[0.72rem] text-center pt-6">
-                      No jobs
-                    </div>
-                  )}
-                  {dayBookings.map((b) => (
-                    <div
-                      key={b.id}
-                      className={`rounded-lg border-l-4 bg-ivory/50 p-2 text-[0.75rem] ${
-                        statusColors[b.status] || "border-l-gray-300"
-                      }`}
-                    >
-                      <div className="font-medium truncate">
-                        {b.service.icon} {b.service.name}
+                  <div className="p-3 space-y-2">
+                    {dayBookings.length === 0 ? (
+                      <div className="text-gray-300 text-[0.8rem] text-center py-3">
+                        No jobs scheduled
                       </div>
-                      <div className="text-gray-500 truncate">{b.customer.name}</div>
-                      <div className="text-gray-400 text-[0.68rem]">
-                        {TIME_LABELS[b.scheduledTime] || b.scheduledTime}
-                      </div>
-                      {b.address && (
-                        <div className="text-gray-400 text-[0.68rem] truncate">
-                          {b.address.street}
-                        </div>
-                      )}
-
-                      {/* Assigned employees */}
-                      {b.assignments.length > 0 && (
-                        <div className="mt-1 flex flex-wrap gap-1">
-                          {b.assignments.map((a) => {
-                            const empIdx = employees.findIndex(
-                              (e) => e.id === a.employee.id
-                            );
-                            return (
-                              <span
-                                key={a.employee.id}
-                                className={`inline-flex items-center gap-1 text-[0.65rem] px-1.5 py-0.5 rounded-full text-white ${
-                                  empIdx === 0
-                                    ? "bg-teal"
-                                    : empIdx === 1
-                                    ? "bg-gold"
-                                    : "bg-green"
-                                }`}
-                              >
-                                {a.employee.name.split(" ")[0]}
-                                <button
-                                  onClick={() => unassignEmployee(b.id, a.employee.id)}
-                                  className="hover:opacity-70 ml-0.5"
-                                  title="Remove"
-                                >
-                                  ×
-                                </button>
-                              </span>
-                            );
-                          })}
-                        </div>
-                      )}
-
-                      {/* Assign dropdown */}
-                      {employees.length > 0 && (
-                        <div className="mt-1">
-                          <select
-                            className="w-full text-[0.68rem] border rounded px-1 py-0.5 bg-white text-gray-500"
-                            value=""
-                            disabled={assigning === b.id}
-                            onChange={(e) => {
-                              if (e.target.value) assignEmployee(b.id, e.target.value);
-                            }}
-                          >
-                            <option value="">
-                              {assigning === b.id ? "Saving..." : "+ Assign"}
-                            </option>
-                            {employees
-                              .filter(
-                                (emp) =>
-                                  !b.assignments.some(
-                                    (a) => a.employee.id === emp.id
-                                  )
-                              )
-                              .map((emp) => (
-                                <option key={emp.id} value={emp.id}>
-                                  {emp.name}
-                                </option>
-                              ))}
-                          </select>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                    ) : (
+                      dayBookings.map((b) => (
+                        <BookingCard
+                          key={b.id}
+                          b={b}
+                          employees={employees}
+                          assigning={assigning}
+                          assignEmployee={assignEmployee}
+                          unassignEmployee={unassignEmployee}
+                        />
+                      ))
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-        </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop: 7-column grid */}
+          <div className="hidden md:grid grid-cols-7 gap-2">
+            {days.map((day) => {
+              const isToday = isSameDay(day, today);
+              const dayBookings = bookings.filter((b) =>
+                isSameDay(new Date(b.scheduledDate), day)
+              );
+
+              return (
+                <div key={day.toISOString()} className="min-h-[180px]">
+                  {/* Day header */}
+                  <div
+                    className={`text-center py-2 rounded-t-lg text-sm font-medium ${
+                      isToday
+                        ? "bg-green text-white"
+                        : "bg-ivory border border-[#ece6d9]"
+                    }`}
+                  >
+                    <div className="text-[0.72rem] uppercase tracking-wider">
+                      {formatDayLabel(day)}
+                    </div>
+                    <div className="text-lg">{day.getDate()}</div>
+                  </div>
+
+                  {/* Day body */}
+                  <div className="bg-white border border-t-0 border-[#ece6d9] rounded-b-lg p-1.5 space-y-1.5 min-h-[140px]">
+                    {dayBookings.length === 0 && (
+                      <div className="text-gray-300 text-[0.72rem] text-center pt-6">
+                        No jobs
+                      </div>
+                    )}
+                    {dayBookings.map((b) => (
+                      <BookingCard
+                        key={b.id}
+                        b={b}
+                        employees={employees}
+                        assigning={assigning}
+                        assignEmployee={assignEmployee}
+                        unassignEmployee={unassignEmployee}
+                        compact
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
 
       {/* Empty state message */}
