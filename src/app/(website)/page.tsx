@@ -39,6 +39,22 @@ export default async function HomePage() {
           backgroundImage: "repeating-linear-gradient(45deg, #C9941A 0, #C9941A 1px, transparent 0, transparent 50%)",
           backgroundSize: "20px 20px",
         }} />
+
+        {/* Left palm tree */}
+        <svg className="absolute left-0 bottom-0 w-[280px] md:w-[380px] h-auto opacity-[0.06] pointer-events-none" viewBox="0 0 400 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M180 900V350" stroke="#C9941A" strokeWidth="18" strokeLinecap="round"/>
+          <path d="M180 350c-30-60-120-100-170-90 60-30 130-20 170 10-50-50-150-60-175-40 70-40 150-10 180 40-40-70-100-120-160-110 80-20 145 50 165 110-20-80-50-140-110-170 80 10 120 100 130 170" fill="#C9941A"/>
+          <path d="M180 350c30-60 120-100 170-90-60-30-130-20-170 10 50-50 150-60 175-40-70-40-150-10-180 40 40-70 100-120 160-110-80-20-145 50-165 110 20-80 50-140 110-170-80 10-120 100-130 170" fill="#C9941A"/>
+          <path d="M180 380c-60-30-140-20-165 10 50-50 130-40 165-10M180 380c60-30 140-20 165 10-50-50-130-40-165-10" stroke="#C9941A" strokeWidth="4" fill="none"/>
+        </svg>
+
+        {/* Right palm tree */}
+        <svg className="absolute right-0 bottom-0 w-[240px] md:w-[340px] h-auto opacity-[0.06] pointer-events-none" viewBox="0 0 400 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M220 800V300" stroke="#C9941A" strokeWidth="16" strokeLinecap="round"/>
+          <path d="M220 300c-25-55-110-90-155-80 55-25 120-15 155 15-45-45-135-55-160-35 65-35 135-8 165 40-35-65-90-110-145-100 75-18 132 45 150 100-18-75-45-130-100-155 75 10 110 90 120 155" fill="#C9941A"/>
+          <path d="M220 300c25-55 110-90 155-80-55-25-120-15-155 15 45-45 135-55 160-35-65-35-135-8-165 40 35-65 90-110 145-100-75-18-132 45-150 100 18-75 45-130 100-155-75 10-110 90-120 155" fill="#C9941A"/>
+        </svg>
+
         <div className="max-w-[800px] relative z-10 text-center px-6 pt-36 pb-20 mx-auto">
           <div className="text-[0.75rem] tracking-[0.25em] uppercase text-green-light mb-6 flex items-center justify-center gap-3">
             <span className="w-10 h-px bg-green-light" />
