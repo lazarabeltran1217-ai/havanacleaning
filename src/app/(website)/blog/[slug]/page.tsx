@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/website/JsonLd";
 import { breadcrumbSchema } from "@/lib/schema";
+import { BlogContent } from "@/components/website/BlogContent";
 
 export async function generateMetadata({
   params,
@@ -75,9 +76,7 @@ export default async function BlogPostPage({
 
       {/* Content */}
       {post.content ? (
-        <div className="prose prose-tobacco max-w-none text-gray-600 leading-relaxed whitespace-pre-line">
-          {post.content}
-        </div>
+        <BlogContent content={post.content} />
       ) : (
         <p className="text-gray-400">Content coming soon.</p>
       )}
