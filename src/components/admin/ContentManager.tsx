@@ -2,10 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { getServiceDefaults } from "@/lib/service-defaults";
+
+interface ServiceInfo {
+  id: string;
+  name: string;
+  slug: string;
+}
 
 interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialContent: Record<string, any>;
+  services?: ServiceInfo[];
 }
 
 const DEFAULTS = {
@@ -27,7 +35,7 @@ const DEFAULTS = {
   },
 };
 
-export function ContentManager({ initialContent }: Props) {
+export function ContentManager({ initialContent, services = [] }: Props) {
   const router = useRouter();
 
   // Merge defaults with saved content
@@ -63,6 +71,36 @@ export function ContentManager({ initialContent }: Props) {
     get("about_section").paragraphs || DEFAULTS.about_section.paragraphs
   );
 
+  // Service page content
+  const [selectedService, setSelectedService] = useState(services[0]?.slug || "");
+  const [svcLongDesc, setSvcLongDesc] = useState("");
+  const [svcFeatures, setSvcFeatures] = useState<string[]>([]);
+  const [svcBenefits, setSvcBenefits] = useState<{ title: string; text: string }[]>([]);
+
+  // Load service content when selection changes
+  function loadServiceContent(slug: string) {
+    setSelectedService(slug);
+    const saved = initialContent[`service_${slug}`];
+    const defaults = getServiceDefaults(slug);
+
+    setSvcLongDesc(saved?.longDescription || defaults.longDescription);
+    setSvcFeatures(
+      Array.isArray(saved?.features) && saved.features.length > 0
+        ? saved.features
+        : defaults.features
+    );
+    setSvcBenefits(
+      Array.isArray(saved?.benefits) && saved.benefits.length > 0
+        ? saved.benefits
+        : defaults.benefits
+    );
+  }
+
+  // Initialize on first render if services exist
+  if (services.length > 0 && selectedService && svcFeatures.length === 0 && svcLongDesc === "") {
+    loadServiceContent(selectedService);
+  }
+
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -70,7 +108,7 @@ export function ContentManager({ initialContent }: Props) {
     setLoading(true);
     setSaved(false);
 
-    const items = [
+    const items: { key: string; dataEn: Record<string, unknown> }[] = [
       { key: "hero_eyebrow", dataEn: { text: eyebrow } },
       { key: "hero_headline", dataEn: { line1: headline1, line2: headline2, line3: headline3 } },
       { key: "hero_subtitle", dataEn: { text: subtitle } },
@@ -81,10 +119,48 @@ export function ContentManager({ initialContent }: Props) {
       { key: "about_section", dataEn: { label: aboutLabel, title: aboutTitle, paragraphs: aboutParagraphs } },
     ];
 
+    // Include current service content if a service is selected
+    if (selectedService) {
+      items.push({
+        key: `service_${selectedService}`,
+        dataEn: {
+          longDescription: svcLongDesc,
+          features: svcFeatures,
+          benefits: svcBenefits,
+        },
+      });
+    }
+
     await fetch("/api/content", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ items }),
+    });
+
+    setLoading(false);
+    setSaved(true);
+    router.refresh();
+    setTimeout(() => setSaved(false), 3000);
+  }
+
+  async function handleSaveServiceOnly() {
+    if (!selectedService) return;
+    setLoading(true);
+    setSaved(false);
+
+    await fetch("/api/content", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items: [{
+          key: `service_${selectedService}`,
+          dataEn: {
+            longDescription: svcLongDesc,
+            features: svcFeatures,
+            benefits: svcBenefits,
+          },
+        }],
+      }),
     });
 
     setLoading(false);
@@ -203,8 +279,8 @@ export function ContentManager({ initialContent }: Props) {
         </div>
       </div>
 
-      {/* SAVE */}
-      <div className="flex items-center gap-3 pb-10">
+      {/* SAVE HOMEPAGE CONTENT */}
+      <div className="flex items-center gap-3">
         <button
           onClick={handleSave}
           disabled={loading}
@@ -214,6 +290,130 @@ export function ContentManager({ initialContent }: Props) {
         </button>
         {saved && <span className="text-green text-[0.85rem]">Content saved!</span>}
       </div>
+
+      {/* SERVICE PAGES */}
+      {services.length > 0 && (
+        <>
+          <div className="border-t border-[#ece6d9] pt-8 mt-8">
+            <h2 className="font-display text-xl mb-2">Service Pages</h2>
+            <p className="text-gray-400 text-[0.85rem] mb-6">
+              Edit the content shown on each individual service page.
+            </p>
+          </div>
+
+          <div className={sectionClass}>
+            <div className="mb-5">
+              <label className={labelClass}>Select Service</label>
+              <select
+                value={selectedService}
+                onChange={(e) => loadServiceContent(e.target.value)}
+                className={inputClass}
+              >
+                {services.map((s) => (
+                  <option key={s.slug} value={s.slug}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {selectedService && (
+              <div className="space-y-5">
+                {/* Long Description */}
+                <div>
+                  <label className={labelClass}>Long Description</label>
+                  <textarea
+                    value={svcLongDesc}
+                    onChange={(e) => setSvcLongDesc(e.target.value)}
+                    rows={4}
+                    className={inputClass}
+                    placeholder="Extended description shown below the hero on the service page..."
+                  />
+                </div>
+
+                {/* Features */}
+                <div>
+                  <label className={labelClass}>What&apos;s Included</label>
+                  <div className="space-y-2">
+                    {svcFeatures.map((feat, i) => (
+                      <div key={i} className="flex gap-2">
+                        <input
+                          type="text"
+                          value={feat}
+                          onChange={(e) => { const n = [...svcFeatures]; n[i] = e.target.value; setSvcFeatures(n); }}
+                          className={inputClass}
+                        />
+                        <button
+                          onClick={() => setSvcFeatures(svcFeatures.filter((_, j) => j !== i))}
+                          className="text-red-400 hover:text-red-600 text-sm px-2"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => setSvcFeatures([...svcFeatures, ""])}
+                      className="text-green text-[0.82rem] font-medium hover:underline"
+                    >
+                      + Add Feature
+                    </button>
+                  </div>
+                </div>
+
+                {/* Benefits */}
+                <div>
+                  <label className={labelClass}>Why Choose Us (Benefits)</label>
+                  <div className="space-y-3">
+                    {svcBenefits.map((b, i) => (
+                      <div key={i} className="border border-gray-100 rounded-lg p-3 space-y-2">
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={b.title}
+                            onChange={(e) => { const n = [...svcBenefits]; n[i] = { ...n[i], title: e.target.value }; setSvcBenefits(n); }}
+                            className={inputClass}
+                            placeholder="Benefit title"
+                          />
+                          <button
+                            onClick={() => setSvcBenefits(svcBenefits.filter((_, j) => j !== i))}
+                            className="text-red-400 hover:text-red-600 text-sm px-2"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <textarea
+                          value={b.text}
+                          onChange={(e) => { const n = [...svcBenefits]; n[i] = { ...n[i], text: e.target.value }; setSvcBenefits(n); }}
+                          rows={2}
+                          className={inputClass}
+                          placeholder="Benefit description"
+                        />
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => setSvcBenefits([...svcBenefits, { title: "", text: "" }])}
+                      className="text-green text-[0.82rem] font-medium hover:underline"
+                    >
+                      + Add Benefit
+                    </button>
+                  </div>
+                </div>
+
+                {/* Save Service Content */}
+                <div className="flex items-center gap-3 pt-2">
+                  <button
+                    onClick={handleSaveServiceOnly}
+                    disabled={loading}
+                    className="bg-green text-white px-6 py-2.5 text-[0.85rem] font-semibold rounded-lg hover:bg-green/90 disabled:opacity-50 transition-colors"
+                  >
+                    {loading ? "Saving..." : `Save ${services.find(s => s.slug === selectedService)?.name || "Service"} Content`}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      <div className="pb-10" />
     </div>
   );
 }

@@ -32,10 +32,17 @@ export function Footer() {
         <div>
           <h4 className="text-green-light text-[0.72rem] tracking-[0.2em] uppercase mb-5 font-semibold">{t("servicesTitle")}</h4>
           <ul className="space-y-2.5">
-            {["Residential", "Deep Clean", "Move-In/Out", "Commercial", "Post-Construction", "Airbnb Turnover"].map((s) => (
-              <li key={s}><Link href="/services" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{s}</Link></li>
+            {[
+              { name: "Residential", slug: "residential-cleaning" },
+              { name: "Deep Clean", slug: "deep-cleaning" },
+              { name: "Move-In/Out", slug: "move-in-move-out" },
+              { name: "Commercial", slug: "commercial-cleaning" },
+              { name: "Post-Construction", slug: "post-construction" },
+              { name: "Airbnb Turnover", slug: "airbnb-turnover" },
+            ].map((s) => (
+              <li key={s.slug}><Link href={`/services/${s.slug}`} className="text-sand text-[0.88rem] hover:text-cream transition-colors">{s.name}</Link></li>
             ))}
-            <li><Link href="/services" className="text-green-light text-[0.88rem] hover:text-white transition-colors">Green Clean</Link></li>
+            <li><Link href="/services/green-clean" className="text-green-light text-[0.88rem] hover:text-white transition-colors">Green Clean</Link></li>
           </ul>
         </div>
 

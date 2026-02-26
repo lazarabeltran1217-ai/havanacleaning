@@ -4,8 +4,11 @@ import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import type { Metadata } from "next";
 import { ServiceIcon } from "@/lib/service-icons";
+import { Check } from "lucide-react";
 import { JsonLd } from "@/components/website/JsonLd";
-import { serviceSchema, breadcrumbSchema } from "@/lib/schema";
+import { serviceSchema, breadcrumbSchema, faqPageSchema } from "@/lib/schema";
+import { getServiceDefaults, type ServiceContent } from "@/lib/service-defaults";
+import { FAQSection } from "@/components/website/FAQSection";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -17,8 +20,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const service = await prisma.service.findUnique({ where: { slug } });
     if (!service) return { title: "Service Not Found" };
     return {
-      title: `${service.name} | Havana Cleaning`,
-      description: service.description || `Professional ${service.name} in Miami-Dade County.`,
+      title: `${service.name} in Miami | Havana Cleaning`,
+      description: service.description || `Professional ${service.name} in Miami-Dade County. Book online today.`,
+      alternates: { canonical: `/services/${slug}` },
     };
   } catch {
     return { title: "Service Not Found" };
@@ -43,6 +47,36 @@ export default async function ServiceDetailPage({ params }: Props) {
 
   if (!service || !service.isActive) notFound();
 
+  // Fetch admin-managed content for this service
+  const defaults = getServiceDefaults(slug);
+  let content: ServiceContent = defaults;
+  try {
+    const contentRecord = await prisma.content.findUnique({ where: { key: `service_${slug}` } });
+    if (contentRecord?.dataEn) {
+      const data = contentRecord.dataEn as Record<string, unknown>;
+      content = {
+        longDescription: (data.longDescription as string) || defaults.longDescription,
+        features: Array.isArray(data.features) && data.features.length > 0 ? data.features as string[] : defaults.features,
+        benefits: Array.isArray(data.benefits) && data.benefits.length > 0 ? data.benefits as ServiceContent["benefits"] : defaults.benefits,
+      };
+    }
+  } catch {
+    // Use defaults
+  }
+
+  // Fetch service-related FAQs
+  let faqs: { id: string; question: string; answer: string }[] = [];
+  try {
+    faqs = await prisma.fAQ.findMany({
+      where: { pageType: "service", isPublished: true },
+      orderBy: { sortOrder: "asc" },
+      take: 5,
+      select: { id: true, question: true, answer: true },
+    });
+  } catch {
+    // No FAQs
+  }
+
   const breadcrumbs = [
     { name: "Home", url: "/" },
     { name: "Services", url: "/services" },
@@ -53,6 +87,7 @@ export default async function ServiceDetailPage({ params }: Props) {
     <>
       <JsonLd data={serviceSchema(service)} />
       <JsonLd data={breadcrumbSchema(breadcrumbs)} />
+      {faqs.length > 0 && <JsonLd data={faqPageSchema(faqs)} />}
 
       {/* HERO */}
       <section className="bg-tobacco pt-36 pb-16 px-6 md:px-20">
@@ -90,26 +125,32 @@ export default async function ServiceDetailPage({ params }: Props) {
         </div>
       </section>
 
+      {/* LONG DESCRIPTION */}
+      {content.longDescription && (
+        <section className="bg-cream py-14 px-6 md:px-20">
+          <div className="max-w-3xl mx-auto">
+            <p className="text-[#5a4535] text-[1rem] leading-relaxed">
+              {content.longDescription}
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* MAIN CONTENT */}
       <section className="bg-ivory py-16 px-6 md:px-20">
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* PRICING TABLE */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 space-y-8">
+            {/* PRICING TABLE */}
             {service.pricingRules.length > 0 && (
-              <div className="bg-white border border-tobacco/10 rounded-lg p-8 mb-8">
+              <div className="bg-white border border-tobacco/10 rounded-lg p-8">
                 <h2 className="font-display text-xl mb-6">Pricing by Home Size</h2>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
                       <tr className="border-b border-tobacco/10">
-                        <th className="pb-3 text-[0.78rem] uppercase tracking-wider text-sand">
-                          Bedrooms
-                        </th>
-                        <th className="pb-3 text-[0.78rem] uppercase tracking-wider text-sand">
-                          Bathrooms
-                        </th>
-                        <th className="pb-3 text-[0.78rem] uppercase tracking-wider text-sand text-right">
-                          Price
-                        </th>
+                        <th className="pb-3 text-[0.78rem] uppercase tracking-wider text-sand">Bedrooms</th>
+                        <th className="pb-3 text-[0.78rem] uppercase tracking-wider text-sand">Bathrooms</th>
+                        <th className="pb-3 text-[0.78rem] uppercase tracking-wider text-sand text-right">Price</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -140,27 +181,32 @@ export default async function ServiceDetailPage({ params }: Props) {
             <div className="bg-white border border-tobacco/10 rounded-lg p-8">
               <h2 className="font-display text-xl mb-4">What&apos;s Included</h2>
               <ul className="space-y-3 text-[0.9rem] text-[#5a4535]">
-                <li className="flex items-start gap-2">
-                  <span className="text-green mt-0.5">✓</span>
-                  All cleaning supplies and equipment provided
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green mt-0.5">✓</span>
-                  Background-checked, trained professionals
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green mt-0.5">✓</span>
-                  Professional-grade products and equipment
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green mt-0.5">✓</span>
-                  100% satisfaction guaranteed
-                </li>
+                {content.features.map((feature, i) => (
+                  <li key={i} className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 text-green mt-0.5 shrink-0" />
+                    {feature}
+                  </li>
+                ))}
               </ul>
             </div>
+
+            {/* WHY CHOOSE US */}
+            {content.benefits.length > 0 && (
+              <div>
+                <h2 className="font-display text-xl mb-5">Why Choose Havana Cleaning</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {content.benefits.map((benefit, i) => (
+                    <div key={i} className="bg-white border border-tobacco/10 rounded-lg p-5">
+                      <h3 className="font-display text-[0.95rem] mb-2">{benefit.title}</h3>
+                      <p className="text-[#7a6555] text-[0.85rem] leading-relaxed">{benefit.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* SIDEBAR — BOOK + ADD-ONS */}
+          {/* SIDEBAR */}
           <div>
             <div className="bg-white border border-tobacco/10 rounded-lg p-6 sticky top-28">
               <h3 className="font-display text-lg mb-4">Book This Service</h3>
@@ -178,21 +224,15 @@ export default async function ServiceDetailPage({ params }: Props) {
                   </h4>
                   <ul className="space-y-2">
                     {service.addOns.map((addon) => (
-                      <li
-                        key={addon.id}
-                        className="flex items-center justify-between text-[0.85rem]"
-                      >
+                      <li key={addon.id} className="flex items-center justify-between text-[0.85rem]">
                         <span>{addon.name}</span>
-                        <span className="text-amber font-medium">
-                          +{formatCurrency(addon.price)}
-                        </span>
+                        <span className="text-amber font-medium">+{formatCurrency(addon.price)}</span>
                       </li>
                     ))}
                   </ul>
                 </>
               )}
 
-              {/* Global add-ons (no serviceId) */}
               <div className="mt-4 pt-4 border-t border-tobacco/10">
                 <p className="text-[0.78rem] text-sand">
                   Additional add-ons available during booking
@@ -201,6 +241,31 @@ export default async function ServiceDetailPage({ params }: Props) {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* SERVICE FAQs */}
+      {faqs.length > 0 && (
+        <section className="bg-cream py-16 px-6 md:px-20">
+          <div className="max-w-3xl mx-auto">
+            <FAQSection faqs={faqs} title={`${service.name} FAQ`} />
+          </div>
+        </section>
+      )}
+
+      {/* CTA */}
+      <section className="bg-green py-16 px-6 text-center">
+        <h2 className="font-display text-white text-3xl mb-4">
+          Ready to Book Your {service.name}?
+        </h2>
+        <p className="text-white/80 mb-8 max-w-md mx-auto">
+          Book online in minutes. Pick your time and we handle the rest.
+        </p>
+        <Link
+          href={`/book?service=${service.slug}`}
+          className="inline-block bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber transition-colors"
+        >
+          Book Now
+        </Link>
       </section>
     </>
   );
