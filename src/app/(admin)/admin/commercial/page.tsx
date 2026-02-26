@@ -27,7 +27,8 @@ export default async function AdminCommercialPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
-        <table className="w-full text-left text-[0.85rem]">
+        <div className="overflow-x-auto">
+        <table className="w-full text-left text-[0.85rem] min-w-[750px]">
           <thead>
             <tr className="bg-ivory/50 border-b border-[#ece6d9]">
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Company</th>
@@ -70,6 +71,7 @@ export default async function AdminCommercialPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

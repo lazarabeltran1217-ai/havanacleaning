@@ -131,8 +131,8 @@ export function ScheduleView() {
   return (
     <div>
       {/* Week navigation */}
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+        <div className="flex items-center gap-2 flex-wrap">
           <button onClick={prevWeek} className="px-3 py-1.5 border rounded-lg text-sm hover:bg-ivory">
             ← Prev
           </button>
@@ -144,7 +144,7 @@ export function ScheduleView() {
           </button>
           <QuickBookForm onCreated={fetchSchedule} />
         </div>
-        <div className="font-display text-lg">
+        <div className="font-display text-base sm:text-lg">
           {formatShortDate(weekStart)} — {formatShortDate(weekEndDate)},{" "}
           {weekEndDate.getFullYear()}
         </div>
@@ -152,7 +152,7 @@ export function ScheduleView() {
 
       {/* Employee legend */}
       {employees.length > 0 && (
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex items-center gap-3 flex-wrap mb-4">
           <span className="text-[0.72rem] uppercase tracking-wider text-gray-400">Employees:</span>
           {employees.map((emp, i) => (
             <span key={emp.id} className="flex items-center gap-1.5 text-sm">
@@ -173,7 +173,8 @@ export function ScheduleView() {
         </div>
       ) : (
         /* Weekly grid */
-        <div className="grid grid-cols-7 gap-2">
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+        <div className="grid grid-cols-7 gap-2 min-w-[700px]">
           {days.map((day) => {
             const isToday = isSameDay(day, today);
             const dayBookings = bookings.filter((b) =>
@@ -290,6 +291,7 @@ export function ScheduleView() {
               </div>
             );
           })}
+        </div>
         </div>
       )}
 
