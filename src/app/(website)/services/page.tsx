@@ -11,10 +11,15 @@ export const metadata: Metadata = {
 };
 
 export default async function ServicesPage() {
-  const services = await prisma.service.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: "asc" },
-  });
+  let services: Awaited<ReturnType<typeof prisma.service.findMany>> = [];
+  try {
+    services = await prisma.service.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: "asc" },
+    });
+  } catch (error) {
+    console.error("Failed to fetch services:", error);
+  }
 
   return (
     <>

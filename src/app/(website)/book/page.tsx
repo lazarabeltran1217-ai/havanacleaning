@@ -10,24 +10,29 @@ export const metadata: Metadata = {
 };
 
 export default async function BookPage() {
-  const services = await prisma.service.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: "asc" },
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      icon: true,
-      basePrice: true,
-      estimatedHours: true,
-    },
-  });
-
-  const addOns = await prisma.serviceAddOn.findMany({
-    where: { isActive: true },
-    select: { id: true, name: true, price: true },
-    orderBy: { name: "asc" },
-  });
+  let services: { id: string; name: string; slug: string; icon: string | null; basePrice: number; estimatedHours: number }[] = [];
+  let addOns: { id: string; name: string; price: number }[] = [];
+  try {
+    services = await prisma.service.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: "asc" },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        icon: true,
+        basePrice: true,
+        estimatedHours: true,
+      },
+    });
+    addOns = await prisma.serviceAddOn.findMany({
+      where: { isActive: true },
+      select: { id: true, name: true, price: true },
+      orderBy: { name: "asc" },
+    });
+  } catch (error) {
+    console.error("Failed to fetch booking data:", error);
+  }
 
   return (
     <>

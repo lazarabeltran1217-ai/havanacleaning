@@ -10,10 +10,15 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage() {
-  const posts = await prisma.blogPost.findMany({
-    where: { isPublished: true },
-    orderBy: { publishedAt: "desc" },
-  });
+  let posts: Awaited<ReturnType<typeof prisma.blogPost.findMany>> = [];
+  try {
+    posts = await prisma.blogPost.findMany({
+      where: { isPublished: true },
+      orderBy: { publishedAt: "desc" },
+    });
+  } catch (error) {
+    console.error("Failed to fetch blog posts:", error);
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-5 py-16">

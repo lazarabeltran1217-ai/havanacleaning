@@ -11,10 +11,15 @@ export const metadata: Metadata = {
 };
 
 export default async function AreasPage() {
-  const areaPages = await prisma.areaPage.findMany({
-    where: { isPublished: true },
-    orderBy: { name: "asc" },
-  });
+  let areaPages: Awaited<ReturnType<typeof prisma.areaPage.findMany>> = [];
+  try {
+    areaPages = await prisma.areaPage.findMany({
+      where: { isPublished: true },
+      orderBy: { name: "asc" },
+    });
+  } catch (error) {
+    console.error("Failed to fetch area pages:", error);
+  }
 
   const publishedSlugs = new Set(areaPages.map((a) => a.slug));
 

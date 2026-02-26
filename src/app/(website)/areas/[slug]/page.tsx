@@ -11,16 +11,19 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const area = await prisma.areaPage.findUnique({ where: { slug } });
-  if (!area) return {};
-
-  return {
-    title: area.metaTitle || `${area.name} Cleaning Service | Havana Cleaning`,
-    description:
-      area.metaDescription ||
-      `Professional house cleaning and deep cleaning services in ${area.name}, Miami. Book online with Havana Cleaning.`,
-  };
+  try {
+    const { slug } = await params;
+    const area = await prisma.areaPage.findUnique({ where: { slug } });
+    if (!area) return {};
+    return {
+      title: area.metaTitle || `${area.name} Cleaning Service | Havana Cleaning`,
+      description:
+        area.metaDescription ||
+        `Professional house cleaning and deep cleaning services in ${area.name}, Miami. Book online with Havana Cleaning.`,
+    };
+  } catch {
+    return {};
+  }
 }
 
 export default async function AreaPage({
@@ -30,24 +33,33 @@ export default async function AreaPage({
 }) {
   const { slug } = await params;
 
-  const area = await prisma.areaPage.findUnique({
-    where: { slug },
-  });
+  let area = null;
+  let faqs: Awaited<ReturnType<typeof prisma.fAQ.findMany>> = [];
+  let services: { name: string; slug: string; icon: string | null; basePrice: number }[] = [];
+
+  try {
+    area = await prisma.areaPage.findUnique({ where: { slug } });
+  } catch (error) {
+    console.error("Failed to fetch area page:", error);
+  }
 
   if (!area || !area.isPublished) notFound();
 
-  // Get FAQs for this area
-  const faqs = await prisma.fAQ.findMany({
-    where: { pageType: "area", pageId: area.id, isPublished: true },
-    orderBy: { sortOrder: "asc" },
-  });
-
-  // Get services for cross-linking
-  const services = await prisma.service.findMany({
-    where: { isActive: true, isFeatured: true },
-    select: { name: true, slug: true, icon: true, basePrice: true },
-    orderBy: { sortOrder: "asc" },
-  });
+  try {
+    [faqs, services] = await Promise.all([
+      prisma.fAQ.findMany({
+        where: { pageType: "area", pageId: area.id, isPublished: true },
+        orderBy: { sortOrder: "asc" },
+      }),
+      prisma.service.findMany({
+        where: { isActive: true, isFeatured: true },
+        select: { name: true, slug: true, icon: true, basePrice: true },
+        orderBy: { sortOrder: "asc" },
+      }),
+    ]);
+  } catch (error) {
+    console.error("Failed to fetch area data:", error);
+  }
 
   const breadcrumbs = [
     { name: "Home", url: "/" },

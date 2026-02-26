@@ -10,14 +10,17 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const post = await prisma.blogPost.findUnique({ where: { slug } });
-  if (!post) return {};
-
-  return {
-    title: post.metaTitle || post.title,
-    description: post.metaDescription || post.excerpt || "",
-  };
+  try {
+    const { slug } = await params;
+    const post = await prisma.blogPost.findUnique({ where: { slug } });
+    if (!post) return {};
+    return {
+      title: post.metaTitle || post.title,
+      description: post.metaDescription || post.excerpt || "",
+    };
+  } catch {
+    return {};
+  }
 }
 
 export default async function BlogPostPage({
@@ -27,9 +30,12 @@ export default async function BlogPostPage({
 }) {
   const { slug } = await params;
 
-  const post = await prisma.blogPost.findUnique({
-    where: { slug },
-  });
+  let post = null;
+  try {
+    post = await prisma.blogPost.findUnique({ where: { slug } });
+  } catch (error) {
+    console.error("Failed to fetch blog post:", error);
+  }
 
   if (!post || !post.isPublished) notFound();
 

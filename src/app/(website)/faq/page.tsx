@@ -13,10 +13,15 @@ export const metadata: Metadata = {
 };
 
 export default async function FaqPage() {
-  const faqs = await prisma.fAQ.findMany({
-    where: { isPublished: true },
-    orderBy: [{ pageType: "asc" }, { sortOrder: "asc" }],
-  });
+  let faqs: Awaited<ReturnType<typeof prisma.fAQ.findMany>> = [];
+  try {
+    faqs = await prisma.fAQ.findMany({
+      where: { isPublished: true },
+      orderBy: [{ pageType: "asc" }, { sortOrder: "asc" }],
+    });
+  } catch (error) {
+    console.error("Failed to fetch FAQs:", error);
+  }
 
   // Group by pageType
   const grouped = faqs.reduce<Record<string, typeof faqs>>((acc, faq) => {

@@ -11,24 +11,34 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const service = await prisma.service.findUnique({ where: { slug } });
-  if (!service) return { title: "Service Not Found" };
-  return {
-    title: `${service.name} | Havana Cleaning`,
-    description: service.description || `Professional ${service.name} in Miami-Dade County.`,
-  };
+  try {
+    const { slug } = await params;
+    const service = await prisma.service.findUnique({ where: { slug } });
+    if (!service) return { title: "Service Not Found" };
+    return {
+      title: `${service.name} | Havana Cleaning`,
+      description: service.description || `Professional ${service.name} in Miami-Dade County.`,
+    };
+  } catch {
+    return { title: "Service Not Found" };
+  }
 }
 
 export default async function ServiceDetailPage({ params }: Props) {
   const { slug } = await params;
-  const service = await prisma.service.findUnique({
-    where: { slug },
-    include: {
-      addOns: { where: { isActive: true } },
-      pricingRules: { orderBy: [{ bedroomsMin: "asc" }, { bathroomsMin: "asc" }] },
-    },
-  });
+
+  let service = null;
+  try {
+    service = await prisma.service.findUnique({
+      where: { slug },
+      include: {
+        addOns: { where: { isActive: true } },
+        pricingRules: { orderBy: [{ bedroomsMin: "asc" }, { bathroomsMin: "asc" }] },
+      },
+    });
+  } catch (error) {
+    console.error("Failed to fetch service:", error);
+  }
 
   if (!service || !service.isActive) notFound();
 

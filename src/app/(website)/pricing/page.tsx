@@ -10,21 +10,25 @@ export const metadata: Metadata = {
   alternates: { canonical: "/pricing" },
 };
 
-export default async function PricingPage() {
-  const services = await prisma.service.findMany({
+const fetchPricingData = () =>
+  prisma.service.findMany({
     where: { isActive: true },
-    include: {
-      pricingRules: {
-        orderBy: [{ bedroomsMin: "asc" }, { bathroomsMin: "asc" }],
-      },
-    },
+    include: { pricingRules: { orderBy: [{ bedroomsMin: "asc" }, { bathroomsMin: "asc" }] } },
     orderBy: { sortOrder: "asc" },
   });
 
-  const addOns = await prisma.serviceAddOn.findMany({
-    where: { isActive: true },
-    orderBy: { name: "asc" },
-  });
+export default async function PricingPage() {
+  let services: Awaited<ReturnType<typeof fetchPricingData>> = [];
+  let addOns: Awaited<ReturnType<typeof prisma.serviceAddOn.findMany>> = [];
+  try {
+    services = await fetchPricingData();
+    addOns = await prisma.serviceAddOn.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+    });
+  } catch (error) {
+    console.error("Failed to fetch pricing data:", error);
+  }
 
   return (
     <>
