@@ -40,77 +40,93 @@ export default async function HomePage() {
           backgroundSize: "20px 20px",
         }} />
 
-        {/* Left coconut palm tree */}
-        <svg className="absolute left-0 bottom-0 w-[300px] md:w-[420px] h-auto opacity-[0.35] pointer-events-none" viewBox="0 0 500 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {/* Trunk - curved, leaning slightly right */}
-          <path d="M160 1000 Q150 750 170 600 Q185 480 200 380 Q210 310 220 260" stroke="#6B4226" strokeWidth="22" strokeLinecap="round" fill="none"/>
-          {/* Trunk texture marks */}
-          <path d="M158 900Q175 895 185 900M155 830Q172 825 182 830M157 760Q174 755 184 760M162 690Q179 685 189 690M168 620Q185 615 195 620M175 550Q192 545 202 550M182 480Q199 475 209 480M190 410Q207 405 217 410M197 350Q214 345 224 350M205 300Q220 295 230 300" stroke="#8B5E3C" strokeWidth="2" opacity="0.6"/>
-          {/* Coconut cluster */}
-          <circle cx="215" cy="268" r="10" fill="#5C8A3C"/>
-          <circle cx="228" cy="260" r="9" fill="#4A7A2E"/>
-          <circle cx="205" cy="258" r="9" fill="#4A7A2E"/>
-          {/* Frond 1 - drooping left far */}
-          <path d="M220 255 Q160 200 60 240 Q100 190 160 180 Q190 190 220 255Z" fill="#52B788"/>
-          <path d="M220 255 Q155 210 80 235" stroke="#2D6A4F" strokeWidth="1.5" fill="none"/>
-          {/* Frond 2 - drooping left */}
-          <path d="M218 250 Q140 170 30 190 Q90 140 155 145 Q190 165 218 250Z" fill="#40916C"/>
-          <path d="M218 250 Q145 175 55 188" stroke="#2D6A4F" strokeWidth="1.5" fill="none"/>
-          {/* Frond 3 - up-left */}
-          <path d="M215 248 Q160 130 80 80 Q130 100 170 130 Q200 170 215 248Z" fill="#52B788"/>
-          <path d="M215 248 Q165 140 95 90" stroke="#2D6A4F" strokeWidth="1.5" fill="none"/>
-          {/* Frond 4 - top center */}
-          <path d="M220 245 Q215 130 230 50 Q240 100 240 160 Q235 210 220 245Z" fill="#52B788"/>
-          <path d="M220 245 Q218 145 228 65" stroke="#2D6A4F" strokeWidth="1.5" fill="none"/>
-          {/* Frond 5 - up-right */}
-          <path d="M225 248 Q290 130 370 90 Q320 115 280 145 Q245 180 225 248Z" fill="#52B788"/>
-          <path d="M225 248 Q285 140 355 95" stroke="#2D6A4F" strokeWidth="1.5" fill="none"/>
-          {/* Frond 6 - drooping right */}
-          <path d="M228 250 Q310 175 420 200 Q360 148 295 150 Q255 168 228 250Z" fill="#40916C"/>
-          <path d="M228 250 Q305 180 395 198" stroke="#2D6A4F" strokeWidth="1.5" fill="none"/>
-          {/* Frond 7 - drooping right far */}
-          <path d="M225 255 Q300 210 400 260 Q350 200 290 195 Q255 205 225 255Z" fill="#52B788"/>
-          <path d="M225 255 Q295 215 380 250" stroke="#2D6A4F" strokeWidth="1.5" fill="none"/>
-          {/* Frond 8 - drooping back-left */}
-          <path d="M215 252 Q120 220 20 280 Q80 225 140 215 Q180 220 215 252Z" fill="#2D6A4F"/>
-          {/* Frond 9 - drooping back-right */}
-          <path d="M230 252 Q330 225 440 290 Q370 230 310 220 Q265 222 230 252Z" fill="#2D6A4F"/>
+        {/* Left palm tree - cartoon style, leaning right */}
+        <svg className="absolute left-0 bottom-0 w-[320px] md:w-[460px] h-auto opacity-[0.30] pointer-events-none" viewBox="0 0 600 1100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* Trunk - thick, curved, with segments */}
+          <path d="M120 1100 C130 950 160 800 190 680 C215 580 240 500 270 420 C290 365 305 310 310 270" stroke="#8B5E3C" strokeWidth="45" strokeLinecap="round" fill="none"/>
+          <path d="M120 1100 C130 950 160 800 190 680 C215 580 240 500 270 420 C290 365 305 310 310 270" stroke="#6B4226" strokeWidth="38" strokeLinecap="round" fill="none"/>
+          {/* Trunk segment lines */}
+          <path d="M128 1020 Q155 1010 172 1020" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M140 940 Q167 930 180 940" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M155 860 Q180 850 193 860" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M170 780 Q195 770 208 780" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M190 700 Q213 690 225 700" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M210 620 Q232 610 243 620" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M232 540 Q253 530 262 540" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M252 465 Q272 455 280 465" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M270 395 Q288 385 296 395" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M288 335 Q304 325 310 335" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          {/* Coconuts */}
+          <circle cx="305" cy="285" r="14" fill="#6B4226" stroke="#4A2A12" strokeWidth="2"/>
+          <circle cx="322" cy="275" r="12" fill="#6B4226" stroke="#4A2A12" strokeWidth="2"/>
+          <circle cx="295" cy="272" r="12" fill="#6B4226" stroke="#4A2A12" strokeWidth="2"/>
+          {/* Frond - up left (big wide leaf) */}
+          <path d="M310 265 C260 180 150 100 50 70 C120 80 200 120 260 180 C280 210 300 245 310 265Z" fill="#2D6A4F"/>
+          <path d="M310 265 C270 195 170 120 70 80" stroke="#1B4332" strokeWidth="3" fill="none"/>
+          <path d="M310 265 C260 180 150 100 50 70" stroke="#52B788" strokeWidth="2" fill="none" opacity="0.5"/>
+          {/* Frond - left drooping */}
+          <path d="M308 270 C240 230 120 220 10 270 C80 210 160 195 230 215 C270 230 295 255 308 270Z" fill="#40916C"/>
+          <path d="M308 270 C240 230 120 225 30 265" stroke="#1B4332" strokeWidth="3" fill="none"/>
+          {/* Frond - far left drooping down */}
+          <path d="M306 275 C230 260 100 290 -10 350 C60 275 140 248 220 255 C265 262 292 270 306 275Z" fill="#52B788"/>
+          <path d="M306 275 C230 260 110 285 10 340" stroke="#2D6A4F" strokeWidth="3" fill="none"/>
+          {/* Frond - top center */}
+          <path d="M310 260 C305 170 320 80 340 10 C345 70 340 150 330 220 C325 245 318 258 310 260Z" fill="#2D6A4F"/>
+          <path d="M310 260 C307 180 320 90 335 20" stroke="#1B4332" strokeWidth="3" fill="none"/>
+          {/* Frond - up right */}
+          <path d="M315 265 C370 180 470 110 570 90 C500 100 420 135 360 190 C340 215 325 245 315 265Z" fill="#40916C"/>
+          <path d="M315 265 C360 195 450 125 550 95" stroke="#1B4332" strokeWidth="3" fill="none"/>
+          <path d="M315 265 C370 180 470 110 570 90" stroke="#52B788" strokeWidth="2" fill="none" opacity="0.5"/>
+          {/* Frond - right drooping */}
+          <path d="M318 270 C380 230 500 225 600 280 C530 215 450 200 380 218 C345 232 328 255 318 270Z" fill="#2D6A4F"/>
+          <path d="M318 270 C380 235 490 228 580 275" stroke="#1B4332" strokeWidth="3" fill="none"/>
+          {/* Frond - far right drooping down */}
+          <path d="M320 275 C390 262 510 295 600 360 C540 280 460 252 385 258 C350 264 332 272 320 275Z" fill="#52B788"/>
+          <path d="M320 275 C390 262 500 290 590 350" stroke="#2D6A4F" strokeWidth="3" fill="none"/>
         </svg>
 
-        {/* Right coconut palm tree */}
-        <svg className="absolute right-0 bottom-0 w-[260px] md:w-[370px] h-auto opacity-[0.35] pointer-events-none" viewBox="0 0 500 900" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {/* Trunk - curved, leaning slightly left */}
-          <path d="M340 900 Q350 680 330 540 Q315 430 300 340 Q290 280 280 230" stroke="#6B4226" strokeWidth="20" strokeLinecap="round" fill="none"/>
-          {/* Trunk texture marks */}
-          <path d="M342 820Q325 815 315 820M340 750Q323 745 313 750M337 680Q320 675 310 680M332 610Q315 605 305 610M325 540Q308 535 298 540M318 470Q301 465 291 470M310 400Q293 395 283 400M302 340Q288 335 278 340M295 290Q281 285 271 290" stroke="#8B5E3C" strokeWidth="2" opacity="0.6"/>
-          {/* Coconut cluster */}
-          <circle cx="285" cy="238" r="9" fill="#5C8A3C"/>
-          <circle cx="273" cy="230" r="8" fill="#4A7A2E"/>
-          <circle cx="295" cy="230" r="8" fill="#4A7A2E"/>
-          {/* Frond 1 - drooping right far */}
-          <path d="M280 225 Q340 175 440 210 Q400 165 340 155 Q310 162 280 225Z" fill="#52B788"/>
-          <path d="M280 225 Q340 178 415 205" stroke="#2D6A4F" strokeWidth="1.5" fill="none"/>
-          {/* Frond 2 - drooping right */}
-          <path d="M282 220 Q360 145 470 160 Q410 115 345 115 Q310 130 282 220Z" fill="#40916C"/>
-          <path d="M282 220 Q358 150 445 158" stroke="#2D6A4F" strokeWidth="1.5" fill="none"/>
-          {/* Frond 3 - up-right */}
-          <path d="M285 218 Q340 105 420 55 Q370 75 330 105 Q300 140 285 218Z" fill="#52B788"/>
-          <path d="M285 218 Q335 110 405 60" stroke="#2D6A4F" strokeWidth="1.5" fill="none"/>
-          {/* Frond 4 - top center */}
-          <path d="M280 215 Q275 105 270 25 Q262 75 260 135 Q265 180 280 215Z" fill="#52B788"/>
-          <path d="M280 215 Q276 115 271 40" stroke="#2D6A4F" strokeWidth="1.5" fill="none"/>
-          {/* Frond 5 - up-left */}
-          <path d="M275 218 Q210 105 130 60 Q180 80 220 110 Q255 145 275 218Z" fill="#52B788"/>
-          <path d="M275 218 Q215 110 145 68" stroke="#2D6A4F" strokeWidth="1.5" fill="none"/>
-          {/* Frond 6 - drooping left */}
-          <path d="M272 220 Q190 148 80 165 Q140 118 205 118 Q245 132 272 220Z" fill="#40916C"/>
-          <path d="M272 220 Q195 152 105 163" stroke="#2D6A4F" strokeWidth="1.5" fill="none"/>
-          {/* Frond 7 - drooping left far */}
-          <path d="M275 225 Q200 180 100 220 Q150 170 210 165 Q245 172 275 225Z" fill="#52B788"/>
-          <path d="M275 225 Q205 182 120 215" stroke="#2D6A4F" strokeWidth="1.5" fill="none"/>
-          {/* Frond 8 - back fronds */}
-          <path d="M285 222 Q380 195 460 255 Q395 200 335 190 Q305 192 285 222Z" fill="#2D6A4F"/>
-          <path d="M270 222 Q170 198 60 260 Q135 205 195 198 Q240 200 270 222Z" fill="#2D6A4F"/>
+        {/* Right palm tree - cartoon style, leaning left */}
+        <svg className="absolute right-0 bottom-0 w-[280px] md:w-[400px] h-auto opacity-[0.30] pointer-events-none" viewBox="0 0 600 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* Trunk - thick, curved, with segments */}
+          <path d="M480 1000 C470 870 440 720 410 600 C385 510 360 430 335 360 C318 310 305 270 295 240" stroke="#8B5E3C" strokeWidth="42" strokeLinecap="round" fill="none"/>
+          <path d="M480 1000 C470 870 440 720 410 600 C385 510 360 430 335 360 C318 310 305 270 295 240" stroke="#6B4226" strokeWidth="35" strokeLinecap="round" fill="none"/>
+          {/* Trunk segment lines */}
+          <path d="M475 920 Q450 910 438 920" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M463 845 Q440 835 428 845" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M448 770 Q426 760 415 770" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M432 695 Q412 685 402 695" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M415 620 Q397 610 388 620" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M397 548 Q380 538 372 548" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M378 478 Q363 468 356 478" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M358 410 Q345 400 338 410" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          <path d="M340 348 Q328 338 322 348" stroke="#4A2A12" strokeWidth="3" opacity="0.7"/>
+          {/* Coconuts */}
+          <circle cx="300" cy="255" r="13" fill="#6B4226" stroke="#4A2A12" strokeWidth="2"/>
+          <circle cx="283" cy="248" r="11" fill="#6B4226" stroke="#4A2A12" strokeWidth="2"/>
+          <circle cx="310" cy="245" r="11" fill="#6B4226" stroke="#4A2A12" strokeWidth="2"/>
+          {/* Frond - up right */}
+          <path d="M298 235 C345 155 455 80 560 55 C485 70 405 108 345 160 C325 185 308 215 298 235Z" fill="#2D6A4F"/>
+          <path d="M298 235 C340 165 440 95 540 65" stroke="#1B4332" strokeWidth="3" fill="none"/>
+          <path d="M298 235 C345 155 455 80 560 55" stroke="#52B788" strokeWidth="2" fill="none" opacity="0.5"/>
+          {/* Frond - right drooping */}
+          <path d="M300 240 C365 205 485 200 600 245 C525 190 440 175 370 190 C330 205 312 225 300 240Z" fill="#40916C"/>
+          <path d="M300 240 C365 208 478 202 585 240" stroke="#1B4332" strokeWidth="3" fill="none"/>
+          {/* Frond - far right drooping down */}
+          <path d="M302 245 C375 235 505 260 610 320 C545 250 455 222 375 228 C335 235 315 242 302 245Z" fill="#52B788"/>
+          <path d="M302 245 C375 235 498 258 600 315" stroke="#2D6A4F" strokeWidth="3" fill="none"/>
+          {/* Frond - top center */}
+          <path d="M295 230 C290 145 278 60 265 -10 C262 50 268 130 278 195 C284 220 290 230 295 230Z" fill="#2D6A4F"/>
+          <path d="M295 230 C291 155 280 70 268 0" stroke="#1B4332" strokeWidth="3" fill="none"/>
+          {/* Frond - up left */}
+          <path d="M292 235 C240 155 135 85 30 60 C105 75 190 110 250 165 C272 190 285 218 292 235Z" fill="#40916C"/>
+          <path d="M292 235 C248 168 150 100 50 70" stroke="#1B4332" strokeWidth="3" fill="none"/>
+          <path d="M292 235 C240 155 135 85 30 60" stroke="#52B788" strokeWidth="2" fill="none" opacity="0.5"/>
+          {/* Frond - left drooping */}
+          <path d="M290 240 C225 208 105 205 -5 248 C75 192 155 178 230 195 C268 208 284 228 290 240Z" fill="#2D6A4F"/>
+          <path d="M290 240 C228 210 115 205 10 242" stroke="#1B4332" strokeWidth="3" fill="none"/>
+          {/* Frond - far left drooping down */}
+          <path d="M288 245 C215 238 85 265 -15 325 C55 255 145 228 225 235 C260 240 280 244 288 245Z" fill="#52B788"/>
+          <path d="M288 245 C218 238 95 262 -5 318" stroke="#2D6A4F" strokeWidth="3" fill="none"/>
         </svg>
 
         <div className="max-w-[800px] relative z-10 text-center px-6 pt-36 pb-20 mx-auto">
