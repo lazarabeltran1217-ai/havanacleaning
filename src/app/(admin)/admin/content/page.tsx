@@ -2,7 +2,14 @@ import { prisma } from "@/lib/prisma";
 import { ContentManager } from "@/components/admin/ContentManager";
 
 export default async function AdminContentPage() {
-  const content = await prisma.content.findMany({ orderBy: { key: "asc" } });
+  const fetchContent = () =>
+    prisma.content.findMany({ orderBy: { key: "asc" } });
+  let content: Awaited<ReturnType<typeof fetchContent>> = [];
+  try {
+    content = await fetchContent();
+  } catch (error) {
+    console.error("Failed to fetch content:", error);
+  }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const contentMap: Record<string, any> = {};
   for (const c of content) {

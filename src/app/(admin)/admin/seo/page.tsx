@@ -1,24 +1,43 @@
 import { prisma } from "@/lib/prisma";
 import { SeoDashboard } from "@/components/admin/SeoDashboard";
 
+const fetchServices = () =>
+  prisma.service.findMany({ where: { isActive: true }, select: { id: true, name: true, slug: true } });
+const fetchAreas = () =>
+  prisma.areaPage.findMany({ select: { id: true, name: true, slug: true, isPublished: true } });
+const fetchPosts = () =>
+  prisma.blogPost.findMany({ select: { id: true, title: true, slug: true, isPublished: true } });
+const fetchFaqs = () =>
+  prisma.fAQ.findMany({ orderBy: [{ pageType: "asc" }, { sortOrder: "asc" }] });
+const fetchKeywords = () =>
+  prisma.targetKeyword.findMany({ orderBy: { keyword: "asc" } });
+const fetchDirectories = () =>
+  prisma.directoryListing.findMany({ orderBy: { platform: "asc" } });
+const fetchPageConfigs = () =>
+  prisma.pageSeoConfig.findMany({ orderBy: { pageUrl: "asc" } });
+
 export default async function AdminSeoPage() {
-  const [
-    services,
-    areas,
-    posts,
-    faqs,
-    keywords,
-    directories,
-    pages,
-  ] = await Promise.all([
-    prisma.service.findMany({ where: { isActive: true }, select: { id: true, name: true, slug: true } }),
-    prisma.areaPage.findMany({ select: { id: true, name: true, slug: true, isPublished: true } }),
-    prisma.blogPost.findMany({ select: { id: true, title: true, slug: true, isPublished: true } }),
-    prisma.fAQ.findMany({ orderBy: [{ pageType: "asc" }, { sortOrder: "asc" }] }),
-    prisma.targetKeyword.findMany({ orderBy: { keyword: "asc" } }),
-    prisma.directoryListing.findMany({ orderBy: { platform: "asc" } }),
-    prisma.pageSeoConfig.findMany({ orderBy: { pageUrl: "asc" } }),
-  ]);
+  let services: Awaited<ReturnType<typeof fetchServices>> = [];
+  let areas: Awaited<ReturnType<typeof fetchAreas>> = [];
+  let posts: Awaited<ReturnType<typeof fetchPosts>> = [];
+  let faqs: Awaited<ReturnType<typeof fetchFaqs>> = [];
+  let keywords: Awaited<ReturnType<typeof fetchKeywords>> = [];
+  let directories: Awaited<ReturnType<typeof fetchDirectories>> = [];
+  let pages: Awaited<ReturnType<typeof fetchPageConfigs>> = [];
+
+  try {
+    [services, areas, posts, faqs, keywords, directories, pages] = await Promise.all([
+      fetchServices(),
+      fetchAreas(),
+      fetchPosts(),
+      fetchFaqs(),
+      fetchKeywords(),
+      fetchDirectories(),
+      fetchPageConfigs(),
+    ]);
+  } catch (error) {
+    console.error("Failed to fetch SEO data:", error);
+  }
 
   // Compute simple SEO scores
   const totalPublicPages = services.length + areas.filter((a) => a.isPublished).length + posts.filter((p) => p.isPublished).length + 5;

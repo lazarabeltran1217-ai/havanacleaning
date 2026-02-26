@@ -3,14 +3,21 @@ import { formatDate } from "@/lib/utils";
 import { AddCustomerButton } from "@/components/admin/AddCustomerButton";
 
 export default async function AdminClientsPage() {
-  const customers = await prisma.user.findMany({
-    where: { role: "CUSTOMER" },
-    include: {
-      _count: { select: { bookings: true } },
-      bookings: { select: { total: true }, where: { status: { not: "CANCELLED" } } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const fetchCustomers = () =>
+    prisma.user.findMany({
+      where: { role: "CUSTOMER" },
+      include: {
+        _count: { select: { bookings: true } },
+        bookings: { select: { total: true }, where: { status: { not: "CANCELLED" } } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  let customers: Awaited<ReturnType<typeof fetchCustomers>> = [];
+  try {
+    customers = await fetchCustomers();
+  } catch (error) {
+    console.error("Failed to fetch customers:", error);
+  }
 
   return (
     <div>

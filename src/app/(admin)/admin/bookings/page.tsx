@@ -4,16 +4,24 @@ import Link from "next/link";
 import { QuickBookForm } from "@/components/admin/QuickBookForm";
 
 export default async function AdminBookingsPage() {
-  const bookings = await prisma.booking.findMany({
-    include: {
-      service: { select: { name: true, icon: true } },
-      customer: { select: { name: true, email: true, phone: true } },
-      address: true,
-      assignments: { include: { employee: { select: { name: true } } } },
-    },
-    orderBy: { scheduledDate: "desc" },
-    take: 50,
-  });
+  const fetchBookings = () =>
+    prisma.booking.findMany({
+      include: {
+        service: { select: { name: true, icon: true } },
+        customer: { select: { name: true, email: true, phone: true } },
+        address: true,
+        assignments: { include: { employee: { select: { name: true } } } },
+      },
+      orderBy: { scheduledDate: "desc" },
+      take: 50,
+    });
+
+  let bookings: Awaited<ReturnType<typeof fetchBookings>> = [];
+  try {
+    bookings = await fetchBookings();
+  } catch (error) {
+    console.error("Failed to fetch bookings:", error);
+  }
 
   const statusColors: Record<string, string> = {
     PENDING: "bg-amber/10 text-amber",

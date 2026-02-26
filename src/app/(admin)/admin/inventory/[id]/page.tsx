@@ -10,16 +10,23 @@ export default async function InventoryDetailPage({
 }) {
   const { id } = await params;
 
-  const item = await prisma.inventoryItem.findUnique({
-    where: { id },
-    include: {
-      transactions: {
-        include: { loggedBy: { select: { name: true } } },
-        orderBy: { createdAt: "desc" },
-        take: 50,
+  const fetchItem = (id: string) =>
+    prisma.inventoryItem.findUnique({
+      where: { id },
+      include: {
+        transactions: {
+          include: { loggedBy: { select: { name: true } } },
+          orderBy: { createdAt: "desc" },
+          take: 50,
+        },
       },
-    },
-  });
+    });
+  let item: Awaited<ReturnType<typeof fetchItem>> = null;
+  try {
+    item = await fetchItem(id);
+  } catch (error) {
+    console.error("Failed to fetch inventory item:", error);
+  }
 
   if (!item) notFound();
 

@@ -5,13 +5,18 @@ import { InventoryActions } from "@/components/admin/InventoryActions";
 import { InventoryEditButton } from "@/components/admin/InventoryEditButton";
 
 export default async function AdminInventoryPage() {
-  const items = await prisma.inventoryItem.findMany({
-    where: { isActive: true },
-    orderBy: [{ category: "asc" }, { name: "asc" }],
-    include: {
-      assignedTo: { select: { id: true, name: true } },
-    },
-  });
+  const fetchItems = () =>
+    prisma.inventoryItem.findMany({
+      where: { isActive: true },
+      orderBy: [{ category: "asc" }, { name: "asc" }],
+      include: { assignedTo: { select: { id: true, name: true } } },
+    });
+  let items: Awaited<ReturnType<typeof fetchItems>> = [];
+  try {
+    items = await fetchItems();
+  } catch (error) {
+    console.error("Failed to fetch inventory:", error);
+  }
 
   const lowStockCount = items.filter((i) => i.currentStock <= i.minStock).length;
 

@@ -10,25 +10,36 @@ interface Props {
 export default async function AdminBookingDetailPage({ params }: Props) {
   const { id } = await params;
 
-  const booking = await prisma.booking.findUnique({
-    where: { id },
-    include: {
-      service: true,
-      customer: { select: { id: true, name: true, email: true, phone: true } },
-      address: true,
-      addOns: { include: { addOn: { select: { name: true } } } },
-      assignments: { include: { employee: { select: { id: true, name: true } } } },
-      payments: true,
-    },
-  });
+  const fetchBooking = (id: string) =>
+    prisma.booking.findUnique({
+      where: { id },
+      include: {
+        service: true,
+        customer: { select: { id: true, name: true, email: true, phone: true } },
+        address: true,
+        addOns: { include: { addOn: { select: { name: true } } } },
+        assignments: { include: { employee: { select: { id: true, name: true } } } },
+        payments: true,
+      },
+    });
 
-  if (!booking) notFound();
+  const fetchEmployees = () =>
+    prisma.user.findMany({
+      where: { role: "EMPLOYEE", isActive: true },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    });
 
-  const employees = await prisma.user.findMany({
-    where: { role: "EMPLOYEE", isActive: true },
-    select: { id: true, name: true },
-    orderBy: { name: "asc" },
-  });
+  let booking: Awaited<ReturnType<typeof fetchBooking>> = null;
+  let employees: Awaited<ReturnType<typeof fetchEmployees>> = [];
+  try {
+    booking = await fetchBooking(id);
+    if (!booking) notFound();
+    employees = await fetchEmployees();
+  } catch (error) {
+    console.error("Failed to fetch booking:", error);
+    notFound();
+  }
 
   const statusColors: Record<string, string> = {
     PENDING: "bg-amber/10 text-amber",

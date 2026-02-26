@@ -2,14 +2,20 @@ import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { PayrollActions, PayrollStatusButtonClient } from "@/components/admin/PayrollActions";
 
-export default async function AdminPayrollPage() {
-  const payrolls = await prisma.payroll.findMany({
-    include: {
-      employee: { select: { name: true } },
-    },
+const fetchPayrolls = () =>
+  prisma.payroll.findMany({
+    include: { employee: { select: { name: true } } },
     orderBy: { periodStart: "desc" },
     take: 50,
   });
+
+export default async function AdminPayrollPage() {
+  let payrolls: Awaited<ReturnType<typeof fetchPayrolls>> = [];
+  try {
+    payrolls = await fetchPayrolls();
+  } catch (error) {
+    console.error("Failed to fetch payroll:", error);
+  }
 
   const statusColors: Record<string, string> = {
     DRAFT: "bg-amber/10 text-amber",

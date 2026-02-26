@@ -24,10 +24,18 @@ const SOCIAL_FIELDS = [
   { key: "social_nextdoor", label: "Nextdoor URL" },
 ];
 
+const API_FIELDS = [
+  { key: "api_stripe_secret", label: "Stripe Secret Key", placeholder: "sk_live_..." },
+  { key: "api_stripe_publishable", label: "Stripe Publishable Key", placeholder: "pk_live_..." },
+  { key: "api_deepseek_key", label: "DeepSeek API Key", placeholder: "sk-..." },
+  { key: "api_email_key", label: "Email Service API Key (Resend / SendGrid)", placeholder: "re_..." },
+];
+
 export function SettingsForm({ initialSettings }: Props) {
   const [settings, setSettings] = useState(initialSettings);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
 
   function update(key: string, value: string) {
     setSettings((prev) => ({ ...prev, [key]: value }));
@@ -85,6 +93,47 @@ export function SettingsForm({ initialSettings }: Props) {
                 placeholder="https://..."
                 className={inputClass}
               />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* API KEYS */}
+      <div className="bg-white rounded-xl p-6 border border-[#ece6d9]">
+        <div className="flex items-center gap-2 mb-1">
+          <h3 className="font-display text-base">API Keys</h3>
+          <span className="text-[0.65rem] bg-amber/10 text-amber px-2 py-0.5 rounded-full font-medium uppercase tracking-wider">Sensitive</span>
+        </div>
+        <p className="text-gray-400 text-[0.78rem] mb-4">
+          Add your API keys here. The system will detect and use them automatically.
+        </p>
+        <div className="space-y-3">
+          {API_FIELDS.map((field) => (
+            <div key={field.key}>
+              <label className={labelClass}>{field.label}</label>
+              <div className="relative">
+                <input
+                  type={showKeys[field.key] ? "text" : "password"}
+                  value={settings[field.key] || ""}
+                  onChange={(e) => update(field.key, e.target.value)}
+                  placeholder={field.placeholder}
+                  className={`${inputClass} pr-16 font-mono text-[0.8rem]`}
+                  autoComplete="off"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowKeys((prev) => ({ ...prev, [field.key]: !prev[field.key] }))}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[0.72rem] text-gray-400 hover:text-tobacco transition-colors px-2 py-1"
+                >
+                  {showKeys[field.key] ? "Hide" : "Show"}
+                </button>
+              </div>
+              {settings[field.key] && (
+                <div className="flex items-center gap-1 mt-1">
+                  <span className="w-1.5 h-1.5 bg-green rounded-full" />
+                  <span className="text-green text-[0.7rem]">Connected</span>
+                </div>
+              )}
             </div>
           ))}
         </div>

@@ -2,9 +2,14 @@ import { prisma } from "@/lib/prisma";
 import { SettingsForm } from "@/components/admin/SettingsForm";
 
 export default async function AdminSettingsPage() {
-  const settings = await prisma.setting.findMany({
-    orderBy: { key: "asc" },
-  });
+  const fetchSettings = () =>
+    prisma.setting.findMany({ orderBy: { key: "asc" } });
+  let settings: Awaited<ReturnType<typeof fetchSettings>> = [];
+  try {
+    settings = await fetchSettings();
+  } catch (error) {
+    console.error("Failed to fetch settings:", error);
+  }
 
   const settingsMap: Record<string, string> = {};
   for (const s of settings) {

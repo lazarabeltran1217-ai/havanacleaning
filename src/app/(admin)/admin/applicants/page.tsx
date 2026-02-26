@@ -4,11 +4,18 @@ import Link from "next/link";
 import { AddApplicationButton } from "@/components/admin/AddApplicationButton";
 
 export default async function AdminApplicantsPage() {
-  const applications = await prisma.jobApplication.findMany({
-    include: { references: true },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
+  const fetchApplications = () =>
+    prisma.jobApplication.findMany({
+      include: { references: true },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+  let applications: Awaited<ReturnType<typeof fetchApplications>> = [];
+  try {
+    applications = await fetchApplications();
+  } catch (error) {
+    console.error("Failed to fetch applications:", error);
+  }
 
   const statusColors: Record<string, string> = {
     NEW: "bg-amber/10 text-amber",

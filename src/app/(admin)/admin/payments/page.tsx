@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
-export default async function AdminPaymentsPage() {
-  const payments = await prisma.payment.findMany({
+const fetchPayments = () =>
+  prisma.payment.findMany({
     include: {
       customer: { select: { name: true } },
       booking: { select: { bookingNumber: true, service: { select: { name: true } } } },
@@ -10,6 +10,14 @@ export default async function AdminPaymentsPage() {
     orderBy: { createdAt: "desc" },
     take: 50,
   });
+
+export default async function AdminPaymentsPage() {
+  let payments: Awaited<ReturnType<typeof fetchPayments>> = [];
+  try {
+    payments = await fetchPayments();
+  } catch (error) {
+    console.error("Failed to fetch payments:", error);
+  }
 
   const statusColors: Record<string, string> = {
     PENDING: "bg-amber/10 text-amber",

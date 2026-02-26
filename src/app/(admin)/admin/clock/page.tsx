@@ -3,14 +3,21 @@ import { formatDate, formatTime } from "@/lib/utils";
 import { ClockEditButton } from "@/components/admin/ClockEditButton";
 
 export default async function AdminClockPage() {
-  const entries = await prisma.timeEntry.findMany({
-    include: {
-      employee: { select: { name: true } },
-      booking: { select: { bookingNumber: true, service: { select: { name: true } } } },
-    },
-    orderBy: { clockIn: "desc" },
-    take: 50,
-  });
+  const fetchEntries = () =>
+    prisma.timeEntry.findMany({
+      include: {
+        employee: { select: { name: true } },
+        booking: { select: { bookingNumber: true, service: { select: { name: true } } } },
+      },
+      orderBy: { clockIn: "desc" },
+      take: 50,
+    });
+  let entries: Awaited<ReturnType<typeof fetchEntries>> = [];
+  try {
+    entries = await fetchEntries();
+  } catch (error) {
+    console.error("Failed to fetch time entries:", error);
+  }
 
   // Currently clocked in
   const activeClocks = entries.filter((e) => !e.clockOut);

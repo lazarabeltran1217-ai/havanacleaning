@@ -4,13 +4,18 @@ import Link from "next/link";
 import { StaffEditButton } from "@/components/admin/StaffEditButton";
 
 export default async function AdminStaffPage() {
-  const employees = await prisma.user.findMany({
-    where: { role: "EMPLOYEE" },
-    include: {
-      _count: { select: { jobAssignments: true, timeEntries: true } },
-    },
-    orderBy: { name: "asc" },
-  });
+  const fetchEmployees = () =>
+    prisma.user.findMany({
+      where: { role: "EMPLOYEE" },
+      include: { _count: { select: { jobAssignments: true, timeEntries: true } } },
+      orderBy: { name: "asc" },
+    });
+  let employees: Awaited<ReturnType<typeof fetchEmployees>> = [];
+  try {
+    employees = await fetchEmployees();
+  } catch (error) {
+    console.error("Failed to fetch employees:", error);
+  }
 
   return (
     <div>

@@ -4,11 +4,18 @@ import Link from "next/link";
 import { AddCommercialButton } from "@/components/admin/AddCommercialButton";
 
 export default async function AdminCommercialPage() {
-  const inquiries = await prisma.commercialInquiry.findMany({
-    include: { quotes: true },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
+  const fetchInquiries = () =>
+    prisma.commercialInquiry.findMany({
+      include: { quotes: true },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+  let inquiries: Awaited<ReturnType<typeof fetchInquiries>> = [];
+  try {
+    inquiries = await fetchInquiries();
+  } catch (error) {
+    console.error("Failed to fetch inquiries:", error);
+  }
 
   const statusColors: Record<string, string> = {
     NEW: "bg-amber/10 text-amber",

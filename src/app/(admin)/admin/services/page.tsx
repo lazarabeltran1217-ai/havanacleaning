@@ -3,13 +3,20 @@ import { formatCurrency } from "@/lib/utils";
 import { ServiceEditButton } from "@/components/admin/ServiceEditor";
 
 export default async function AdminServicesPage() {
-  const services = await prisma.service.findMany({
-    include: {
-      addOns: { where: { isActive: true } },
-      pricingRules: { orderBy: [{ bedroomsMin: "asc" }] },
-    },
-    orderBy: { sortOrder: "asc" },
-  });
+  const fetchServices = () =>
+    prisma.service.findMany({
+      include: {
+        addOns: { where: { isActive: true } },
+        pricingRules: { orderBy: [{ bedroomsMin: "asc" }] },
+      },
+      orderBy: { sortOrder: "asc" },
+    });
+  let services: Awaited<ReturnType<typeof fetchServices>> = [];
+  try {
+    services = await fetchServices();
+  } catch (error) {
+    console.error("Failed to fetch services:", error);
+  }
 
   return (
     <div>

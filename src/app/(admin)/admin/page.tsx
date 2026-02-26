@@ -2,6 +2,16 @@ import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import Link from "next/link";
 
+const fetchRecentBookings = () =>
+  prisma.booking.findMany({
+    include: {
+      service: { select: { name: true, icon: true } },
+      customer: { select: { name: true } },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 5,
+  });
+
 export default async function AdminDashboard() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -9,44 +19,59 @@ export default async function AdminDashboard() {
   const tomorrowStart = new Date(todayStart);
   tomorrowStart.setDate(tomorrowStart.getDate() + 1);
 
-  const [
-    totalBookings,
-    pendingBookings,
-    confirmedToday,
-    employeeCount,
-    customerCount,
-    monthRevenue,
-    recentBookings,
-    newApplicants,
-    newInquiries,
-  ] = await Promise.all([
-    prisma.booking.count(),
-    prisma.booking.count({ where: { status: "PENDING" } }),
-    prisma.booking.count({
-      where: {
-        status: { in: ["CONFIRMED", "IN_PROGRESS"] },
-        scheduledDate: { gte: todayStart, lt: tomorrowStart },
-      },
-    }),
-    prisma.user.count({ where: { role: "EMPLOYEE", isActive: true } }),
-    prisma.user.count({ where: { role: "CUSTOMER" } }),
-    prisma.payment.aggregate({
-      where: { status: "SUCCEEDED", paidAt: { gte: startOfMonth } },
-      _sum: { amount: true },
-    }),
-    prisma.booking.findMany({
-      include: {
-        service: { select: { name: true, icon: true } },
-        customer: { select: { name: true } },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }),
-    prisma.jobApplication.count({ where: { status: "NEW" } }),
-    prisma.commercialInquiry.count({ where: { status: "NEW" } }),
-  ]);
+  let totalBookings = 0;
+  let pendingBookings = 0;
+  let confirmedToday = 0;
+  let employeeCount = 0;
+  let customerCount = 0;
+  let revenue = 0;
+  let recentBookings: Awaited<ReturnType<typeof fetchRecentBookings>> = [];
+  let newApplicants = 0;
+  let newInquiries = 0;
 
-  const revenue = monthRevenue._sum.amount ?? 0;
+  try {
+    const [
+      _totalBookings,
+      _pendingBookings,
+      _confirmedToday,
+      _employeeCount,
+      _customerCount,
+      monthRevenue,
+      _recentBookings,
+      _newApplicants,
+      _newInquiries,
+    ] = await Promise.all([
+      prisma.booking.count(),
+      prisma.booking.count({ where: { status: "PENDING" } }),
+      prisma.booking.count({
+        where: {
+          status: { in: ["CONFIRMED", "IN_PROGRESS"] },
+          scheduledDate: { gte: todayStart, lt: tomorrowStart },
+        },
+      }),
+      prisma.user.count({ where: { role: "EMPLOYEE", isActive: true } }),
+      prisma.user.count({ where: { role: "CUSTOMER" } }),
+      prisma.payment.aggregate({
+        where: { status: "SUCCEEDED", paidAt: { gte: startOfMonth } },
+        _sum: { amount: true },
+      }),
+      fetchRecentBookings(),
+      prisma.jobApplication.count({ where: { status: "NEW" } }),
+      prisma.commercialInquiry.count({ where: { status: "NEW" } }),
+    ]);
+
+    totalBookings = _totalBookings;
+    pendingBookings = _pendingBookings;
+    confirmedToday = _confirmedToday;
+    employeeCount = _employeeCount;
+    customerCount = _customerCount;
+    revenue = monthRevenue._sum.amount ?? 0;
+    recentBookings = _recentBookings;
+    newApplicants = _newApplicants;
+    newInquiries = _newInquiries;
+  } catch (error) {
+    console.error("Failed to fetch dashboard data:", error);
+  }
 
   const stats = [
     { label: "Monthly Revenue", value: formatCurrency(revenue), color: "text-green" },

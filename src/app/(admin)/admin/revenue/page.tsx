@@ -7,60 +7,80 @@ export default async function AdminRevenuePage() {
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-  const [thisMonth, lastMonth, totalRevenue, totalPayments] = await Promise.all([
-    prisma.payment.aggregate({
-      where: { status: "SUCCEEDED", paidAt: { gte: startOfMonth } },
-      _sum: { amount: true },
-      _count: true,
-    }),
-    prisma.payment.aggregate({
-      where: { status: "SUCCEEDED", paidAt: { gte: startOfLastMonth, lt: startOfMonth } },
-      _sum: { amount: true },
-      _count: true,
-    }),
-    prisma.payment.aggregate({
-      where: { status: "SUCCEEDED" },
-      _sum: { amount: true },
-    }),
-    prisma.payment.count({ where: { status: "SUCCEEDED" } }),
-  ]);
+  let monthlyData: { month: string; revenue: number; bookings: number }[] = [];
+  let revenue = 0;
+  let lastMonthRevenue = 0;
+  let lastMonthCount = 0;
+  let thisMonthCount = 0;
+  let totalRevenueAmount = 0;
+  let totalPaymentsCount = 0;
+  let payrollCost = 0;
+  let profit = 0;
 
-  // Get monthly data for the last 12 months
-  const monthlyData: { month: string; revenue: number; bookings: number }[] = [];
-  for (let i = 11; i >= 0; i--) {
-    const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
-    const label = monthStart.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+  try {
+    const [thisMonth, lastMonth, totalRevenue, totalPayments] = await Promise.all([
+      prisma.payment.aggregate({
+        where: { status: "SUCCEEDED", paidAt: { gte: startOfMonth } },
+        _sum: { amount: true },
+        _count: true,
+      }),
+      prisma.payment.aggregate({
+        where: { status: "SUCCEEDED", paidAt: { gte: startOfLastMonth, lt: startOfMonth } },
+        _sum: { amount: true },
+        _count: true,
+      }),
+      prisma.payment.aggregate({
+        where: { status: "SUCCEEDED" },
+        _sum: { amount: true },
+      }),
+      prisma.payment.count({ where: { status: "SUCCEEDED" } }),
+    ]);
 
-    const agg = await prisma.payment.aggregate({
-      where: { status: "SUCCEEDED", paidAt: { gte: monthStart, lt: monthEnd } },
-      _sum: { amount: true },
-      _count: true,
+    // Get monthly data for the last 12 months
+    const monthlyDataArr: { month: string; revenue: number; bookings: number }[] = [];
+    for (let i = 11; i >= 0; i--) {
+      const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+      const label = monthStart.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+
+      const agg = await prisma.payment.aggregate({
+        where: { status: "SUCCEEDED", paidAt: { gte: monthStart, lt: monthEnd } },
+        _sum: { amount: true },
+        _count: true,
+      });
+
+      monthlyDataArr.push({
+        month: label,
+        revenue: agg._sum.amount ?? 0,
+        bookings: agg._count,
+      });
+    }
+
+    // Get total payroll costs this month
+    const payrollThisMonth = await prisma.payroll.aggregate({
+      where: {
+        status: { in: ["APPROVED", "PAID"] },
+        periodStart: { gte: startOfMonth },
+      },
+      _sum: { netPay: true },
     });
 
-    monthlyData.push({
-      month: label,
-      revenue: agg._sum.amount ?? 0,
-      bookings: agg._count,
-    });
+    monthlyData = monthlyDataArr;
+    revenue = thisMonth._sum.amount ?? 0;
+    lastMonthRevenue = lastMonth._sum.amount ?? 0;
+    lastMonthCount = lastMonth._count;
+    thisMonthCount = thisMonth._count;
+    totalRevenueAmount = totalRevenue._sum.amount ?? 0;
+    totalPaymentsCount = totalPayments;
+    payrollCost = payrollThisMonth._sum.netPay ?? 0;
+    profit = revenue - payrollCost;
+  } catch (error) {
+    console.error("Failed to fetch revenue data:", error);
   }
 
-  // Get total payroll costs this month
-  const payrollThisMonth = await prisma.payroll.aggregate({
-    where: {
-      status: { in: ["APPROVED", "PAID"] },
-      periodStart: { gte: startOfMonth },
-    },
-    _sum: { netPay: true },
-  });
-
-  const revenue = thisMonth._sum.amount ?? 0;
-  const payrollCost = payrollThisMonth._sum.netPay ?? 0;
-  const profit = revenue - payrollCost;
-
   const stats = [
-    { label: "This Month", value: formatCurrency(revenue), sub: `${thisMonth._count} payments`, color: "text-green" },
-    { label: "Last Month", value: formatCurrency(lastMonth._sum.amount ?? 0), sub: `${lastMonth._count} payments`, color: "text-tobacco" },
+    { label: "This Month", value: formatCurrency(revenue), sub: `${thisMonthCount} payments`, color: "text-green" },
+    { label: "Last Month", value: formatCurrency(lastMonthRevenue), sub: `${lastMonthCount} payments`, color: "text-tobacco" },
     { label: "Payroll (This Month)", value: formatCurrency(payrollCost), sub: "Approved + Paid", color: "text-amber" },
     { label: "Net Profit (Est.)", value: formatCurrency(profit), sub: "Revenue − Payroll", color: profit >= 0 ? "text-green" : "text-red" },
   ];
@@ -84,10 +104,10 @@ export default async function AdminRevenuePage() {
       <div className="bg-ivory/50 rounded-xl p-5 border border-[#ece6d9] mb-8 flex items-center justify-between">
         <div>
           <div className="text-[0.72rem] uppercase tracking-wider text-gray-400">All-Time Revenue</div>
-          <div className="font-display text-3xl font-bold text-green mt-1">{formatCurrency(totalRevenue._sum.amount ?? 0)}</div>
+          <div className="font-display text-3xl font-bold text-green mt-1">{formatCurrency(totalRevenueAmount)}</div>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-tobacco">{totalPayments}</div>
+          <div className="text-2xl font-bold text-tobacco">{totalPaymentsCount}</div>
           <div className="text-gray-400 text-[0.78rem]">Total Payments</div>
         </div>
       </div>

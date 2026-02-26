@@ -10,10 +10,17 @@ interface Props {
 export default async function ApplicantDetailPage({ params }: Props) {
   const { id } = await params;
 
-  const app = await prisma.jobApplication.findUnique({
-    where: { id },
-    include: { references: true },
-  });
+  const fetchApplication = (id: string) =>
+    prisma.jobApplication.findUnique({
+      where: { id },
+      include: { references: true },
+    });
+  let app: Awaited<ReturnType<typeof fetchApplication>> = null;
+  try {
+    app = await fetchApplication(id);
+  } catch (error) {
+    console.error("Failed to fetch application:", error);
+  }
 
   if (!app) notFound();
 

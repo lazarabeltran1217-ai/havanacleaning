@@ -2,9 +2,14 @@ import { prisma } from "@/lib/prisma";
 import { BlogManager } from "@/components/admin/BlogManager";
 
 export default async function AdminBlogPage() {
-  const posts = await prisma.blogPost.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const fetchPosts = () =>
+    prisma.blogPost.findMany({ orderBy: { createdAt: "desc" } });
+  let posts: Awaited<ReturnType<typeof fetchPosts>> = [];
+  try {
+    posts = await fetchPosts();
+  } catch (error) {
+    console.error("Failed to fetch blog posts:", error);
+  }
 
   return (
     <div>
