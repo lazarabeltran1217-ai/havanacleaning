@@ -16,14 +16,16 @@ export default async function HomePage() {
   let testimonials: Awaited<ReturnType<typeof prisma.testimonial.findMany>> = [];
   let allTestimonials: { rating: number; customerName: string; content: string; location: string | null }[] = [];
   let faqs: { question: string; answer: string }[] = [];
+  let areaPages: { slug: string; name: string }[] = [];
   const contentMap: Record<string, unknown> = {};
 
   try {
-    [services, testimonials, allTestimonials, faqs] = await Promise.all([
+    [services, testimonials, allTestimonials, faqs, areaPages] = await Promise.all([
       prisma.service.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
       prisma.testimonial.findMany({ where: { isApproved: true, isFeatured: true }, take: 3, orderBy: { createdAt: "desc" } }),
       prisma.testimonial.findMany({ where: { isApproved: true }, select: { rating: true, customerName: true, content: true, location: true } }),
       prisma.fAQ.findMany({ where: { isPublished: true, pageType: "general" }, orderBy: { sortOrder: "asc" }, select: { question: true, answer: true }, take: 6 }),
+      prisma.areaPage.findMany({ where: { isPublished: true }, select: { slug: true, name: true } }),
     ]);
 
     // Load editable content
@@ -236,17 +238,35 @@ export default async function HomePage() {
           <span className="w-8 h-px bg-green" />Where We Clean
         </div>
         <h2 className="font-display mb-2" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>Serving All of Miami-Dade</h2>
-        <p className="text-[#7a6555] max-w-[500px] leading-relaxed mb-10">Click an area to see local pricing and availability.</p>
+        <p className="text-[#7a6555] max-w-[500px] leading-relaxed mb-10">We proudly serve neighborhoods across Miami-Dade County.</p>
         <div className="flex flex-wrap gap-2.5">
-          {SERVICE_AREAS.map((area) => (
-            <Link
-              key={area}
-              href={`/areas/${area.toLowerCase().replace(/\s+/g, "-")}`}
-              className="bg-white border border-tobacco/10 px-5 py-2.5 rounded-full text-[0.85rem] text-tobacco hover:bg-green hover:text-white hover:border-green transition-all"
-            >
-              {area}
-            </Link>
-          ))}
+          {SERVICE_AREAS.map((area) => {
+            const slug = area.toLowerCase().replace(/\s+/g, "-");
+            const hasPage = areaPages.some((a) => a.slug === slug || a.slug === `${slug}-cleaning`);
+            const matchedSlug = areaPages.find((a) => a.slug === slug || a.slug === `${slug}-cleaning`)?.slug;
+
+            return hasPage ? (
+              <Link
+                key={area}
+                href={`/areas/${matchedSlug}`}
+                className="bg-white border border-tobacco/10 px-5 py-2.5 rounded-full text-[0.85rem] text-tobacco hover:bg-green hover:text-white hover:border-green transition-all"
+              >
+                {area}
+              </Link>
+            ) : (
+              <span
+                key={area}
+                className="bg-white border border-tobacco/10 px-5 py-2.5 rounded-full text-[0.85rem] text-tobacco/70"
+              >
+                {area}
+              </span>
+            );
+          })}
+        </div>
+        <div className="mt-6">
+          <Link href="/areas" className="text-green font-medium hover:underline text-[0.9rem]">
+            View All Service Areas →
+          </Link>
         </div>
       </section>
 
