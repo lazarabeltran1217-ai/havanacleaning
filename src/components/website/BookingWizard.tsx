@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { formatCurrency } from "@/lib/utils";
 import { TIME_SLOTS } from "@/lib/constants";
+import { ServiceIcon } from "@/lib/service-icons";
 
 interface ServiceOption {
   id: string;
@@ -181,7 +182,7 @@ export function BookingWizard({ services, addOns }: Props) {
                     : "border-tobacco/10 hover:border-green/30"
                 }`}
               >
-                <span className="text-2xl block mb-1">{s.icon || "✨"}</span>
+                <ServiceIcon emoji={s.icon} className="w-7 h-7 mx-auto mb-1 text-tobacco/60" />
                 <div className="text-[0.8rem] font-medium">{s.name}</div>
                 <div className="text-amber text-[0.75rem] mt-1">
                   {s.basePrice > 0 ? formatCurrency(s.basePrice) : "Quote"}
