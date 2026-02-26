@@ -6,22 +6,31 @@ import { JsonLd } from "@/components/website/JsonLd";
 import { aggregateRatingSchema, reviewSchema } from "@/lib/schema";
 
 export default async function HomePage() {
-  const services = await prisma.service.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: "asc" },
-  });
+  let services: Awaited<ReturnType<typeof prisma.service.findMany>> = [];
+  let testimonials: Awaited<ReturnType<typeof prisma.testimonial.findMany>> = [];
+  let allTestimonials: { rating: number; customerName: string; content: string; location: string | null }[] = [];
 
-  const testimonials = await prisma.testimonial.findMany({
-    where: { isApproved: true, isFeatured: true },
-    take: 3,
-    orderBy: { createdAt: "desc" },
-  });
+  try {
+    services = await prisma.service.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: "asc" },
+    });
 
-  // Aggregate rating from all approved testimonials
-  const allTestimonials = await prisma.testimonial.findMany({
-    where: { isApproved: true },
-    select: { rating: true, customerName: true, content: true, location: true },
-  });
+    testimonials = await prisma.testimonial.findMany({
+      where: { isApproved: true, isFeatured: true },
+      take: 3,
+      orderBy: { createdAt: "desc" },
+    });
+
+    // Aggregate rating from all approved testimonials
+    allTestimonials = await prisma.testimonial.findMany({
+      where: { isApproved: true },
+      select: { rating: true, customerName: true, content: true, location: true },
+    });
+  } catch (error) {
+    console.error("Failed to fetch data from database:", error);
+  }
+
   const avgRating = allTestimonials.length > 0
     ? allTestimonials.reduce((sum, t) => sum + t.rating, 0) / allTestimonials.length
     : 5;
