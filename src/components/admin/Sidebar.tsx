@@ -18,6 +18,7 @@ const navItems = [
   { label: "Inventory", href: "/admin/inventory", icon: "📦" },
   { label: "Payroll", href: "/admin/payroll", icon: "💰" },
   { label: "Services", href: "/admin/services", icon: "✨" },
+  { label: "Content", href: "/admin/content", icon: "📝" },
   { label: "SEO Manager", href: "/admin/seo", icon: "🔍" },
   { label: "Settings", href: "/admin/settings", icon: "⚙️" },
 ];

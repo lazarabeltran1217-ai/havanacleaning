@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Service Areas — Miami-Dade Cleaning Coverage",
   description:
     "Havana Cleaning serves all of Miami-Dade County. Find professional cleaning services in Brickell, Coral Gables, Kendall, Doral, Miami Beach, and 15+ more neighborhoods.",
+  alternates: { canonical: "/areas" },
 };
 
 export default async function AreasPage() {

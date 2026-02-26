@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Book a Cleaning | Havana Cleaning",
   description:
     "Book your professional cleaning in Miami in minutes. Choose your service, pick a time, and pay securely online.",
+  alternates: { canonical: "/book" },
 };
 
 export default async function BookPage() {

@@ -33,9 +33,9 @@ export function Footer() {
           <h4 className="text-green-light text-[0.72rem] tracking-[0.2em] uppercase mb-5 font-semibold">{t("servicesTitle")}</h4>
           <ul className="space-y-2.5">
             {["Residential", "Deep Clean", "Move-In/Out", "Commercial", "Post-Construction", "Airbnb Turnover"].map((s) => (
-              <li key={s}><Link href="#" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{s}</Link></li>
+              <li key={s}><Link href="/services" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{s}</Link></li>
             ))}
-            <li><Link href="#" className="text-green-light text-[0.88rem] hover:text-white transition-colors">Green Clean</Link></li>
+            <li><Link href="/services" className="text-green-light text-[0.88rem] hover:text-white transition-colors">Green Clean</Link></li>
           </ul>
         </div>
 
@@ -43,9 +43,11 @@ export function Footer() {
         <div>
           <h4 className="text-green-light text-[0.72rem] tracking-[0.2em] uppercase mb-5 font-semibold">{t("companyTitle")}</h4>
           <ul className="space-y-2.5">
-            {["About Us", "Our Team", "Reviews", "Blog", "Service Areas"].map((s) => (
-              <li key={s}><Link href="#" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{s}</Link></li>
-            ))}
+            <li><Link href="/#about" className="text-sand text-[0.88rem] hover:text-cream transition-colors">About Us</Link></li>
+            <li><Link href="/#about" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Our Team</Link></li>
+            <li><Link href="/#testimonials" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Reviews</Link></li>
+            <li><Link href="/blog" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Blog</Link></li>
+            <li><Link href="/areas" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Service Areas</Link></li>
             <li><Link href="/careers" className="text-green-light text-[0.88rem] hover:text-white transition-colors font-medium">Careers</Link></li>
           </ul>
         </div>
@@ -57,7 +59,7 @@ export function Footer() {
             <li><span className="text-sand text-[0.88rem]">(305) 555-CLEAN</span></li>
             <li><span className="text-sand text-[0.88rem]">hello@havanacleaning.com</span></li>
             <li><span className="text-sand text-[0.88rem]">Miami, FL</span></li>
-            <li><Link href="/#booking" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Book Online</Link></li>
+            <li><Link href="/book" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Book Online</Link></li>
           </ul>
         </div>
       </div>

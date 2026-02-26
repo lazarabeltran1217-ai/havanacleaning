@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Pricing | Havana Cleaning",
   description:
     "Transparent cleaning prices for Miami homes. Get instant pricing by bedroom and bathroom count. No hidden fees.",
+  alternates: { canonical: "/pricing" },
 };
 
 export default async function PricingPage() {

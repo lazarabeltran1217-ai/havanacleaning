@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Commercial Cleaning | Havana Cleaning",
   description:
     "Professional commercial cleaning services for Miami businesses. Offices, retail, medical, restaurants. Get a custom quote today.",
+  alternates: { canonical: "/commercial" },
 };
 
 export default function CommercialPage() {

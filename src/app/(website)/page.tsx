@@ -3,33 +3,55 @@ import Link from "next/link";
 import { SERVICE_AREAS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import { JsonLd } from "@/components/website/JsonLd";
-import { aggregateRatingSchema, reviewSchema } from "@/lib/schema";
+import { aggregateRatingSchema, reviewSchema, faqPageSchema } from "@/lib/schema";
+
+// Helper to get content with fallback
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getContent(contentMap: Record<string, unknown>, key: string, fallback: Record<string, unknown>): Record<string, any> {
+  return (contentMap[key] ?? fallback) as Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+}
 
 export default async function HomePage() {
   let services: Awaited<ReturnType<typeof prisma.service.findMany>> = [];
   let testimonials: Awaited<ReturnType<typeof prisma.testimonial.findMany>> = [];
   let allTestimonials: { rating: number; customerName: string; content: string; location: string | null }[] = [];
+  let faqs: { question: string; answer: string }[] = [];
+  const contentMap: Record<string, unknown> = {};
 
   try {
-    services = await prisma.service.findMany({
-      where: { isActive: true },
-      orderBy: { sortOrder: "asc" },
-    });
+    [services, testimonials, allTestimonials, faqs] = await Promise.all([
+      prisma.service.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
+      prisma.testimonial.findMany({ where: { isApproved: true, isFeatured: true }, take: 3, orderBy: { createdAt: "desc" } }),
+      prisma.testimonial.findMany({ where: { isApproved: true }, select: { rating: true, customerName: true, content: true, location: true } }),
+      prisma.fAQ.findMany({ where: { isPublished: true, pageType: "general" }, orderBy: { sortOrder: "asc" }, select: { question: true, answer: true }, take: 6 }),
+    ]);
 
-    testimonials = await prisma.testimonial.findMany({
-      where: { isApproved: true, isFeatured: true },
-      take: 3,
-      orderBy: { createdAt: "desc" },
-    });
-
-    // Aggregate rating from all approved testimonials
-    allTestimonials = await prisma.testimonial.findMany({
-      where: { isApproved: true },
-      select: { rating: true, customerName: true, content: true, location: true },
-    });
+    // Load editable content
+    const contentRows = await prisma.content.findMany({ where: { published: true } });
+    for (const row of contentRows) {
+      contentMap[row.key] = row.dataEn;
+    }
   } catch (error) {
     console.error("Failed to fetch data from database:", error);
   }
+
+  // Editable content with fallbacks
+  const heroEyebrow = getContent(contentMap, "hero_eyebrow", { text: "Miami's Premier Cleaning Service" });
+  const heroHeadline = getContent(contentMap, "hero_headline", { line1: "Clean Homes,", line2: "Cuban", line3: "Soul." });
+  const heroSubtitle = getContent(contentMap, "hero_subtitle", { text: "Family-owned and rooted in the heart of Cuban-American pride. We treat every home like our own — with care, passion, and the kind of clean your abuela would approve of." });
+  const heroCta1 = getContent(contentMap, "hero_cta_primary", { text: "Book a Cleaning", href: "/book" });
+  const heroCta2 = getContent(contentMap, "hero_cta_secondary", { text: "View Pricing", href: "/pricing" });
+  const heroStats = getContent(contentMap, "hero_stats", { items: [{ value: "500+", label: "Homes Cleaned" }, { value: "4.9★", label: "Average Rating" }, { value: "100%", label: "Eco-Friendly" }] });
+  const trustBar = getContent(contentMap, "trust_bar", { items: ["Fully Insured & Bonded", "Background-Checked Staff", "Same-Day Availability", "Eco-Friendly Products", "Satisfaction Guaranteed"] });
+  const aboutSection = getContent(contentMap, "about_section", {
+    label: "Our Story",
+    title: "Born in Havana, Built in Miami.",
+    paragraphs: [
+      "Havana Cleaning was founded by a family who brought their Cuban heritage and work ethic to Miami. We believe in treating every home like it's our own — with care, pride, and the kind of attention to detail that makes a real difference.",
+      "We're not just a cleaning company. We're a family business built on trust, hard work, and the belief that a clean home is the foundation of a happy life.",
+      "From Kendall to Coral Gables, from Brickell condos to Pinecrest estates — we bring the same level of care and professionalism to every job. Our team is background-checked, fully insured, and trained to deliver results that would make your abuela proud.",
+    ],
+  });
 
   const avgRating = allTestimonials.length > 0
     ? allTestimonials.reduce((sum, t) => sum + t.rating, 0) / allTestimonials.length
@@ -60,47 +82,39 @@ export default async function HomePage() {
         <div className="max-w-[800px] relative z-10 text-center px-6 pt-36 pb-20 mx-auto">
           <div className="text-[0.75rem] tracking-[0.25em] uppercase text-green-light mb-6 flex items-center justify-center gap-3">
             <span className="w-10 h-px bg-green-light" />
-            Miami&apos;s Premier Cleaning Service
+            {heroEyebrow.text}
             <span className="w-10 h-px bg-green-light" />
           </div>
           <h1 className="font-display text-cream mb-7 leading-none" style={{ fontSize: "clamp(3.5rem, 6vw, 5.5rem)" }}>
-            Clean Homes,<br />
-            <em className="text-amber">Cuban</em><br />
-            <span className="text-green-light">Soul.</span>
+            {heroHeadline.line1}<br />
+            <em className="text-amber">{heroHeadline.line2}</em><br />
+            <span className="text-green-light">{heroHeadline.line3}</span>
           </h1>
           <p className="text-sand text-lg leading-relaxed max-w-[500px] mx-auto mb-12">
-            Family-owned and rooted in the heart of Cuban-American pride.
-            We treat every home like our own — with care, passion, and the kind of clean
-            your abuela would approve of.
+            {heroSubtitle.text}
           </p>
           <div className="flex gap-4 flex-wrap justify-center">
-            <Link href="#booking" className="bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber hover:-translate-y-0.5 transition-all">
-              Book a Cleaning
+            <Link href={heroCta1.href || "/book"} className="bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber hover:-translate-y-0.5 transition-all">
+              {heroCta1.text}
             </Link>
-            <Link href="#pricing" className="border-[1.5px] border-cream/30 text-cream px-9 py-4 text-[0.9rem] font-medium tracking-[0.08em] uppercase rounded-[3px] hover:border-cream transition-colors">
-              View Pricing
+            <Link href={heroCta2.href || "/pricing"} className="border-[1.5px] border-cream/30 text-cream px-9 py-4 text-[0.9rem] font-medium tracking-[0.08em] uppercase rounded-[3px] hover:border-cream transition-colors">
+              {heroCta2.text}
             </Link>
           </div>
           <div className="flex gap-12 mt-12 pt-10 border-t border-cream/[0.12] justify-center">
-            <div>
-              <div className="font-display text-3xl font-black text-amber">500+</div>
-              <div className="text-sand text-[0.75rem] tracking-[0.1em] mt-1.5 uppercase">Homes Cleaned</div>
-            </div>
-            <div>
-              <div className="font-display text-3xl font-black text-amber">4.9★</div>
-              <div className="text-sand text-[0.75rem] tracking-[0.1em] mt-1.5 uppercase">Average Rating</div>
-            </div>
-            <div>
-              <div className="font-display text-3xl font-black text-amber">100%</div>
-              <div className="text-sand text-[0.75rem] tracking-[0.1em] mt-1.5 uppercase">Eco-Friendly</div>
-            </div>
+            {(heroStats.items as { value: string; label: string }[]).map((stat: { value: string; label: string }, i: number) => (
+              <div key={i}>
+                <div className="font-display text-3xl font-black text-amber">{stat.value}</div>
+                <div className="text-sand text-[0.75rem] tracking-[0.1em] mt-1.5 uppercase">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* TRUST BAR */}
       <div className="bg-gradient-to-r from-green to-teal py-5 px-6 md:px-20 flex items-center justify-evenly gap-10 flex-wrap">
-        {["Fully Insured & Bonded", "Background-Checked Staff", "Same-Day Availability", "Eco-Friendly Products", "Satisfaction Guaranteed"].map((item) => (
+        {(trustBar.items as string[]).map((item: string) => (
           <div key={item} className="flex items-center gap-2.5 text-white text-[0.85rem] font-medium tracking-[0.06em] uppercase">
             ✓ {item}
           </div>
@@ -112,7 +126,14 @@ export default async function HomePage() {
         <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center gap-3">
           <span className="w-8 h-px bg-green-light" />What We Do
         </div>
-        <h2 className="font-display text-cream mb-16" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>Our Services</h2>
+        <h2 className="font-display text-cream mb-4" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>Our Services</h2>
+        {allTestimonials.length > 0 && (
+          <div className="flex items-center gap-2 mb-12 text-sand text-[0.85rem]">
+            <span className="text-gold">★★★★★</span>
+            <span>{(Math.round(avgRating * 10) / 10).toFixed(1)} stars from {allTestimonials.length} reviews</span>
+          </div>
+        )}
+        {allTestimonials.length === 0 && <div className="mb-12" />}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0.5">
           {services.map((service) => (
             <div key={service.id} className="bg-white/[0.04] border border-gold/15 p-10 hover:bg-green-light/10 hover:border-green-light transition-colors cursor-pointer">
@@ -124,6 +145,33 @@ export default async function HomePage() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ABOUT */}
+      <section id="about" className="bg-cream py-24 px-6 md:px-20">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center gap-3">
+            <span className="w-8 h-px bg-green" />{aboutSection.label}
+          </div>
+          <h2 className="font-display mb-10" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>
+            {aboutSection.title}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="space-y-5">
+              {(aboutSection.paragraphs as string[]).slice(0, 2).map((p: string, i: number) => (
+                <p key={i} className="text-[#5a4535] text-[0.95rem] leading-relaxed">{p}</p>
+              ))}
+            </div>
+            <div className="space-y-5">
+              {(aboutSection.paragraphs as string[]).slice(2).map((p: string, i: number) => (
+                <p key={i} className="text-[#5a4535] text-[0.95rem] leading-relaxed">{p}</p>
+              ))}
+              <Link href="/book" className="inline-block bg-green text-white px-8 py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-green-light hover:text-tobacco transition-colors">
+                Book a Cleaning Today
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -147,6 +195,41 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* FAQ — AEO */}
+      {faqs.length > 0 && (
+        <>
+          <JsonLd data={faqPageSchema(faqs.map(f => ({ question: f.question, answer: f.answer })))} />
+          <section id="faq" className="bg-ivory py-24 px-6 md:px-20">
+            <div className="max-w-3xl mx-auto">
+              <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center justify-center gap-3">
+                <span className="w-8 h-px bg-green" />Common Questions
+              </div>
+              <h2 className="font-display text-center mb-12" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>
+                Frequently Asked Questions
+              </h2>
+              <div className="space-y-4">
+                {faqs.map((faq, i) => (
+                  <details key={i} className="bg-white border border-tobacco/10 rounded-lg group">
+                    <summary className="px-6 py-5 cursor-pointer font-semibold text-[0.95rem] text-tobacco flex items-center justify-between hover:text-green transition-colors">
+                      {faq.question}
+                      <span className="text-green ml-4 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div className="px-6 pb-5 text-[#5a4535] text-[0.9rem] leading-relaxed border-t border-tobacco/5 pt-4">
+                      {faq.answer}
+                    </div>
+                  </details>
+                ))}
+              </div>
+              <div className="text-center mt-8">
+                <Link href="/faq" className="text-green font-medium hover:underline text-[0.9rem]">
+                  View All FAQs →
+                </Link>
+              </div>
+            </div>
+          </section>
+        </>
+      )}
+
       {/* SERVICE AREAS */}
       <section id="areas" className="bg-cream py-24 px-6 md:px-20">
         <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center gap-3">
@@ -164,6 +247,24 @@ export default async function HomePage() {
               {area}
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* FINAL CTA — CRO */}
+      <section className="bg-green py-20 px-6 text-center">
+        <h2 className="font-display text-white mb-4" style={{ fontSize: "clamp(2rem, 4vw, 3rem)" }}>
+          Ready for a Spotless Home?
+        </h2>
+        <p className="text-white/80 max-w-lg mx-auto mb-8 text-lg leading-relaxed">
+          Join 500+ Miami families who trust Havana Cleaning. Book in minutes, pay securely online.
+        </p>
+        <div className="flex gap-4 flex-wrap justify-center">
+          <Link href="/book" className="bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber hover:-translate-y-0.5 transition-all">
+            Book Now — Free Estimate
+          </Link>
+          <a href="tel:+13055552532" className="border-[1.5px] border-white/40 text-white px-9 py-4 text-[0.9rem] font-medium tracking-[0.08em] uppercase rounded-[3px] hover:border-white transition-colors">
+            Call (305) 555-CLEAN
+          </a>
         </div>
       </section>
     </>

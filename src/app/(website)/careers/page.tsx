@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Careers | Join Havana Cleaning",
   description:
     "Apply to join the Havana Cleaning team. We're hiring professional cleaners in Miami-Dade County. Competitive pay, flexible hours.",
+  alternates: { canonical: "/careers" },
 };
 
 export default function CareersPage() {

@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Blog — Cleaning Tips & Home Care Guides",
   description:
     "Expert cleaning tips, home care guides, and industry insights from Havana Cleaning. Learn how to maintain a spotless home in Miami.",
+  alternates: { canonical: "/blog" },
 };
 
 export default async function BlogPage() {

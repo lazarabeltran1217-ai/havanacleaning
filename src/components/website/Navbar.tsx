@@ -44,12 +44,12 @@ export function Navbar() {
             </Link>
           </li>
           <li>
-            <Link href="/#pricing" className="text-cream text-[0.82rem] tracking-[0.1em] uppercase font-medium hover:text-amber transition-colors">
+            <Link href="/pricing" className="text-cream text-[0.82rem] tracking-[0.1em] uppercase font-medium hover:text-amber transition-colors">
               {t("pricing")}
             </Link>
           </li>
           <li>
-            <Link href="/#commercial" className="text-cream text-[0.82rem] tracking-[0.1em] uppercase font-medium hover:text-amber transition-colors">
+            <Link href="/commercial" className="text-cream text-[0.82rem] tracking-[0.1em] uppercase font-medium hover:text-amber transition-colors">
               {t("commercial")}
             </Link>
           </li>
@@ -69,7 +69,7 @@ export function Navbar() {
             </Link>
           </li>
           <li>
-            <Link href="/#booking" className="bg-gold text-tobacco px-5 py-2.5 rounded-[3px] text-[0.82rem] tracking-[0.1em] uppercase font-semibold hover:bg-amber transition-colors">
+            <Link href="/book" className="bg-gold text-tobacco px-5 py-2.5 rounded-[3px] text-[0.82rem] tracking-[0.1em] uppercase font-semibold hover:bg-amber transition-colors">
               {t("bookNow")}
             </Link>
           </li>
@@ -91,12 +91,12 @@ export function Navbar() {
               </Link>
             </li>
             <li>
-              <Link href="/#pricing" onClick={() => setMobileOpen(false)} className="block py-3 text-cream text-[0.9rem] tracking-[0.08em] uppercase font-medium hover:text-amber transition-colors border-b border-white/[0.06]">
+              <Link href="/pricing" onClick={() => setMobileOpen(false)} className="block py-3 text-cream text-[0.9rem] tracking-[0.08em] uppercase font-medium hover:text-amber transition-colors border-b border-white/[0.06]">
                 {t("pricing")}
               </Link>
             </li>
             <li>
-              <Link href="/#commercial" onClick={() => setMobileOpen(false)} className="block py-3 text-cream text-[0.9rem] tracking-[0.08em] uppercase font-medium hover:text-amber transition-colors border-b border-white/[0.06]">
+              <Link href="/commercial" onClick={() => setMobileOpen(false)} className="block py-3 text-cream text-[0.9rem] tracking-[0.08em] uppercase font-medium hover:text-amber transition-colors border-b border-white/[0.06]">
                 {t("commercial")}
               </Link>
             </li>
@@ -119,7 +119,7 @@ export function Navbar() {
               <Link href="/careers" onClick={() => setMobileOpen(false)} className="flex-1 text-center bg-green text-white py-3 rounded-[3px] text-[0.85rem] tracking-[0.08em] uppercase font-semibold hover:bg-green-light hover:text-tobacco transition-colors">
                 {t("hiring")}
               </Link>
-              <Link href="/#booking" onClick={() => setMobileOpen(false)} className="flex-1 text-center bg-gold text-tobacco py-3 rounded-[3px] text-[0.85rem] tracking-[0.08em] uppercase font-semibold hover:bg-amber transition-colors">
+              <Link href="/book" onClick={() => setMobileOpen(false)} className="flex-1 text-center bg-gold text-tobacco py-3 rounded-[3px] text-[0.85rem] tracking-[0.08em] uppercase font-semibold hover:bg-amber transition-colors">
                 {t("bookNow")}
               </Link>
             </li>

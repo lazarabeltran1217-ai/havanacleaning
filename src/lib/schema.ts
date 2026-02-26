@@ -1,11 +1,11 @@
-import { BUSINESS } from "./constants";
+import { BUSINESS, SERVICE_AREAS } from "./constants";
 
 // JSON-LD builders for structured data
 
 export function localBusinessSchema() {
   return {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": ["LocalBusiness", "CleaningService"],
     "@id": "https://havanacleaning.com/#business",
     name: BUSINESS.name,
     description:
@@ -17,6 +17,7 @@ export function localBusinessSchema() {
       "@type": "PostalAddress",
       addressLocality: "Miami",
       addressRegion: "FL",
+      postalCode: "33101",
       addressCountry: "US",
     },
     geo: {
@@ -24,11 +25,18 @@ export function localBusinessSchema() {
       latitude: 25.7617,
       longitude: -80.1918,
     },
-    areaServed: {
-      "@type": "City",
-      name: "Miami",
-      "@id": "https://www.wikidata.org/wiki/Q8652",
-    },
+    areaServed: [
+      {
+        "@type": "City",
+        name: "Miami",
+        "@id": "https://www.wikidata.org/wiki/Q8652",
+      },
+      ...SERVICE_AREAS.map((area) => ({
+        "@type": "Neighborhood",
+        name: area,
+        containedInPlace: { "@type": "City", name: "Miami" },
+      })),
+    ],
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
@@ -40,6 +48,31 @@ export function localBusinessSchema() {
     priceRange: "$$",
     image: "https://havanacleaning.com/og-image.jpg",
     sameAs: [],
+    knowsLanguage: ["en", "es"],
+    paymentAccepted: ["Cash", "Credit Card", "Debit Card"],
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Cleaning Services",
+      itemListElement: [
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Residential Cleaning" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Deep Cleaning" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Commercial Cleaning" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Move-In/Move-Out Cleaning" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Eco-Friendly Cleaning" } },
+      ],
+    },
+  };
+}
+
+export function speakableSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "#faq summary", "#about h2"],
+    },
+    url: "https://havanacleaning.com",
   };
 }
 
