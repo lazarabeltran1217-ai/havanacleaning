@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 900">
+  <!-- Trunk - curved, thick, brown with segments (mirrored, leaning left) -->
+  <path d="M300 900 C290 780 270 660 245 560 C225 480 200 410 175 350 C155 305 142 270 135 245" fill="#5C3D1E" />
+  <path d="M270 900 C262 780 245 660 225 560 C208 480 188 410 168 350 C152 305 140 270 135 245" fill="#7A5230" />
+  <!-- Trunk segment curves -->
+  <path d="M292 850 Q260 842 242 850" stroke="#3D2210" stroke-width="2.5" fill="none" opacity="0.6"/>
+  <path d="M285 790 Q253 782 238 790" stroke="#3D2210" stroke-width="2.5" fill="none" opacity="0.6"/>
+  <path d="M275 730 Q245 722 232 730" stroke="#3D2210" stroke-width="2.5" fill="none" opacity="0.6"/>
+  <path d="M263 670 Q237 662 225 670" stroke="#3D2210" stroke-width="2.5" fill="none" opacity="0.6"/>
+  <path d="M250 610 Q227 602 216 610" stroke="#3D2210" stroke-width="2.5" fill="none" opacity="0.6"/>
+  <path d="M237 550 Q217 542 207 550" stroke="#3D2210" stroke-width="2.5" fill="none" opacity="0.6"/>
+  <path d="M223 490 Q205 482 196 490" stroke="#3D2210" stroke-width="2.5" fill="none" opacity="0.6"/>
+  <path d="M208 430 Q192 422 184 430" stroke="#3D2210" stroke-width="2.5" fill="none" opacity="0.6"/>
+  <path d="M192 375 Q178 367 172 375" stroke="#3D2210" stroke-width="2.5" fill="none" opacity="0.6"/>
+  <path d="M175 325 Q163 317 158 325" stroke="#3D2210" stroke-width="2.5" fill="none" opacity="0.6"/>
+
+  <!-- Coconuts -->
+  <ellipse cx="140" cy="252" rx="11" ry="10" fill="#5C3D1E"/>
+  <ellipse cx="125" cy="245" rx="10" ry="9" fill="#4A3018"/>
+  <ellipse cx="150" cy="244" rx="9" ry="9" fill="#4A3018"/>
+
+  <!-- Frond 1 - upper right, big wide leaf -->
+  <path d="M135 240 C170 180 250 110 360 60 C350 55 335 52 320 55 C250 75 180 140 140 220 Z" fill="#2E8B57"/>
+  <path d="M135 240 C165 185 240 118 345 60" stroke="#1B5E3A" stroke-width="2.5" fill="none"/>
+  <path d="M170 185 L185 175 M200 155 L217 142 M230 128 L250 112 M265 102 L288 85" stroke="#1B5E3A" stroke-width="1.5" fill="none" opacity="0.4"/>
+
+  <!-- Frond 2 - right, drooping -->
+  <path d="M138 248 C185 225 280 218 385 260 C380 250 370 240 355 232 C280 200 200 210 145 238 Z" fill="#3CB371"/>
+  <path d="M138 248 C182 228 275 220 375 255" stroke="#1B5E3A" stroke-width="2.5" fill="none"/>
+
+  <!-- Frond 3 - far right, drooping down -->
+  <path d="M142 255 C200 252 310 285 420 350 C412 335 400 318 382 305 C320 265 230 250 150 250 Z" fill="#228B44"/>
+  <path d="M142 255 C195 252 300 280 405 340" stroke="#165E30" stroke-width="2.5" fill="none"/>
+
+  <!-- Frond 4 - top center -->
+  <path d="M135 235 C138 175 130 100 115 20 C112 15 108 18 107 25 C110 100 118 175 128 230 Z" fill="#2E8B57"/>
+  <path d="M135 235 C137 178 130 105 116 28" stroke="#1B5E3A" stroke-width="2.5" fill="none"/>
+
+  <!-- Frond 5 - upper left -->
+  <path d="M130 240 C95 180 20 115 -100 70 C-90 78 -75 85 -58 90 C15 120 85 170 122 225 Z" fill="#3CB371"/>
+  <path d="M130 240 C98 185 25 122 -85 75" stroke="#1B5E3A" stroke-width="2.5" fill="none"/>
+  <path d="M100 185 L85 178 M65 158 L48 148 M35 132 L15 120 M5 108 L-18 95" stroke="#1B5E3A" stroke-width="1.5" fill="none" opacity="0.4"/>
+
+  <!-- Frond 6 - left, drooping -->
+  <path d="M128 248 C80 228 -10 225 -120 270 C-112 260 -100 250 -85 243 C-15 215 65 218 122 240 Z" fill="#2E8B57"/>
+  <path d="M128 248 C82 230 -8 226 -110 265" stroke="#1B5E3A" stroke-width="2.5" fill="none"/>
+
+  <!-- Frond 7 - far left, drooping down -->
+  <path d="M125 255 C65 255 -40 290 -140 360 C-130 348 -115 335 -98 325 C-40 290 45 262 118 258 Z" fill="#228B44"/>
+  <path d="M125 255 C68 256 -35 285 -130 350" stroke="#165E30" stroke-width="2.5" fill="none"/>
+</svg>
