@@ -46,6 +46,7 @@ export function Footer() {
             {["About Us", "Our Team", "Reviews", "Blog", "Service Areas"].map((s) => (
               <li key={s}><Link href="#" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{s}</Link></li>
             ))}
+            <li><Link href="/careers" className="text-green-light text-[0.88rem] hover:text-white transition-colors font-medium">Careers</Link></li>
           </ul>
         </div>
 
