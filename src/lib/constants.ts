@@ -1,7 +1,5 @@
 export const BUSINESS = {
   name: "Havana Cleaning",
-  phone: "(305) 555-CLEAN",
-  email: "hello@havanacleaning.com",
   address: "Miami, FL",
   hours: "Mon-Sat 7AM - 7PM",
   taxRate: 0.07, // 7% Florida sales tax

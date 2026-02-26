@@ -11,8 +11,6 @@ export function localBusinessSchema() {
     description:
       "Miami's premier family-owned cleaning service. Residential, deep clean, commercial, and eco-friendly cleaning.",
     url: "https://havanacleaning.com",
-    telephone: BUSINESS.phone,
-    email: BUSINESS.email,
     address: {
       "@type": "PostalAddress",
       addressLocality: "Miami",
@@ -85,7 +83,7 @@ export function organizationSchema() {
     logo: "https://havanacleaning.com/logo.png",
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: BUSINESS.phone,
+      url: "https://havanacleaning.com/book",
       contactType: "customer service",
       availableLanguage: ["English", "Spanish"],
     },

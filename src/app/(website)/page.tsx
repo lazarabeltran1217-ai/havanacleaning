@@ -282,9 +282,9 @@ export default async function HomePage() {
           <Link href="/book" className="bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber hover:-translate-y-0.5 transition-all">
             Book Now — Free Estimate
           </Link>
-          <a href="tel:+13055552532" className="border-[1.5px] border-white/40 text-white px-9 py-4 text-[0.9rem] font-medium tracking-[0.08em] uppercase rounded-[3px] hover:border-white transition-colors">
-            Call (305) 555-CLEAN
-          </a>
+          <Link href="/pricing" className="border-[1.5px] border-white/40 text-white px-9 py-4 text-[0.9rem] font-medium tracking-[0.08em] uppercase rounded-[3px] hover:border-white transition-colors">
+            View Pricing
+          </Link>
         </div>
       </section>
     </>

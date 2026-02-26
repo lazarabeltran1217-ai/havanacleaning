@@ -32,14 +32,9 @@ export async function POST(req: NextRequest) {
 
   // Get business info for context
   let companyName = "Havana Cleaning";
-  let companyPhone = "(305) 555-CLEAN";
   try {
-    const [nameSetting, phoneSetting] = await Promise.all([
-      prisma.setting.findUnique({ where: { key: "company_name" } }),
-      prisma.setting.findUnique({ where: { key: "company_phone" } }),
-    ]);
+    const nameSetting = await prisma.setting.findUnique({ where: { key: "company_name" } });
     if (nameSetting?.value) companyName = nameSetting.value as string;
-    if (phoneSetting?.value) companyPhone = phoneSetting.value as string;
   } catch {
     // Use defaults
   }
@@ -49,7 +44,7 @@ export async function POST(req: NextRequest) {
 - **SEO-optimized**: Natural keyword placement, proper heading hierarchy (H2, H3), 1200-1800 words
 - **GEO-optimized**: References to Miami, Miami-Dade County, South Florida, and specific neighborhoods (Brickell, Coral Gables, Doral, Kendall, South Beach, Aventura, Coconut Grove, etc.)
 - **AEO-optimized** (Answer Engine Optimization): Include FAQ sections, direct answers to common questions, structured content that voice assistants and AI can extract
-- **CRO-optimized** (Conversion Rate Optimization): Include natural calls-to-action, mention booking online, reference the company phone number ${companyPhone}
+- **CRO-optimized** (Conversion Rate Optimization): Include natural calls-to-action, mention booking online at /book and checking pricing at /pricing
 
 ## IMPORTANT: Links
 You MUST include markdown links throughout the content:

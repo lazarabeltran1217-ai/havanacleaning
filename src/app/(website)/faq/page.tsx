@@ -62,8 +62,7 @@ export default async function FaqPage() {
           Frequently Asked Questions
         </h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Everything you need to know about Havana Cleaning services. Can&apos;t
-          find your answer? Call us at (305) 555-CLEAN.
+          Everything you need to know about Havana Cleaning services, pricing, scheduling, and more.
         </p>
       </section>
 
@@ -99,12 +98,12 @@ export default async function FaqPage() {
           >
             Book Your Cleaning
           </Link>
-          <a
-            href="tel:+13055552532"
+          <Link
+            href="/pricing"
             className="inline-block bg-white border border-tobacco/20 text-tobacco px-8 py-3 rounded-xl font-semibold hover:bg-ivory transition-colors"
           >
-            Call (305) 555-CLEAN
-          </a>
+            View Pricing
+          </Link>
         </div>
       </section>
     </div>
