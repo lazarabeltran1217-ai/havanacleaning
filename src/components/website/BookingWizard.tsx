@@ -477,7 +477,7 @@ export function BookingWizard({ services, addOns }: Props) {
               {loading
                 ? "Processing..."
                 : session
-                  ? "Proceed to Payment"
+                  ? "Submit Request"
                   : "Sign In to Book"}
             </button>
           </div>
