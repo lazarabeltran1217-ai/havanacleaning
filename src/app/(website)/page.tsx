@@ -51,11 +51,11 @@ export default async function HomePage() {
 
         {/* Left palm tree */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/palm-left.svg" alt="" className="absolute left-0 bottom-0 w-[300px] md:w-[450px] h-auto pointer-events-none opacity-60" />
+        <img src="/palm-left.svg" alt="" className="absolute left-0 bottom-0 w-[180px] md:w-[280px] h-auto pointer-events-none opacity-60" />
 
         {/* Right palm tree */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/palm-right.svg" alt="" className="absolute right-0 bottom-0 w-[260px] md:w-[400px] h-auto pointer-events-none opacity-60" />
+        <img src="/palm-right.svg" alt="" className="absolute right-0 bottom-0 w-[160px] md:w-[250px] h-auto pointer-events-none opacity-60" />
 
         <div className="max-w-[800px] relative z-10 text-center px-6 pt-36 pb-20 mx-auto">
           <div className="text-[0.75rem] tracking-[0.25em] uppercase text-green-light mb-6 flex items-center justify-center gap-3">
