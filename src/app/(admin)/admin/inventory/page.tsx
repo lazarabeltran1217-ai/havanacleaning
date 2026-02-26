@@ -29,9 +29,83 @@ export default async function AdminInventoryPage() {
         <InventoryActions items={items.map((i) => ({ id: i.id, name: i.name }))} />
       </div>
 
-      <div className="bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
-        <div className="overflow-x-auto">
-        <table className="w-full text-left text-[0.85rem] min-w-[900px]">
+      {/* Mobile card view */}
+      <div className="md:hidden space-y-3">
+        {items.map((item) => {
+          const isLow = item.currentStock <= item.minStock;
+          return (
+            <div key={item.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-medium">{item.name}</span>
+                <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${isLow ? "bg-red/10 text-red" : "bg-green/10 text-green"}`}>
+                  {isLow ? "Low Stock" : "OK"}
+                </span>
+              </div>
+              <div className="space-y-2 text-[0.82rem]">
+                {item.sku && (
+                  <div className="flex justify-between">
+                    <span className="text-sand">SKU</span>
+                    <span className="font-mono text-[0.78rem] text-gray-400">{item.sku}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-sand">Category</span>
+                  <span className="text-gray-500">{item.category || "—"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sand">Stock</span>
+                  <span className={`font-medium ${isLow ? "text-red" : ""}`}>{item.currentStock} {item.unit}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sand">Min Stock</span>
+                  <span className="text-gray-400">{item.minStock}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sand">Cost/Unit</span>
+                  <span>{formatCurrency(item.costPerUnit)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sand">Supplier</span>
+                  <span className="text-gray-500">{item.supplier || "—"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sand">Assigned</span>
+                  <span>
+                    {item.assignedTo ? (
+                      <span className="text-[0.78rem] font-medium text-teal">{item.assignedTo.name}</span>
+                    ) : (
+                      <span className="text-gray-400">—</span>
+                    )}
+                  </span>
+                </div>
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-end gap-3">
+                  <InventoryEditButton item={{
+                    id: item.id,
+                    name: item.name,
+                    sku: item.sku,
+                    category: item.category,
+                    unit: item.unit,
+                    minStock: item.minStock,
+                    costPerUnit: item.costPerUnit,
+                    supplier: item.supplier,
+                    assignedToId: item.assignedToId,
+                  }} />
+                  <Link href={`/admin/inventory/${item.id}`} className="text-teal text-[0.78rem] font-medium hover:underline">
+                    History
+                  </Link>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        {items.length === 0 && (
+          <div className="bg-white rounded-xl border border-[#ece6d9] px-4 py-12 text-center text-gray-400">No inventory items.</div>
+        )}
+      </div>
+
+      {/* Desktop table view */}
+      <div className="hidden md:block bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
+        <table className="w-full text-left text-[0.85rem]">
           <thead>
             <tr className="bg-ivory/50 border-b border-[#ece6d9]">
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Item</th>
@@ -102,7 +176,6 @@ export default async function AdminInventoryPage() {
             })}
           </tbody>
         </table>
-        </div>
       </div>
     </div>
   );

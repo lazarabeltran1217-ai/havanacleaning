@@ -24,9 +24,66 @@ export default async function AdminPayrollPage() {
         <PayrollActions />
       </div>
 
-      <div className="bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
-        <div className="overflow-x-auto">
-        <table className="w-full text-left text-[0.85rem] min-w-[850px]">
+      {/* Mobile card view */}
+      <div className="md:hidden space-y-3">
+        {payrolls.map((p) => {
+          const adjustments = p.bonuses + p.tips + p.mileageReimbursement - p.deductions;
+          return (
+            <div key={p.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-medium">{p.employee.name}</span>
+                <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[p.status] || ""}`}>
+                  {p.status}
+                </span>
+              </div>
+              <div className="space-y-2 text-[0.82rem]">
+                <div className="flex justify-between">
+                  <span className="text-sand">Period</span>
+                  <span className="text-gray-500">{formatDate(p.periodStart)} — {formatDate(p.periodEnd)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sand">Hours</span>
+                  <span>{p.totalHours.toFixed(1)}h</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sand">Rate</span>
+                  <span>{formatCurrency(p.hourlyRate)}/hr</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sand">Gross</span>
+                  <span>{formatCurrency(p.grossPay)}</span>
+                </div>
+                {adjustments !== 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-sand">Adjustments</span>
+                    <span className={adjustments > 0 ? "text-green" : "text-red"}>
+                      {adjustments > 0 ? "+" : ""}{formatCurrency(adjustments)}
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between pt-2 border-t border-gray-100">
+                  <span className="text-sand font-medium">Net Pay</span>
+                  <span className="font-medium text-green">{formatCurrency(p.netPay)}</span>
+                </div>
+                {p.status !== "PAID" && (
+                  <div className="pt-2 flex justify-end">
+                    <PayrollStatusButtonClient id={p.id} status={p.status} />
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+        {payrolls.length === 0 && (
+          <div className="bg-white rounded-xl border border-[#ece6d9] px-4 py-12 text-center text-gray-400">
+            No payroll records yet. Click &quot;Generate Payroll&quot; to create from time entries.
+          </div>
+        )}
+      </div>
+
+      {/* Desktop table view */}
+      <div className="hidden md:block bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
+        <table className="w-full text-left text-[0.85rem]">
           <thead>
             <tr className="bg-ivory/50 border-b border-[#ece6d9]">
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Employee</th>
@@ -86,7 +143,6 @@ export default async function AdminPayrollPage() {
             )}
           </tbody>
         </table>
-        </div>
       </div>
     </div>
   );

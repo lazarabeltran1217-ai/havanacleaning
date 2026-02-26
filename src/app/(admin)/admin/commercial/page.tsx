@@ -26,9 +26,59 @@ export default async function AdminCommercialPage() {
         <AddCommercialButton />
       </div>
 
-      <div className="bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
-        <div className="overflow-x-auto">
-        <table className="w-full text-left text-[0.85rem] min-w-[750px]">
+      {/* Mobile card view */}
+      <div className="md:hidden space-y-3">
+        {inquiries.map((inq) => (
+          <div key={inq.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-medium">{inq.companyName}</span>
+              <div className="flex items-center gap-1">
+                <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[inq.status] || ""}`}>
+                  {inq.status.replace(/_/g, " ")}
+                </span>
+                {inq.spamScore > 2 && (
+                  <span className="text-[0.65rem] text-red">⚠</span>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2 text-[0.82rem]">
+              <div className="flex justify-between">
+                <span className="text-sand">Contact</span>
+                <span className="text-right">
+                  <div>{inq.contactName}</div>
+                  <div className="text-gray-400 text-[0.75rem]">{inq.contactEmail}</div>
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sand">Industry</span>
+                <span className="text-gray-500">{inq.industry || "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sand">Sq Ft</span>
+                <span className="text-gray-500">{inq.squareFootage || "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sand">Budget</span>
+                <span className="text-gray-500">{inq.budgetRange || "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sand">Received</span>
+                <span className="text-gray-500">{formatDate(inq.createdAt)}</span>
+              </div>
+              <div className="pt-2 border-t border-gray-100 flex justify-end">
+                <Link href={`/admin/commercial/${inq.id}`} className="text-green text-[0.78rem] font-medium hover:underline">View →</Link>
+              </div>
+            </div>
+          </div>
+        ))}
+        {inquiries.length === 0 && (
+          <div className="bg-white rounded-xl border border-[#ece6d9] px-4 py-12 text-center text-gray-400">No commercial inquiries yet.</div>
+        )}
+      </div>
+
+      {/* Desktop table view */}
+      <div className="hidden md:block bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
+        <table className="w-full text-left text-[0.85rem]">
           <thead>
             <tr className="bg-ivory/50 border-b border-[#ece6d9]">
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Company</th>
@@ -71,7 +121,6 @@ export default async function AdminCommercialPage() {
             )}
           </tbody>
         </table>
-        </div>
       </div>
     </div>
   );

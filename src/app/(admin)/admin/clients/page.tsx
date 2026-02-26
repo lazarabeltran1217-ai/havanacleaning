@@ -19,9 +19,39 @@ export default async function AdminClientsPage() {
         <AddCustomerButton />
       </div>
 
-      <div className="bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
-        <div className="overflow-x-auto">
-        <table className="w-full text-left text-[0.85rem] min-w-[500px]">
+      {/* Mobile card view */}
+      <div className="md:hidden space-y-3">
+        {customers.map((c) => (
+          <div key={c.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
+            <div className="font-medium mb-3">{c.name}</div>
+            <div className="space-y-2 text-[0.82rem]">
+              <div className="flex justify-between">
+                <span className="text-sand">Email</span>
+                <span className="text-gray-500">{c.email}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sand">Phone</span>
+                <span className="text-gray-500">{c.phone || "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sand">Bookings</span>
+                <span>{c._count.bookings}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sand">Joined</span>
+                <span className="text-gray-500">{formatDate(c.createdAt)}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+        {customers.length === 0 && (
+          <div className="bg-white rounded-xl border border-[#ece6d9] px-4 py-12 text-center text-gray-400">No customers yet.</div>
+        )}
+      </div>
+
+      {/* Desktop table view */}
+      <div className="hidden md:block bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
+        <table className="w-full text-left text-[0.85rem]">
           <thead>
             <tr className="bg-ivory/50 border-b border-[#ece6d9]">
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Name</th>
@@ -46,7 +76,6 @@ export default async function AdminClientsPage() {
             )}
           </tbody>
         </table>
-        </div>
       </div>
     </div>
   );

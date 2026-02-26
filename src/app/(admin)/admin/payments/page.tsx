@@ -23,9 +23,44 @@ export default async function AdminPaymentsPage() {
     <div>
       <h2 className="font-display text-xl mb-6">Payments</h2>
 
-      <div className="bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
-        <div className="overflow-x-auto">
-        <table className="w-full text-left text-[0.85rem] min-w-[600px]">
+      {/* Mobile card view */}
+      <div className="md:hidden space-y-3">
+        {payments.map((p) => (
+          <div key={p.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-medium">{p.customer.name}</span>
+              <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[p.status] || ""}`}>
+                {p.status}
+              </span>
+            </div>
+            <div className="space-y-2 text-[0.82rem]">
+              <div className="flex justify-between">
+                <span className="text-sand">Booking</span>
+                <span className="text-gray-500">{p.booking ? `${p.booking.bookingNumber} — ${p.booking.service.name}` : "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sand">Method</span>
+                <span className="capitalize">{p.method.toLowerCase()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sand">Date</span>
+                <span className="text-gray-500">{p.paidAt ? formatDate(p.paidAt) : formatDate(p.createdAt)}</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-gray-100">
+                <span className="text-sand">Amount</span>
+                <span className="font-medium text-green">{formatCurrency(p.amount)}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+        {payments.length === 0 && (
+          <div className="bg-white rounded-xl border border-[#ece6d9] px-4 py-12 text-center text-gray-400">No payments yet.</div>
+        )}
+      </div>
+
+      {/* Desktop table view */}
+      <div className="hidden md:block bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
+        <table className="w-full text-left text-[0.85rem]">
           <thead>
             <tr className="bg-ivory/50 border-b border-[#ece6d9]">
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Customer</th>
@@ -58,7 +93,6 @@ export default async function AdminPaymentsPage() {
             )}
           </tbody>
         </table>
-        </div>
       </div>
     </div>
   );

@@ -27,9 +27,51 @@ export default async function AdminApplicantsPage() {
         <AddApplicationButton />
       </div>
 
-      <div className="bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
-        <div className="overflow-x-auto">
-        <table className="w-full text-left text-[0.85rem] min-w-[650px]">
+      {/* Mobile card view */}
+      <div className="md:hidden space-y-3">
+        {applications.map((app) => (
+          <div key={app.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-medium">{app.firstName} {app.lastName}</span>
+              <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[app.status] || ""}`}>
+                {app.status.replace(/_/g, " ")}
+              </span>
+            </div>
+            <div className="space-y-2 text-[0.82rem]">
+              <div className="flex justify-between">
+                <span className="text-sand">Email</span>
+                <span className="text-gray-500">{app.email}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sand">Phone</span>
+                <span className="text-gray-400">{app.phone}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sand">Experience</span>
+                <span>{app.yearsExperience || "N/A"} yrs</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sand">Type</span>
+                <span className="text-gray-500">{app.employmentType || "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sand">Applied</span>
+                <span className="text-gray-500">{formatDate(app.createdAt)}</span>
+              </div>
+              <div className="pt-2 border-t border-gray-100 flex justify-end">
+                <Link href={`/admin/applicants/${app.id}`} className="text-green text-[0.78rem] font-medium hover:underline">Review →</Link>
+              </div>
+            </div>
+          </div>
+        ))}
+        {applications.length === 0 && (
+          <div className="bg-white rounded-xl border border-[#ece6d9] px-4 py-12 text-center text-gray-400">No applications yet.</div>
+        )}
+      </div>
+
+      {/* Desktop table view */}
+      <div className="hidden md:block bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
+        <table className="w-full text-left text-[0.85rem]">
           <thead>
             <tr className="bg-ivory/50 border-b border-[#ece6d9]">
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Name</th>
@@ -67,7 +109,6 @@ export default async function AdminApplicantsPage() {
             )}
           </tbody>
         </table>
-        </div>
       </div>
     </div>
   );
