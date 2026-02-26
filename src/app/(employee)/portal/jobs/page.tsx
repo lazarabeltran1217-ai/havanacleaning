@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { ClipboardList } from "lucide-react";
+import { ServiceIcon } from "@/lib/service-icons";
 import { formatDate } from "@/lib/utils";
 
 interface Job {
@@ -43,7 +45,7 @@ export default function MyJobsPage() {
 
       {jobs.length === 0 ? (
         <div className="bg-white rounded-2xl p-8 border border-gray-100 text-center">
-          <div className="text-3xl mb-3">📋</div>
+          <ClipboardList className="w-8 h-8 text-gray-300 mx-auto mb-3" />
           <p className="text-gray-400 text-sm">No jobs assigned to you yet.</p>
         </div>
       ) : (
@@ -51,8 +53,9 @@ export default function MyJobsPage() {
           {jobs.map((j) => (
             <div key={j.id} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium">
-                  {j.booking.service.icon} {j.booking.service.name}
+                <span className="font-medium flex items-center gap-1.5">
+                  <ServiceIcon emoji={j.booking.service.icon} className="w-4 h-4 text-green" />
+                  {j.booking.service.name}
                 </span>
                 <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[j.booking.status] || "bg-gray-100 text-gray-500"}`}>
                   {j.booking.status}

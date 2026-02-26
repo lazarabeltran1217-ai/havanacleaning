@@ -4,6 +4,8 @@ import { SERVICE_AREAS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import { JsonLd } from "@/components/website/JsonLd";
 import { aggregateRatingSchema, reviewSchema, faqPageSchema } from "@/lib/schema";
+import { Check } from "lucide-react";
+import { ServiceIcon } from "@/lib/service-icons";
 
 // Helper to get content with fallback
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -118,7 +120,7 @@ export default async function HomePage() {
       <div className="bg-gradient-to-r from-green to-teal py-5 px-6 md:px-20 flex items-center justify-evenly gap-10 flex-wrap">
         {(trustBar.items as string[]).map((item: string) => (
           <div key={item} className="flex items-center gap-2.5 text-white text-[0.85rem] font-medium tracking-[0.06em] uppercase">
-            ✓ {item}
+            <Check className="w-4 h-4 shrink-0" /> {item}
           </div>
         ))}
       </div>
@@ -139,7 +141,7 @@ export default async function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0.5">
           {services.map((service) => (
             <div key={service.id} className="bg-white/[0.04] border border-gold/15 p-10 hover:bg-green-light/10 hover:border-green-light transition-colors cursor-pointer">
-              <span className="text-4xl block mb-4">{service.icon || "✨"}</span>
+              <ServiceIcon emoji={service.icon || "✨"} className="w-10 h-10 text-green-light mb-4" />
               <div className="font-display text-lg text-cream mb-2.5">{service.name}</div>
               <p className="text-sand text-[0.88rem] leading-relaxed mb-4">{service.description}</p>
               <div className="text-amber text-[0.85rem] font-medium tracking-wide">

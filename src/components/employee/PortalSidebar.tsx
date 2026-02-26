@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import type { LucideIcon } from "lucide-react";
+import { Home, ClipboardList, Timer, CalendarDays, DollarSign, User } from "lucide-react";
 
-const navItems = [
-  { label: "Today", href: "/portal", icon: "🏠" },
-  { label: "Jobs", href: "/portal/jobs", icon: "📋" },
-  { label: "Clock In/Out", href: "/portal/clock", icon: "⏱️" },
-  { label: "Schedule", href: "/portal/schedule", icon: "📅" },
-  { label: "Hours & Pay", href: "/portal/hours", icon: "💰" },
-  { label: "Profile", href: "/portal/profile", icon: "👤" },
+const navItems: { label: string; href: string; icon: LucideIcon }[] = [
+  { label: "Today", href: "/portal", icon: Home },
+  { label: "Jobs", href: "/portal/jobs", icon: ClipboardList },
+  { label: "Clock In/Out", href: "/portal/clock", icon: Timer },
+  { label: "Schedule", href: "/portal/schedule", icon: CalendarDays },
+  { label: "Hours & Pay", href: "/portal/hours", icon: DollarSign },
+  { label: "Profile", href: "/portal/profile", icon: User },
 ];
 
 export function PortalSidebar() {
@@ -36,7 +38,7 @@ export function PortalSidebar() {
                   : "text-sand hover:bg-white/[0.07] hover:text-white"
               }`}
             >
-              <span className="text-base">{item.icon}</span>
+              <item.icon className="w-4 h-4 shrink-0" />
               {item.label}
             </Link>
           );

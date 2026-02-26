@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { FileText } from "lucide-react";
 
 interface BlogPost {
   id: string;
@@ -216,7 +217,7 @@ export function BlogManager({ initialPosts }: Props) {
       {/* Posts list */}
       {posts.length === 0 ? (
         <div className="bg-white rounded-xl p-12 border border-[#ece6d9] text-center">
-          <div className="text-4xl mb-4">📝</div>
+          <FileText className="w-10 h-10 text-gray-300 mx-auto mb-4" />
           <p className="text-gray-400">No blog posts yet. Create your first one!</p>
         </div>
       ) : (

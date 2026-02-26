@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import Link from "next/link";
+import { ServiceIcon } from "@/lib/service-icons";
 import { QuickBookForm } from "@/components/admin/QuickBookForm";
 
 export default async function AdminBookingsPage() {
@@ -49,7 +50,7 @@ export default async function AdminBookingsPage() {
                 {b.status}
               </span>
             </div>
-            <div className="text-[0.88rem] font-medium mb-1">{b.service.icon} {b.service.name}</div>
+            <div className="text-[0.88rem] font-medium mb-1 flex items-center gap-1.5"><ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-green" /> {b.service.name}</div>
             <div className="space-y-2 text-[0.82rem]">
               <div className="flex justify-between">
                 <span className="text-sand">Customer</span>
@@ -106,7 +107,7 @@ export default async function AdminBookingsPage() {
             {bookings.map((b) => (
               <tr key={b.id} className="border-b border-gray-50 hover:bg-ivory/30">
                 <td className="px-4 py-3 font-mono text-[0.8rem]">{b.bookingNumber}</td>
-                <td className="px-4 py-3">{b.service.icon} {b.service.name}</td>
+                <td className="px-4 py-3"><span className="flex items-center gap-1.5"><ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-green" /> {b.service.name}</span></td>
                 <td className="px-4 py-3">
                   <div>{b.customer.name}</div>
                   <div className="text-gray-400 text-[0.75rem]">{b.customer.email}</div>

@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ServiceIcon } from "@/lib/service-icons";
 
 interface TodayJob {
   id: string;
@@ -84,8 +85,8 @@ export default function EmployeeToday() {
             {jobs.map((j) => (
               <div key={j.id} className="border border-gray-100 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-[0.9rem]">
-                    {j.booking.service.icon} {j.booking.service.name}
+                  <span className="font-medium text-[0.9rem] flex items-center gap-1.5">
+                    <ServiceIcon emoji={j.booking.service.icon} className="w-4 h-4 text-green" /> {j.booking.service.name}
                   </span>
                   <span className="text-gray-400 text-[0.78rem] capitalize">{j.booking.scheduledTime}</span>
                 </div>

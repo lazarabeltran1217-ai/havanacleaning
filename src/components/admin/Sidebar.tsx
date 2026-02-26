@@ -3,25 +3,31 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import type { LucideIcon } from "lucide-react";
+import {
+  LayoutDashboard, CalendarCheck, Calendar, Clock, ClipboardList,
+  Building2, CreditCard, TrendingUp, Users, Home, Package,
+  DollarSign, Sparkles, PenLine, FileText, Search, Settings,
+} from "lucide-react";
 
-const navItems = [
-  { label: "Dashboard", href: "/admin", icon: "📊" },
-  { label: "Bookings", href: "/admin/bookings", icon: "📅" },
-  { label: "Schedule", href: "/admin/schedule", icon: "🗓️" },
-  { label: "Clock", href: "/admin/clock", icon: "⏰" },
-  { label: "Applicants", href: "/admin/applicants", icon: "📋" },
-  { label: "Commercial", href: "/admin/commercial", icon: "🏢" },
-  { label: "Payments", href: "/admin/payments", icon: "💳" },
-  { label: "Revenue", href: "/admin/revenue", icon: "📈" },
-  { label: "Staff", href: "/admin/staff", icon: "👥" },
-  { label: "Clients", href: "/admin/clients", icon: "🏠" },
-  { label: "Inventory", href: "/admin/inventory", icon: "📦" },
-  { label: "Payroll", href: "/admin/payroll", icon: "💰" },
-  { label: "Services", href: "/admin/services", icon: "✨" },
-  { label: "Blog", href: "/admin/blog", icon: "✍️" },
-  { label: "Content", href: "/admin/content", icon: "📝" },
-  { label: "SEO Manager", href: "/admin/seo", icon: "🔍" },
-  { label: "Settings", href: "/admin/settings", icon: "⚙️" },
+const navItems: { label: string; href: string; icon: LucideIcon }[] = [
+  { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { label: "Bookings", href: "/admin/bookings", icon: CalendarCheck },
+  { label: "Schedule", href: "/admin/schedule", icon: Calendar },
+  { label: "Clock", href: "/admin/clock", icon: Clock },
+  { label: "Applicants", href: "/admin/applicants", icon: ClipboardList },
+  { label: "Commercial", href: "/admin/commercial", icon: Building2 },
+  { label: "Payments", href: "/admin/payments", icon: CreditCard },
+  { label: "Revenue", href: "/admin/revenue", icon: TrendingUp },
+  { label: "Staff", href: "/admin/staff", icon: Users },
+  { label: "Clients", href: "/admin/clients", icon: Home },
+  { label: "Inventory", href: "/admin/inventory", icon: Package },
+  { label: "Payroll", href: "/admin/payroll", icon: DollarSign },
+  { label: "Services", href: "/admin/services", icon: Sparkles },
+  { label: "Blog", href: "/admin/blog", icon: PenLine },
+  { label: "Content", href: "/admin/content", icon: FileText },
+  { label: "SEO Manager", href: "/admin/seo", icon: Search },
+  { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
 interface SidebarProps {
@@ -62,7 +68,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   : "text-sand hover:bg-white/[0.07] hover:text-white"
               }`}
             >
-              <span className="text-base">{item.icon}</span>
+              <item.icon className="w-4 h-4 shrink-0" />
               {item.label}
             </Link>
           );

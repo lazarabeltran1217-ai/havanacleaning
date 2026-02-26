@@ -1,5 +1,6 @@
 "use client";
 
+import { TrendingUp } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -25,7 +26,7 @@ export function RevenueChart({ data }: Props) {
   if (data.length === 0) {
     return (
       <div className="bg-white rounded-xl p-12 border border-[#ece6d9] text-center">
-        <div className="text-4xl mb-4">📈</div>
+        <TrendingUp className="w-10 h-10 text-gray-300 mx-auto mb-4" />
         <p className="text-gray-400 text-[0.9rem]">
           Revenue chart will appear once you have payment data.
         </p>

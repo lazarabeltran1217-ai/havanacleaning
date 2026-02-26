@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { FileText } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Blog — Cleaning Tips & Home Care Guides",
@@ -34,7 +35,7 @@ export default async function BlogPage() {
 
       {posts.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 border border-gray-100 text-center">
-          <div className="text-4xl mb-4">📝</div>
+          <FileText className="w-10 h-10 text-gray-300 mx-auto mb-4" />
           <p className="text-gray-400">Blog posts coming soon!</p>
         </div>
       ) : (

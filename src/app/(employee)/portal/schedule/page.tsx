@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { ServiceIcon } from "@/lib/service-icons";
 
 interface ScheduleJob {
   id: string;
@@ -122,8 +123,8 @@ export default function SchedulePage() {
                   {dayJobs.map((j) => (
                     <div key={j.id} className="border border-gray-100 rounded-lg px-3 py-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[0.85rem] font-medium">
-                          {j.booking.service.icon} {j.booking.service.name}
+                        <span className="text-[0.85rem] font-medium flex items-center gap-1">
+                          <ServiceIcon emoji={j.booking.service.icon} className="w-3.5 h-3.5 text-green" /> {j.booking.service.name}
                         </span>
                         <span className="text-gray-400 text-[0.75rem] capitalize">{j.booking.scheduledTime}</span>
                       </div>

@@ -161,7 +161,7 @@ export function InventoryActions({ items }: Props) {
                   <option value="">No job (general stock change)</option>
                   {bookings.map((b) => (
                     <option key={b.id} value={b.id}>
-                      {b.bookingNumber} — {b.service.icon} {b.service.name} — {b.customer.name} ({formatDate(b.scheduledDate)})
+                      {b.bookingNumber} — {b.service.name} — {b.customer.name} ({formatDate(b.scheduledDate)})
                     </option>
                   ))}
                 </select>

@@ -3,6 +3,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { Sparkles } from "lucide-react";
+import { ServiceIcon } from "@/lib/service-icons";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 export default async function MyBookingsPage() {
@@ -32,7 +34,7 @@ export default async function MyBookingsPage() {
 
       {bookings.length === 0 ? (
         <div className="bg-white border border-tobacco/10 rounded-lg p-12 text-center">
-          <div className="text-4xl mb-4">🧹</div>
+          <Sparkles className="w-10 h-10 text-gray-300 mx-auto mb-4" />
           <p className="text-sand text-[0.9rem] mb-4">
             You haven&apos;t booked any cleanings yet.
           </p>
@@ -53,7 +55,7 @@ export default async function MyBookingsPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xl">{b.service.icon}</span>
+                    <ServiceIcon emoji={b.service.icon} className="w-5 h-5 text-green" />
                     <h3 className="font-display text-lg">{b.service.name}</h3>
                     <span
                       className={`text-[0.7rem] uppercase tracking-wider px-2.5 py-0.5 rounded-full font-medium ${

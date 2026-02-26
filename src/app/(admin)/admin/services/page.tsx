@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
 import { ServiceEditButton } from "@/components/admin/ServiceEditor";
+import { ServiceIcon } from "@/lib/service-icons";
 
 export default async function AdminServicesPage() {
   const fetchServices = () =>
@@ -27,7 +28,7 @@ export default async function AdminServicesPage() {
           <div key={service.id} className="bg-white rounded-xl border border-[#ece6d9] p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <span className="text-3xl">{service.icon}</span>
+                <ServiceIcon emoji={service.icon} className="w-8 h-8 text-green" />
                 <div>
                   <h3 className="font-display text-lg">{service.name}</h3>
                   {!service.isActive && (

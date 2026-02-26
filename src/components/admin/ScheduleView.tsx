@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { ClipboardList } from "lucide-react";
+import { ServiceIcon } from "@/lib/service-icons";
 import { QuickBookForm } from "./QuickBookForm";
 
 interface Employee {
@@ -94,8 +96,9 @@ function BookingCard({
         statusColors[b.status] || "border-l-gray-300"
       }`}
     >
-      <div className="font-medium truncate">
-        {b.service.icon} {b.service.name}
+      <div className="font-medium truncate flex items-center gap-1">
+        <ServiceIcon emoji={b.service.icon} className="w-3.5 h-3.5 shrink-0" />
+        {b.service.name}
       </div>
       <div className="text-gray-500 truncate">{b.customer.name}</div>
       <div className="text-gray-400 text-[0.68rem]">
@@ -396,7 +399,7 @@ export function ScheduleView() {
       {/* Empty state message */}
       {!loading && bookings.length === 0 && (
         <div className="mt-6 bg-white rounded-xl border border-[#ece6d9] p-8 text-center">
-          <div className="text-3xl mb-3">📋</div>
+          <ClipboardList className="w-8 h-8 text-gray-300 mx-auto mb-3" />
           <p className="text-gray-500 text-[0.9rem] mb-2">
             No bookings this week.
           </p>

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import type { Metadata } from "next";
+import { ServiceIcon } from "@/lib/service-icons";
 import { JsonLd } from "@/components/website/JsonLd";
 import { serviceSchema, breadcrumbSchema } from "@/lib/schema";
 
@@ -63,7 +64,7 @@ export default async function ServiceDetailPage({ params }: Props) {
             ← Back to Services
           </Link>
           <div className="flex items-center gap-4 mb-4">
-            <span className="text-5xl">{service.icon || "✨"}</span>
+            <ServiceIcon emoji={service.icon || "✨"} className="w-12 h-12 text-green-light" />
             <h1
               className="font-display text-cream"
               style={{ fontSize: "clamp(2.2rem, 4vw, 3.5rem)" }}

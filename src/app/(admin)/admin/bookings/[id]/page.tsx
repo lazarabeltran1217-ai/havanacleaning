@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { ServiceIcon } from "@/lib/service-icons";
 import { BookingActions } from "@/components/admin/BookingActions";
 
 interface Props {
@@ -69,7 +70,7 @@ export default async function AdminBookingDetailPage({ params }: Props) {
             <dl className="grid grid-cols-2 gap-4 text-[0.85rem]">
               <div>
                 <dt className="text-gray-400 text-[0.75rem] uppercase tracking-wider">Service</dt>
-                <dd className="mt-1">{booking.service.icon} {booking.service.name}</dd>
+                <dd className="mt-1 flex items-center gap-1.5"><ServiceIcon emoji={booking.service.icon} className="w-4 h-4 text-green" /> {booking.service.name}</dd>
               </div>
               <div>
                 <dt className="text-gray-400 text-[0.75rem] uppercase tracking-wider">Date / Time</dt>

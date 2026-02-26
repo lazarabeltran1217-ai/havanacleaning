@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import type { Metadata } from "next";
+import { ServiceIcon } from "@/lib/service-icons";
 
 export const metadata: Metadata = {
   title: "Pricing | Havana Cleaning",
@@ -61,7 +62,7 @@ export default async function PricingPage() {
             >
               <div className="bg-tobacco/[0.03] px-8 py-5 border-b border-tobacco/10 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">{service.icon || "✨"}</span>
+                  <ServiceIcon emoji={service.icon || "✨"} className="w-6 h-6 text-green" />
                   <h2 className="font-display text-xl">{service.name}</h2>
                 </div>
                 <Link

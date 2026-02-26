@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { ServiceIcon } from "@/lib/service-icons";
 
 export default async function AccountOverview() {
   const session = await getServerSession(authOptions);
@@ -91,8 +92,8 @@ export default async function AccountOverview() {
                 className="flex items-center justify-between border-b border-tobacco/5 pb-3 last:border-0"
               >
                 <div>
-                  <div className="font-medium text-[0.9rem]">
-                    {b.service.icon} {b.service.name}
+                  <div className="font-medium text-[0.9rem] flex items-center gap-1.5">
+                    <ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-green" /> {b.service.name}
                   </div>
                   <div className="text-sand text-[0.8rem]">
                     {formatDate(b.scheduledDate)} &middot; {b.bookingNumber}

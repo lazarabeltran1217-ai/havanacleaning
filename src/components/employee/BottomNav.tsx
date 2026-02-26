@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { LucideIcon } from "lucide-react";
+import { Home, ClipboardList, Timer, CalendarDays, DollarSign } from "lucide-react";
 
-const tabs = [
-  { label: "Today", href: "/portal", icon: "🏠" },
-  { label: "Jobs", href: "/portal/jobs", icon: "📋" },
-  { label: "Clock", href: "/portal/clock", icon: "⏱️", elevated: true },
-  { label: "Schedule", href: "/portal/schedule", icon: "📅" },
-  { label: "Hours", href: "/portal/hours", icon: "💰" },
+const tabs: { label: string; href: string; icon: LucideIcon; elevated?: boolean }[] = [
+  { label: "Today", href: "/portal", icon: Home },
+  { label: "Jobs", href: "/portal/jobs", icon: ClipboardList },
+  { label: "Clock", href: "/portal/clock", icon: Timer, elevated: true },
+  { label: "Schedule", href: "/portal/schedule", icon: CalendarDays },
+  { label: "Hours", href: "/portal/hours", icon: DollarSign },
 ];
 
 export function BottomNav() {
@@ -28,11 +30,11 @@ export function BottomNav() {
               } ${isActive ? "text-green" : "text-gray-400"}`}
             >
               {tab.elevated ? (
-                <span className="w-14 h-14 rounded-full bg-green text-white text-2xl flex items-center justify-center shadow-lg border-4 border-white">
-                  {tab.icon}
+                <span className="w-14 h-14 rounded-full bg-green text-white flex items-center justify-center shadow-lg border-4 border-white">
+                  <tab.icon className="w-6 h-6" />
                 </span>
               ) : (
-                <span className="text-xl">{tab.icon}</span>
+                <tab.icon className="w-5 h-5" />
               )}
               <span>{tab.label}</span>
             </Link>

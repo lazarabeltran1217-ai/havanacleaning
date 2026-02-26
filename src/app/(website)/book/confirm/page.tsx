@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { BookingPayment } from "@/components/website/BookingPayment";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { ServiceIcon } from "@/lib/service-icons";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -75,7 +76,7 @@ export default async function ConfirmPage({ searchParams }: Props) {
               <div className="flex justify-between">
                 <dt className="text-sand">Service</dt>
                 <dd>
-                  {booking.service.icon} {booking.service.name}
+                  <span className="flex items-center gap-1.5"><ServiceIcon emoji={booking.service.icon} className="w-4 h-4 text-green" /> {booking.service.name}</span>
                 </dd>
               </div>
               <div className="flex justify-between">

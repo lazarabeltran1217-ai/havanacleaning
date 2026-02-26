@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import Link from "next/link";
+import { ServiceIcon } from "@/lib/service-icons";
 
 const fetchRecentBookings = () =>
   prisma.booking.findMany({
@@ -108,7 +109,7 @@ export default async function AdminDashboard() {
               {recentBookings.map((b) => (
                 <div key={b.id} className="flex items-center justify-between border-b border-gray-100 pb-3 last:border-0">
                   <div>
-                    <div className="text-[0.85rem] font-medium">{b.service.icon} {b.service.name}</div>
+                    <div className="text-[0.85rem] font-medium flex items-center gap-1.5"><ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-green" /> {b.service.name}</div>
                     <div className="text-gray-400 text-[0.78rem]">{b.customer.name} &middot; {formatDate(b.scheduledDate)}</div>
                   </div>
                   <div className="text-right">
