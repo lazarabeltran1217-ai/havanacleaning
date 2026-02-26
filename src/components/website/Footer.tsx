@@ -42,7 +42,6 @@ export function Footer() {
             ].map((s) => (
               <li key={s.slug}><Link href={`/services/${s.slug}`} className="text-sand text-[0.88rem] hover:text-cream transition-colors">{s.name}</Link></li>
             ))}
-            <li><Link href="/services/green-clean" className="text-green-light text-[0.88rem] hover:text-white transition-colors">Green Clean</Link></li>
           </ul>
         </div>
 

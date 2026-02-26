@@ -117,24 +117,6 @@ export const SERVICE_DEFAULTS: Record<string, ServiceContent> = {
       { title: "5-Star Reviews", text: "A consistently clean, well-presented rental leads to better guest ratings." },
     ],
   },
-  "green-clean": {
-    longDescription:
-      "Our Green Clean service uses 100% non-toxic, plant-based cleaning products that are safe for your family, pets, and the environment. Perfect for households with allergies, sensitivities, young children, or anyone who prefers a chemical-free clean. You get the same thorough service with products you can feel good about.",
-    features: [
-      "Non-toxic, plant-based cleaning products",
-      "Fragrance-free options available",
-      "Full residential cleaning with green products",
-      "Safe for children, pets, and allergy sufferers",
-      "HEPA-filtered vacuuming",
-      "Microfiber cloths to reduce chemical use",
-      "All supplies provided — nothing harsh enters your home",
-    ],
-    benefits: [
-      { title: "Safe for Kids & Pets", text: "No harsh chemicals, fumes, or residues — just a clean, healthy home." },
-      { title: "Allergy-Friendly", text: "Fragrance-free and hypoallergenic options for sensitive households." },
-      { title: "Same Thorough Clean", text: "Plant-based doesn't mean less effective. We deliver the same spotless results." },
-    ],
-  },
   "recurring-plans": {
     longDescription:
       "Save time and money with a recurring cleaning plan. Choose weekly, bi-weekly, or monthly service and enjoy a consistently clean home without having to think about it. Recurring clients get priority scheduling, the same trusted team each visit, and discounted rates compared to one-time bookings.",
