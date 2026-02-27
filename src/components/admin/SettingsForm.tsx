@@ -24,6 +24,10 @@ const SOCIAL_FIELDS = [
   { key: "social_nextdoor", label: "Nextdoor URL" },
 ];
 
+const SEO_FIELDS = [
+  { key: "google_analytics_id", label: "Google Analytics Measurement ID", placeholder: "G-XXXXXXXXXX" },
+];
+
 const API_FIELDS = [
   { key: "api_stripe_secret", label: "Stripe Secret Key", placeholder: "sk_live_..." },
   { key: "api_stripe_publishable", label: "Stripe Publishable Key", placeholder: "pk_live_..." },
@@ -94,6 +98,31 @@ export function SettingsForm({ initialSettings }: Props) {
                 placeholder="https://..."
                 className={inputClass}
               />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* SEO & ANALYTICS */}
+      <div className="bg-white rounded-xl p-6 border border-[#ece6d9]">
+        <h3 className="font-display text-base mb-4">SEO & Analytics</h3>
+        <div className="space-y-3">
+          {SEO_FIELDS.map((field) => (
+            <div key={field.key}>
+              <label className={labelClass}>{field.label}</label>
+              <input
+                type="text"
+                value={settings[field.key] || ""}
+                onChange={(e) => update(field.key, e.target.value)}
+                placeholder={field.placeholder}
+                className={inputClass}
+              />
+              {settings[field.key] && (
+                <div className="flex items-center gap-1 mt-1">
+                  <span className="w-1.5 h-1.5 bg-green rounded-full" />
+                  <span className="text-green text-[0.7rem]">Active</span>
+                </div>
+              )}
             </div>
           ))}
         </div>

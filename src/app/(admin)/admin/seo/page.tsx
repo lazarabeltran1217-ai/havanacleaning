@@ -25,8 +25,10 @@ export default async function AdminSeoPage() {
   let directories: Awaited<ReturnType<typeof fetchDirectories>> = [];
   let pages: Awaited<ReturnType<typeof fetchPageConfigs>> = [];
 
+  let gaId = "";
+
   try {
-    [services, areas, posts, faqs, keywords, directories, pages] = await Promise.all([
+    const [s, a, p, f, k, d, pg, gaSetting] = await Promise.all([
       fetchServices(),
       fetchAreas(),
       fetchPosts(),
@@ -34,7 +36,16 @@ export default async function AdminSeoPage() {
       fetchKeywords(),
       fetchDirectories(),
       fetchPageConfigs(),
+      prisma.setting.findUnique({ where: { key: "google_analytics_id" } }),
     ]);
+    services = s;
+    areas = a;
+    posts = p;
+    faqs = f;
+    keywords = k;
+    directories = d;
+    pages = pg;
+    gaId = typeof gaSetting?.value === "string" ? gaSetting.value : "";
   } catch (error) {
     console.error("Failed to fetch SEO data:", error);
   }
@@ -59,6 +70,7 @@ export default async function AdminSeoPage() {
       keywords={keywords}
       directories={directories}
       pages={pages}
+      gaId={gaId}
     />
   );
 }

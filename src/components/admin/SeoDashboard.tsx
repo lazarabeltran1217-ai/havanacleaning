@@ -52,11 +52,12 @@ interface Props {
   keywords: Keyword[];
   directories: Directory[];
   pages: PageSeo[];
+  gaId?: string;
 }
 
 const TABS = ["SEO", "AEO", "GEO", "CRO"] as const;
 
-export function SeoDashboard({ scores, services, areas, posts, faqs, keywords, directories, pages }: Props) {
+export function SeoDashboard({ scores, services, areas, posts, faqs, keywords, directories, pages, gaId }: Props) {
   const [tab, setTab] = useState<(typeof TABS)[number]>("SEO");
 
   return (
@@ -69,13 +70,27 @@ export function SeoDashboard({ scores, services, areas, posts, faqs, keywords, d
           { label: "SEO Score", value: scores.seo, color: scoreColor(scores.seo) },
           { label: "AEO Score", value: scores.aeo, color: scoreColor(scores.aeo) },
           { label: "GEO Score", value: scores.geo, color: scoreColor(scores.geo) },
-          { label: "CRO", value: "—", color: "text-gray-400" },
         ].map((s) => (
           <div key={s.label} className="bg-white rounded-xl p-4 border border-[#ece6d9] text-center">
-            <div className={`text-2xl font-bold ${s.color}`}>{typeof s.value === "number" ? `${s.value}%` : s.value}</div>
+            <div className={`text-2xl font-bold ${s.color}`}>{s.value}%</div>
             <div className="text-[0.72rem] uppercase tracking-wider text-gray-400 mt-1">{s.label}</div>
           </div>
         ))}
+        <div className="bg-white rounded-xl p-4 border border-[#ece6d9] text-center">
+          {gaId ? (
+            <>
+              <div className="text-green text-lg font-bold">Connected</div>
+              <div className="text-[0.72rem] uppercase tracking-wider text-gray-400 mt-1">Google Analytics</div>
+              <div className="text-[0.68rem] text-gray-400 font-mono mt-0.5">{gaId}</div>
+            </>
+          ) : (
+            <>
+              <div className="text-gray-400 text-lg font-bold">Not Set</div>
+              <div className="text-[0.72rem] uppercase tracking-wider text-gray-400 mt-1">Google Analytics</div>
+              <a href="/admin/settings" className="text-[0.68rem] text-green hover:underline mt-0.5 inline-block">Configure in Settings</a>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Tab Bar */}

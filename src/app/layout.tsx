@@ -4,6 +4,7 @@ import { getLocale, getMessages } from "next-intl/server";
 import { Providers } from "@/components/Providers";
 import { JsonLd } from "@/components/website/JsonLd";
 import { localBusinessSchema, organizationSchema, websiteSchema, speakableSchema } from "@/lib/schema";
+import { GoogleAnalytics } from "@/components/website/GoogleAnalytics";
 import "./globals.css";
 
 export const dynamic = "force-dynamic";
@@ -81,6 +82,7 @@ export default async function RootLayout({
         <JsonLd data={speakableSchema()} />
       </head>
       <body className="font-body antialiased bg-ivory text-tobacco">
+        <GoogleAnalytics />
         <Providers>
           <NextIntlClientProvider messages={messages}>
             {children}
