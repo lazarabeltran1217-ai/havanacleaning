@@ -75,7 +75,8 @@ export default async function AdminSeoPage() {
     keywords = k;
     directories = d;
     gaId = typeof gaSetting?.value === "string" ? gaSetting.value : "";
-    gscConnected = typeof gscSetting?.value === "string" && gscSetting.value.length > 10;
+    // Prisma Json field may return the service account JSON as a string or parsed object
+    gscConnected = !!gscSetting?.value && (typeof gscSetting.value === "object" || (typeof gscSetting.value === "string" && gscSetting.value.length > 10));
 
     if (auditRaw) {
       latestAudit = {
