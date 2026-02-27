@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
 import Link from "next/link";
 import { ServiceIcon } from "@/lib/service-icons";
+import { DashboardCharts } from "@/components/admin/DashboardCharts";
 
 const fetchRecentBookings = () =>
   prisma.booking.findMany({
@@ -12,6 +13,66 @@ const fetchRecentBookings = () =>
     orderBy: { createdAt: "desc" },
     take: 5,
   });
+
+/** Build 6-month revenue + booking count data */
+async function fetchMonthlyRevenue() {
+  const now = new Date();
+  const months: { month: string; revenue: number; bookings: number }[] = [];
+
+  for (let i = 5; i >= 0; i--) {
+    const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+    const label = start.toLocaleString("en-US", { month: "short" });
+
+    const [rev, count] = await Promise.all([
+      prisma.payment.aggregate({
+        where: { status: "SUCCEEDED", paidAt: { gte: start, lt: end } },
+        _sum: { amount: true },
+      }),
+      prisma.booking.count({
+        where: { scheduledDate: { gte: start, lt: end } },
+      }),
+    ]);
+
+    months.push({ month: label, revenue: rev._sum.amount ?? 0, bookings: count });
+  }
+  return months;
+}
+
+/** Booking counts grouped by status */
+async function fetchBookingsByStatus() {
+  const grouped = await prisma.booking.groupBy({
+    by: ["status"],
+    _count: true,
+  });
+  return grouped.map((g) => ({ status: g.status, count: g._count }));
+}
+
+/** Revenue totals per service */
+async function fetchRevenueByService() {
+  const bookingsWithPayments = await prisma.booking.findMany({
+    where: { payments: { some: { status: "SUCCEEDED" } } },
+    select: {
+      service: { select: { name: true } },
+      payments: {
+        where: { status: "SUCCEEDED" },
+        select: { amount: true },
+      },
+    },
+  });
+
+  const map = new Map<string, number>();
+  for (const b of bookingsWithPayments) {
+    const name = b.service.name;
+    const total = b.payments.reduce((s, p) => s + p.amount, 0);
+    map.set(name, (map.get(name) ?? 0) + total);
+  }
+
+  return Array.from(map.entries())
+    .map(([service, revenue]) => ({ service, revenue }))
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 7);
+}
 
 export default async function AdminDashboard() {
   const now = new Date();
@@ -29,6 +90,9 @@ export default async function AdminDashboard() {
   let recentBookings: Awaited<ReturnType<typeof fetchRecentBookings>> = [];
   let newApplicants = 0;
   let newInquiries = 0;
+  let monthlyRevenue: { month: string; revenue: number; bookings: number }[] = [];
+  let bookingsByStatus: { status: string; count: number }[] = [];
+  let revenueByService: { service: string; revenue: number }[] = [];
 
   try {
     const [
@@ -41,6 +105,9 @@ export default async function AdminDashboard() {
       _recentBookings,
       _newApplicants,
       _newInquiries,
+      _monthlyRevenue,
+      _bookingsByStatus,
+      _revenueByService,
     ] = await Promise.all([
       prisma.booking.count(),
       prisma.booking.count({ where: { status: "PENDING" } }),
@@ -59,6 +126,9 @@ export default async function AdminDashboard() {
       fetchRecentBookings(),
       prisma.jobApplication.count({ where: { status: "NEW" } }),
       prisma.commercialInquiry.count({ where: { status: "NEW" } }),
+      fetchMonthlyRevenue(),
+      fetchBookingsByStatus(),
+      fetchRevenueByService(),
     ]);
 
     totalBookings = _totalBookings;
@@ -70,6 +140,9 @@ export default async function AdminDashboard() {
     recentBookings = _recentBookings;
     newApplicants = _newApplicants;
     newInquiries = _newInquiries;
+    monthlyRevenue = _monthlyRevenue;
+    bookingsByStatus = _bookingsByStatus;
+    revenueByService = _revenueByService;
   } catch (error) {
     console.error("Failed to fetch dashboard data:", error);
   }
@@ -94,6 +167,15 @@ export default async function AdminDashboard() {
             <div className={`font-display text-2xl font-bold mt-1 ${stat.color}`}>{stat.value}</div>
           </div>
         ))}
+      </div>
+
+      {/* Charts */}
+      <div className="mb-6">
+        <DashboardCharts
+          monthlyRevenue={monthlyRevenue}
+          bookingsByStatus={bookingsByStatus}
+          revenueByService={revenueByService}
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
