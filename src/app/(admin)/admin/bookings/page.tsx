@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
 import Link from "next/link";
 import { ServiceIcon } from "@/lib/service-icons";
 import { QuickBookForm } from "@/components/admin/QuickBookForm";
@@ -47,7 +47,7 @@ export default async function AdminBookingsPage() {
             <div className="flex items-center justify-between mb-3">
               <span className="font-mono text-[0.8rem] font-medium">{b.bookingNumber}</span>
               <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[b.status] || ""}`}>
-                {b.status}
+                {formatStatus(b.status)}
               </span>
             </div>
             <div className="text-[0.88rem] font-medium mb-1 flex items-center gap-1.5"><ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-green" /> {b.service.name}</div>

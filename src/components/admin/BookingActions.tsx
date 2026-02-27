@@ -10,7 +10,14 @@ interface Props {
   employees: { id: string; name: string }[];
 }
 
-const STATUSES = ["PENDING", "CONFIRMED", "IN_PROGRESS", "COMPLETED", "CANCELLED", "NO_SHOW"];
+const STATUSES: { value: string; label: string }[] = [
+  { value: "PENDING", label: "Pending" },
+  { value: "CONFIRMED", label: "Confirmed" },
+  { value: "IN_PROGRESS", label: "In Progress" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "CANCELLED", label: "Cancelled" },
+  { value: "NO_SHOW", label: "No Show" },
+];
 
 export function BookingActions({ bookingId, currentStatus, assignments, employees }: Props) {
   const router = useRouter();
@@ -54,7 +61,7 @@ export function BookingActions({ bookingId, currentStatus, assignments, employee
           className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-[0.85rem] mb-3"
         >
           {STATUSES.map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s.value} value={s.value}>{s.label}</option>
           ))}
         </select>
         <textarea

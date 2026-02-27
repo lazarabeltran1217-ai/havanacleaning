@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
 import Link from "next/link";
 import { ServiceIcon } from "@/lib/service-icons";
 
@@ -119,7 +119,7 @@ export default async function AdminDashboard() {
                       b.status === "COMPLETED" ? "bg-teal/10 text-teal" :
                       b.status === "CANCELLED" ? "bg-red/10 text-red" :
                       "bg-amber/10 text-amber"
-                    }`}>{b.status}</span>
+                    }`}>{formatStatus(b.status)}</span>
                   </div>
                 </div>
               ))}

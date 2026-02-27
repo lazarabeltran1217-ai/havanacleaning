@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
 import { ServiceIcon } from "@/lib/service-icons";
 import { BookingActions } from "@/components/admin/BookingActions";
 
@@ -57,7 +57,7 @@ export default async function AdminBookingDetailPage({ params }: Props) {
         <div>
           <h2 className="font-display text-xl">Booking #{booking.bookingNumber}</h2>
           <span className={`inline-block mt-1 text-[0.72rem] uppercase tracking-wider px-3 py-1 rounded-full font-medium ${statusColors[booking.status] || ""}`}>
-            {booking.status}
+            {formatStatus(booking.status)}
           </span>
         </div>
       </div>

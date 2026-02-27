@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { ClipboardList } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatStatus } from "@/lib/utils";
 
 interface Job {
   id: string;
@@ -58,7 +58,7 @@ export default function MyJobsPage() {
                   {j.booking.service.name}
                 </span>
                 <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[j.booking.status] || "bg-gray-100 text-gray-500"}`}>
-                  {j.booking.status}
+                  {formatStatus(j.booking.status)}
                 </span>
               </div>
 

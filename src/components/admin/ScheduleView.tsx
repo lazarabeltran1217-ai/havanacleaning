@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { ClipboardList } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
+import { formatStatus } from "@/lib/utils";
 import { QuickBookForm } from "./QuickBookForm";
 
 interface Employee {
@@ -114,7 +115,7 @@ function BookingCard({
       {!compact && (
         <div className="flex items-center gap-2 mt-1">
           <span className={`text-[0.65rem] uppercase tracking-wider px-1.5 py-0.5 rounded-full font-medium ${statusBadgeColors[b.status] || "bg-gray-100 text-gray-500"}`}>
-            {b.status.replace(/_/g, " ")}
+            {formatStatus(b.status)}
           </span>
           {b.customer.phone && (
             <span className="text-gray-400 text-[0.65rem]">{b.customer.phone}</span>

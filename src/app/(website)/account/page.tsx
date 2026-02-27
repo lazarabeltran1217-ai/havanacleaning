@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
 import { ServiceIcon } from "@/lib/service-icons";
 
 export default async function AccountOverview() {
@@ -114,7 +114,7 @@ export default async function AccountOverview() {
                             : "bg-amber/10 text-amber"
                     }`}
                   >
-                    {b.status}
+                    {formatStatus(b.status)}
                   </span>
                 </div>
               </div>

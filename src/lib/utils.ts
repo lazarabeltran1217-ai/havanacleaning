@@ -38,6 +38,19 @@ export function formatPhone(phone: string): string {
   return phone;
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  PENDING: "Pending",
+  CONFIRMED: "Confirmed",
+  IN_PROGRESS: "In Progress",
+  COMPLETED: "Completed",
+  CANCELLED: "Cancelled",
+  NO_SHOW: "No Show",
+};
+
+export function formatStatus(status: string): string {
+  return STATUS_LABELS[status] || status;
+}
+
 export function slugify(text: string): string {
   return text
     .toLowerCase()

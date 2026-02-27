@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
 
 export default async function MyBookingsPage() {
   const session = await getServerSession(authOptions);
@@ -68,7 +68,7 @@ export default async function MyBookingsPage() {
                               : "bg-amber/10 text-amber"
                       }`}
                     >
-                      {b.status}
+                      {formatStatus(b.status)}
                     </span>
                   </div>
                   <div className="text-sand text-[0.82rem] space-y-0.5">
