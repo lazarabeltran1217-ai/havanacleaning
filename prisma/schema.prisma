@@ -699,3 +699,45 @@ model AnalyticsEvent {
   @@index([createdAt])
   @@index([sessionId])
 }
+
+// ── Site Audit ──
+
+model SiteAudit {
+  id           String      @id @default(cuid())
+  status       String      @default("running")
+  totalPages   Int         @default(0)
+  totalIssues  Int         @default(0)
+  overallScore Int         @default(0)
+  scores       Json?
+  durationMs   Int?
+  pages        PageAudit[]
+  createdAt    DateTime    @default(now())
+}
+
+model PageAudit {
+  id             String    @id @default(cuid())
+  auditId        String
+  audit          SiteAudit @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  pageUrl        String
+  statusCode     Int?
+  title          String?
+  titleLength    Int?
+  description    String?
+  descLength     Int?
+  h1Count        Int?
+  h1Text         String?
+  headings       Json?
+  wordCount      Int?
+  imageCount     Int?
+  imagesWithAlt  Int?
+  internalLinks  Int?
+  externalLinks  Int?
+  hasCanonical   Boolean   @default(false)
+  structuredData Json?
+  loadTimeMs     Int?
+  issues         Json?
+  scores         Json?
+  createdAt      DateTime  @default(now())
+
+  @@index([auditId])
+}

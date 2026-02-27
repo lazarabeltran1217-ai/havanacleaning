@@ -26,7 +26,10 @@ const SOCIAL_FIELDS = [
 
 const SEO_FIELDS = [
   { key: "google_analytics_id", label: "Google Analytics Measurement ID", placeholder: "G-XXXXXXXXXX" },
+  { key: "google_search_console_site", label: "Search Console Site URL", placeholder: "https://www.havanacleaning.com" },
 ];
+
+const GSC_KEY_FIELD = { key: "google_search_console_key", label: "Google Search Console — Service Account JSON" };
 
 const API_FIELDS = [
   { key: "api_stripe_secret", label: "Stripe Secret Key", placeholder: "sk_live_..." },
@@ -125,6 +128,22 @@ export function SettingsForm({ initialSettings }: Props) {
               )}
             </div>
           ))}
+          <div>
+            <label className={labelClass}>{GSC_KEY_FIELD.label}</label>
+            <textarea
+              value={settings[GSC_KEY_FIELD.key] || ""}
+              onChange={(e) => update(GSC_KEY_FIELD.key, e.target.value)}
+              placeholder='{"type":"service_account","project_id":"...","private_key":"..."}'
+              rows={4}
+              className={`${inputClass} font-mono text-[0.78rem]`}
+            />
+            {settings[GSC_KEY_FIELD.key] && (
+              <div className="flex items-center gap-1 mt-1">
+                <span className="w-1.5 h-1.5 bg-green rounded-full" />
+                <span className="text-green text-[0.7rem]">Connected</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
