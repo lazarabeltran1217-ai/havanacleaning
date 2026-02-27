@@ -634,11 +634,17 @@ export async function runSiteAudit(baseUrl: string): Promise<AuditResult> {
   // Discover all public URLs
   const urls = await discoverUrls(baseUrl);
 
-  // Audit pages sequentially (pool max:1 per instance prevents pool exhaustion)
+  // Audit pages sequentially with a short pause between fetches.
+  // Each fetch triggers SSR on Vercel which opens a DB connection;
+  // the 200ms pause + 1s idle timeout in prisma.ts ensures previous
+  // connections release before new ones are needed.
   const pages: PageResult[] = [];
-  for (const url of urls) {
-    const result = await auditPage(url, baseUrl);
+  for (let i = 0; i < urls.length; i++) {
+    const result = await auditPage(urls[i], baseUrl);
     pages.push(result);
+    if (i < urls.length - 1) {
+      await new Promise((r) => setTimeout(r, 200));
+    }
   }
 
   // Calculate overall scores (average across all pages per category)
