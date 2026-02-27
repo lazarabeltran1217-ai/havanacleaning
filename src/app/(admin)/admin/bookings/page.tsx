@@ -45,7 +45,7 @@ export default async function AdminBookingsPage() {
         {bookings.map((b) => (
           <div key={b.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
             <div className="flex items-center justify-between mb-3">
-              <span className="font-mono text-[0.8rem] font-medium">{b.bookingNumber}</span>
+              <span className="text-[0.8rem] tracking-wide font-medium">{b.bookingNumber}</span>
               <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[b.status] || ""}`}>
                 {formatStatus(b.status)}
               </span>
@@ -106,7 +106,7 @@ export default async function AdminBookingsPage() {
           <tbody>
             {bookings.map((b) => (
               <tr key={b.id} className="border-b border-gray-50 hover:bg-ivory/30">
-                <td className="px-4 py-3 font-mono text-[0.8rem]">{b.bookingNumber}</td>
+                <td className="px-4 py-3 text-[0.8rem] tracking-wide">{b.bookingNumber}</td>
                 <td className="px-4 py-3"><span className="flex items-center gap-1.5"><ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-green" /> {b.service.name}</span></td>
                 <td className="px-4 py-3">
                   <div>{b.customer.name}</div>
