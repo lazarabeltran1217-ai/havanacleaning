@@ -5,6 +5,7 @@ import { redirect, notFound } from "next/navigation";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { ServiceIcon } from "@/lib/service-icons";
 import { BookingPayment } from "@/components/website/BookingPayment";
+import { getStripe } from "@/lib/stripe";
 import { CheckCircle } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -15,7 +16,10 @@ export const metadata: Metadata = {
 
 interface Props {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ redirect_status?: string }>;
+  searchParams: Promise<{
+    redirect_status?: string;
+    payment_intent?: string;
+  }>;
 }
 
 export default async function BookingPayPage({ params, searchParams }: Props) {
@@ -23,7 +27,7 @@ export default async function BookingPayPage({ params, searchParams }: Props) {
   if (!session) redirect("/login?callbackUrl=/account/bookings");
 
   const { id } = await params;
-  const { redirect_status } = await searchParams;
+  const { redirect_status, payment_intent } = await searchParams;
 
   const [booking, stripeSetting] = await Promise.all([
     prisma.booking.findUnique({
@@ -31,7 +35,7 @@ export default async function BookingPayPage({ params, searchParams }: Props) {
       include: {
         service: { select: { name: true, icon: true } },
         address: true,
-        payments: { select: { status: true } },
+        payments: { select: { status: true, stripePaymentIntentId: true } },
       },
     }),
     prisma.setting.findUnique({ where: { key: "api_stripe_publishable" } }),
@@ -39,14 +43,41 @@ export default async function BookingPayPage({ params, searchParams }: Props) {
 
   if (!booking || booking.customerId !== session.user.id) notFound();
 
-  const stripeKey =
-    (typeof stripeSetting?.value === "string" ? stripeSetting.value : "") ||
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
-    "";
+  let isPaid = booking.payments.some((p) => p.status === "SUCCEEDED");
 
-  const isPaid = booking.payments.some((p) => p.status === "SUCCEEDED");
+  // Stripe redirected back — verify payment and update DB (webhook fallback)
+  if (redirect_status === "succeeded" && payment_intent && !isPaid) {
+    try {
+      const stripe = await getStripe();
+      const intent = await stripe.paymentIntents.retrieve(payment_intent);
 
-  // Stripe redirected back after successful payment
+      if (intent.status === "succeeded") {
+        // Update payment record
+        await prisma.payment.updateMany({
+          where: {
+            stripePaymentIntentId: payment_intent,
+            status: { not: "SUCCEEDED" },
+          },
+          data: {
+            status: "SUCCEEDED",
+            paidAt: new Date(),
+          },
+        });
+
+        // Update booking status
+        await prisma.booking.update({
+          where: { id: booking.id },
+          data: { status: "CONFIRMED" },
+        });
+
+        isPaid = true;
+      }
+    } catch (error) {
+      console.error("Failed to verify payment with Stripe:", error);
+    }
+  }
+
+  // Show success screen
   if (redirect_status === "succeeded" || isPaid) {
     return (
       <div className="max-w-lg mx-auto text-center py-8">
@@ -68,6 +99,11 @@ export default async function BookingPayPage({ params, searchParams }: Props) {
       </div>
     );
   }
+
+  const stripeKey =
+    (typeof stripeSetting?.value === "string" ? stripeSetting.value : "") ||
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
+    "";
 
   if (!stripeKey) {
     return (

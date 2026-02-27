@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
 
 const fetchPayments = () =>
   prisma.payment.findMany({
@@ -38,7 +38,7 @@ export default async function AdminPaymentsPage() {
             <div className="flex items-center justify-between mb-3">
               <span className="font-medium">{p.customer.name}</span>
               <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[p.status] || ""}`}>
-                {p.status}
+                {formatStatus(p.status)}
               </span>
             </div>
             <div className="space-y-2 text-[0.82rem]">
