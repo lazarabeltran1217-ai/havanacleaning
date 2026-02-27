@@ -41,33 +41,31 @@ export async function POST() {
       );
     }
 
-    // Create PageAudit records for each page
-    for (const page of auditResult.pages) {
-      await prisma.pageAudit.create({
-        data: {
-          auditId: siteAudit.id,
-          pageUrl: page.url,
-          statusCode: page.statusCode,
-          title: page.title,
-          titleLength: page.titleLength,
-          description: page.description,
-          descLength: page.descriptionLength,
-          h1Count: page.h1Count,
-          h1Text: page.h1Text,
-          headings: page.headings,
-          wordCount: page.wordCount,
-          imageCount: page.imageCount,
-          imagesWithAlt: page.imagesWithAlt,
-          internalLinks: page.internalLinks,
-          externalLinks: page.externalLinks,
-          hasCanonical: page.canonical !== null,
-          structuredData: page.structuredDataTypes,
-          loadTimeMs: page.loadTimeMs,
-          issues: page.issues as unknown as Prisma.InputJsonValue,
-          scores: page.scores as unknown as Prisma.InputJsonValue,
-        },
-      });
-    }
+    // Batch-create all PageAudit records in one query to avoid exhausting DB pool
+    await prisma.pageAudit.createMany({
+      data: auditResult.pages.map((page) => ({
+        auditId: siteAudit.id,
+        pageUrl: page.url,
+        statusCode: page.statusCode,
+        title: page.title,
+        titleLength: page.titleLength,
+        description: page.description,
+        descLength: page.descriptionLength,
+        h1Count: page.h1Count,
+        h1Text: page.h1Text,
+        headings: page.headings,
+        wordCount: page.wordCount,
+        imageCount: page.imageCount,
+        imagesWithAlt: page.imagesWithAlt,
+        internalLinks: page.internalLinks,
+        externalLinks: page.externalLinks,
+        hasCanonical: page.canonical !== null,
+        structuredData: page.structuredDataTypes,
+        loadTimeMs: page.loadTimeMs,
+        issues: page.issues as unknown as Prisma.InputJsonValue,
+        scores: page.scores as unknown as Prisma.InputJsonValue,
+      })),
+    });
 
     // Calculate overall score (average of all category averages)
     const { overallScores } = auditResult;
