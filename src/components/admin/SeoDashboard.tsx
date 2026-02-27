@@ -116,7 +116,7 @@ interface Props {
 function timeAgo(date: string): string {
   const now = Date.now();
   const then = new Date(date).getTime();
-  const diffMs = now - then;
+  const diffMs = Math.max(0, now - then);
   const seconds = Math.floor(diffMs / 1000);
   if (seconds < 60) return `${seconds}s ago`;
   const minutes = Math.floor(seconds / 60);
@@ -202,13 +202,13 @@ function ChartWrap({ children, height }: { children: React.ReactNode; height: nu
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   return (
-    <div style={{ height, minWidth: 0 }}>
+    <div style={{ width: "100%", height, minWidth: 0 }}>
       {mounted ? (
         <ResponsiveContainer width="100%" height="100%">
           {children as React.ReactElement}
         </ResponsiveContainer>
       ) : (
-        <div style={{ height }} />
+        <div style={{ width: "100%", height }} />
       )}
     </div>
   );
@@ -1822,7 +1822,15 @@ function SearchConsoleTab({ gscConnected }: { gscConnected: boolean }) {
       }
 
       const perfData = await perfRes.json();
-      setPerformance(perfData);
+      setPerformance({
+        totals: {
+          clicks: perfData.totalClicks ?? 0,
+          impressions: perfData.totalImpressions ?? 0,
+          ctr: perfData.avgCtr ?? 0,
+          position: perfData.avgPosition ?? 0,
+        },
+        rows: perfData.rows ?? [],
+      });
 
       if (pagesRes.ok) {
         const pData = await pagesRes.json();
