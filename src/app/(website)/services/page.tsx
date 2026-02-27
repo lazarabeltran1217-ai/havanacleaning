@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { ServiceIcon } from "@/lib/service-icons";
 
 export const metadata: Metadata = {
-  title: "Our Services | Havana Cleaning",
+  title: "Our Services",
   description:
     "Professional cleaning services in Miami-Dade: residential, deep clean, move-in/out, commercial, post-construction, Airbnb turnover, and recurring plans.",
   alternates: { canonical: "/services" },

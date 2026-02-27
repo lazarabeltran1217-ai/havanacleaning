@@ -2,9 +2,9 @@ import { CareerApplication } from "@/components/website/CareerApplication";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Careers | Join Havana Cleaning",
+  title: "Careers — Join Our Team",
   description:
-    "Apply to join the Havana Cleaning team. We're hiring professional cleaners in Miami-Dade County. Competitive pay, flexible hours.",
+    "Apply to join the Havana Cleaning team. We're hiring professional cleaners in Miami-Dade County. Competitive pay, flexible hours, and a great culture.",
   alternates: { canonical: "/careers" },
 };
 

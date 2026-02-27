@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { ClipboardCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Quote Requested | Havana Cleaning",
+  title: "Quote Requested",
 };
 
 export default function CommercialSuccessPage() {

@@ -3,9 +3,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About Us | Havana Cleaning",
+  title: "About Us",
   description:
-    "Family-owned and rooted in Cuban-American pride. Learn about Havana Cleaning — Miami's trusted cleaning service.",
+    "Family-owned and rooted in Cuban-American pride. Learn about Havana Cleaning — Miami's trusted residential and commercial cleaning service since day one.",
   alternates: { canonical: "/about" },
 };
 

@@ -19,9 +19,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
     const service = await prisma.service.findUnique({ where: { slug } });
     if (!service) return { title: "Service Not Found" };
+    const baseDesc = service.description || "";
+    // Ensure description is within the recommended 120-160 char range
+    const description =
+      baseDesc.length >= 120
+        ? baseDesc
+        : `Professional ${service.name.toLowerCase()} services in Miami-Dade County. ${baseDesc || "Trusted by local families and businesses."} Book online with Havana Cleaning today.`;
     return {
-      title: `${service.name} in Miami | Havana Cleaning`,
-      description: service.description || `Professional ${service.name} in Miami-Dade County. Book online today.`,
+      title: `${service.name} in Miami`,
+      description: description.slice(0, 160),
       alternates: { canonical: `/services/${slug}` },
     };
   } catch {

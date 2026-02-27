@@ -3,9 +3,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Reviews | Havana Cleaning",
+  title: "Reviews",
   description:
-    "See what Miami families are saying about Havana Cleaning. Real reviews from real customers.",
+    "See what Miami families are saying about Havana Cleaning. Read real reviews from real customers across Miami-Dade County — rated 5 stars for quality and reliability.",
   alternates: { canonical: "/reviews" },
 };
 

@@ -16,10 +16,10 @@ export async function generateMetadata({
     const area = await prisma.areaPage.findUnique({ where: { slug } });
     if (!area) return {};
     return {
-      title: area.metaTitle || `${area.name} Cleaning Service | Havana Cleaning`,
+      title: area.metaTitle || `Cleaning Service in ${area.name}`,
       description:
         area.metaDescription ||
-        `Professional house cleaning and deep cleaning services in ${area.name}, Miami. Book online with Havana Cleaning.`,
+        `Professional house cleaning and deep cleaning services in ${area.name}, Miami-Dade. Trusted by local families. Book online with Havana Cleaning today.`,
     };
   } catch {
     return {};

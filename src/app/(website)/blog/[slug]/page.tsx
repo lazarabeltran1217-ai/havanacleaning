@@ -15,9 +15,13 @@ export async function generateMetadata({
     const { slug } = await params;
     const post = await prisma.blogPost.findUnique({ where: { slug } });
     if (!post) return {};
+    const rawTitle = post.metaTitle || post.title;
+    const rawDesc = post.metaDescription || post.excerpt || "";
     return {
-      title: post.metaTitle || post.title,
-      description: post.metaDescription || post.excerpt || "",
+      // Use absolute title to avoid the layout template appending " | Havana Cleaning"
+      // which pushes long blog titles well past the 60-char recommendation
+      title: { absolute: rawTitle },
+      description: rawDesc.length > 160 ? rawDesc.slice(0, 157) + "..." : rawDesc,
     };
   } catch {
     return {};

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { PartyPopper } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Application Submitted | Havana Cleaning",
+  title: "Application Submitted",
 };
 
 export default function CareerSuccessPage() {

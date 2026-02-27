@@ -5,9 +5,9 @@ import type { Metadata } from "next";
 import { ServiceIcon } from "@/lib/service-icons";
 
 export const metadata: Metadata = {
-  title: "Pricing | Havana Cleaning",
+  title: "Pricing",
   description:
-    "Transparent cleaning prices for Miami homes. Get instant pricing by bedroom and bathroom count. No hidden fees.",
+    "Transparent cleaning prices for Miami homes and businesses. Get instant pricing by bedroom and bathroom count. No hidden fees, no contracts required.",
   alternates: { canonical: "/pricing" },
 };
 
