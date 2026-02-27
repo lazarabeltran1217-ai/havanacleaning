@@ -6,7 +6,7 @@ import { runSiteAudit } from "@/lib/seo-audit";
 import type { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 120; // Allow up to 120s for full site audit
+export const maxDuration = 60; // Vercel Hobby plan max
 
 const BASE_URL = "https://www.havanacleaning.com";
 

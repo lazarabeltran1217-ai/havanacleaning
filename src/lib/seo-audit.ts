@@ -104,7 +104,7 @@ async function fetchPage(
 ): Promise<{ html: string; statusCode: number; loadTimeMs: number }> {
   const start = Date.now();
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
+  const timeout = setTimeout(() => controller.abort(), 5_000);
 
   try {
     const res = await fetch(url, {
@@ -634,16 +634,11 @@ export async function runSiteAudit(baseUrl: string): Promise<AuditResult> {
   // Discover all public URLs
   const urls = await discoverUrls(baseUrl);
 
-  // Audit pages sequentially with delay between each to avoid exhausting
-  // Supabase connection pool (each fetched page triggers SSR with DB queries)
+  // Audit pages sequentially (pool max:1 per instance prevents pool exhaustion)
   const pages: PageResult[] = [];
-  for (let i = 0; i < urls.length; i++) {
-    const result = await auditPage(urls[i], baseUrl);
+  for (const url of urls) {
+    const result = await auditPage(url, baseUrl);
     pages.push(result);
-    // Wait 1s between pages so DB connections from previous SSR can be released
-    if (i < urls.length - 1) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
   }
 
   // Calculate overall scores (average across all pages per category)
