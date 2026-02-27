@@ -17,9 +17,10 @@ const stripePromise = loadStripe(
 interface Props {
   bookingId: string;
   amount: number;
+  returnUrl?: string;
 }
 
-function PaymentForm({ bookingId }: { bookingId: string }) {
+function PaymentForm({ returnUrl }: { returnUrl: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -35,7 +36,7 @@ function PaymentForm({ bookingId }: { bookingId: string }) {
     const { error: submitError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/book/confirm?bookingId=${bookingId}`,
+        return_url: `${window.location.origin}${returnUrl}`,
       },
     });
 
@@ -64,7 +65,7 @@ function PaymentForm({ bookingId }: { bookingId: string }) {
   );
 }
 
-export function BookingPayment({ bookingId, amount }: Props) {
+export function BookingPayment({ bookingId, amount, returnUrl = "/account/bookings" }: Props) {
   const [clientSecret, setClientSecret] = useState("");
   const [error, setError] = useState("");
 
@@ -113,7 +114,7 @@ export function BookingPayment({ bookingId, amount }: Props) {
         stripe={stripePromise}
         options={{ clientSecret, appearance: { theme: "stripe" } }}
       >
-        <PaymentForm bookingId={bookingId} />
+        <PaymentForm returnUrl={returnUrl} />
       </Elements>
     </div>
   );

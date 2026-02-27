@@ -16,6 +16,7 @@ export default async function MyBookingsPage() {
     include: {
       service: { select: { name: true, icon: true } },
       address: true,
+      payments: { select: { status: true } },
     },
     orderBy: { scheduledDate: "desc" },
   });
@@ -82,7 +83,7 @@ export default async function MyBookingsPage() {
                     )}
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right space-y-2">
                   <div className="text-lg font-semibold text-green">
                     {formatCurrency(b.total)}
                   </div>
@@ -90,6 +91,14 @@ export default async function MyBookingsPage() {
                     <div className="text-[0.75rem] text-teal capitalize">
                       {b.recurrence.toLowerCase()}
                     </div>
+                  )}
+                  {b.status === "CONFIRMED" && !b.payments.some((p) => p.status === "SUCCEEDED") && (
+                    <Link
+                      href={`/account/bookings/${b.id}/pay`}
+                      className="inline-block bg-green text-white px-5 py-2 text-[0.78rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-green/90 transition-colors"
+                    >
+                      Pay Now
+                    </Link>
                   )}
                 </div>
               </div>
