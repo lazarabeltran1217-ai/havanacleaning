@@ -9,16 +9,20 @@ async function getServiceAccountJson(): Promise<string> {
   const setting = await prisma.setting.findUnique({
     where: { key: "google_search_console_key" },
   });
-  const val = typeof setting?.value === "string" ? setting.value : "";
-  return val;
+  if (!setting?.value) return "";
+  // Prisma Json field can return a string or a parsed object
+  if (typeof setting.value === "string") return setting.value;
+  if (typeof setting.value === "object") return JSON.stringify(setting.value);
+  return "";
 }
 
 async function getSiteUrl(): Promise<string> {
   const setting = await prisma.setting.findUnique({
     where: { key: "google_search_console_site" },
   });
-  const val = typeof setting?.value === "string" ? setting.value : "";
-  return val;
+  if (!setting?.value) return "";
+  if (typeof setting.value === "string") return setting.value;
+  return String(setting.value);
 }
 
 // ---------------------------------------------------------------------------

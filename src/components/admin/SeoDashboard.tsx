@@ -197,6 +197,23 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
   );
 }
 
+/** Wrapper that defers chart rendering to the client to avoid recharts SSR hydration errors */
+function ChartWrap({ children, height }: { children: React.ReactNode; height: number }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  return (
+    <div style={{ height, minWidth: 0 }}>
+      {mounted ? (
+        <ResponsiveContainer width="100%" height="100%">
+          {children as React.ReactElement}
+        </ResponsiveContainer>
+      ) : (
+        <div style={{ height }} />
+      )}
+    </div>
+  );
+}
+
 function StatCard({ label, value, sub, color }: { label: string; value: string | number; sub?: string; color?: string }) {
   return (
     <Card className="p-4 text-center">
@@ -448,8 +465,7 @@ function OverviewTab({
         {/* Left: RadialBar gauge */}
         <Card className="p-6 flex flex-col items-center justify-center">
           <h3 className="font-display text-sm mb-2 self-start">Overall Score</h3>
-          <div className="w-full" style={{ height: 240 }}>
-            <ResponsiveContainer width="100%" height="100%">
+          <ChartWrap height={240}>
               <RadialBarChart
                 cx="50%"
                 cy="50%"
@@ -485,8 +501,7 @@ function OverviewTab({
                   out of 100
                 </text>
               </RadialBarChart>
-            </ResponsiveContainer>
-          </div>
+          </ChartWrap>
         </Card>
 
         {/* Right: category score cards */}
@@ -513,8 +528,7 @@ function OverviewTab({
       {trendData.length >= 2 && (
         <Card className="p-6">
           <h3 className="font-display text-sm mb-4">Score Trend</h3>
-          <div style={{ height: 260 }}>
-            <ResponsiveContainer width="100%" height="100%">
+          <ChartWrap height={260}>
               <LineChart data={trendData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ece6d9" />
                 <XAxis dataKey="date" tick={{ fontSize: 12, fill: "#999" }} />
@@ -530,8 +544,7 @@ function OverviewTab({
                   dot={{ r: 4, fill: SCORE_HEX_GREEN }}
                 />
               </LineChart>
-            </ResponsiveContainer>
-          </div>
+          </ChartWrap>
         </Card>
       )}
 
@@ -540,8 +553,8 @@ function OverviewTab({
         <Card className="p-6">
           <h3 className="font-display text-sm mb-4">Issues Distribution</h3>
           <div className="flex flex-col sm:flex-row items-center gap-6">
-            <div style={{ width: 200, height: 200 }}>
-              <ResponsiveContainer width="100%" height="100%">
+            <div style={{ width: 200 }}>
+              <ChartWrap height={200}>
                 <PieChart>
                   <Pie
                     data={pieData}
@@ -560,7 +573,7 @@ function OverviewTab({
                     contentStyle={{ borderRadius: 8, border: "1px solid #ece6d9", fontSize: 13 }}
                   />
                 </PieChart>
-              </ResponsiveContainer>
+              </ChartWrap>
             </div>
             <div className="flex flex-col gap-2">
               {pieData.map((d) => (
@@ -1006,8 +1019,7 @@ function GeoTab({ pages, directories }: { pages: PageAuditData[]; directories: D
       {/* Radar Chart */}
       <Card className="p-6">
         <h3 className="font-display text-sm mb-4">Schema Types Coverage</h3>
-        <div style={{ height: 300 }}>
-          <ResponsiveContainer width="100%" height="100%">
+        <ChartWrap height={300}>
             <RadarChart data={schemaRadar}>
               <PolarGrid stroke="#ece6d9" />
               <PolarAngleAxis dataKey="type" tick={{ fontSize: 11, fill: "#999" }} />
@@ -1022,8 +1034,7 @@ function GeoTab({ pages, directories }: { pages: PageAuditData[]; directories: D
                 contentStyle={{ borderRadius: 8, border: "1px solid #ece6d9", fontSize: 13 }}
               />
             </RadarChart>
-          </ResponsiveContainer>
-        </div>
+        </ChartWrap>
       </Card>
 
       {/* Per-page GEO scores */}
@@ -1325,8 +1336,7 @@ function AeoTab({ pages, faqs }: { pages: PageAuditData[]; faqs: FAQ[] }) {
       {/* AEO Radar */}
       <Card className="p-6">
         <h3 className="font-display text-sm mb-4">AEO Dimensions</h3>
-        <div style={{ height: 300 }}>
-          <ResponsiveContainer width="100%" height="100%">
+        <ChartWrap height={300}>
             <RadarChart data={radarData}>
               <PolarGrid stroke="#ece6d9" />
               <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 11, fill: "#999" }} />
@@ -1341,8 +1351,7 @@ function AeoTab({ pages, faqs }: { pages: PageAuditData[]; faqs: FAQ[] }) {
                 contentStyle={{ borderRadius: 8, border: "1px solid #ece6d9", fontSize: 13 }}
               />
             </RadarChart>
-          </ResponsiveContainer>
-        </div>
+        </ChartWrap>
       </Card>
 
       {/* Per-page AEO scores */}
@@ -1586,8 +1595,7 @@ function CroTab({ pages, keywords }: { pages: PageAuditData[]; keywords: Keyword
       {/* Conversion Readiness Funnel */}
       <Card className="p-6">
         <h3 className="font-display text-sm mb-4">Conversion Readiness Funnel</h3>
-        <div style={{ height: 200 }}>
-          <ResponsiveContainer width="100%" height="100%">
+        <ChartWrap height={200}>
             <BarChart data={funnelData} layout="vertical" margin={{ left: 20, right: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#ece6d9" horizontal={false} />
               <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 12, fill: "#999" }} tickFormatter={(v: number) => `${v}%`} />
@@ -1599,8 +1607,7 @@ function CroTab({ pages, keywords }: { pages: PageAuditData[]; keywords: Keyword
               />
               <Bar dataKey="pct" fill={SCORE_HEX_GREEN} radius={[0, 4, 4, 0]} barSize={28} />
             </BarChart>
-          </ResponsiveContainer>
-        </div>
+        </ChartWrap>
       </Card>
 
       {/* Per-page CRO scores */}
@@ -1911,8 +1918,7 @@ function SearchConsoleTab({ gscConnected }: { gscConnected: boolean }) {
       {trendData.length > 0 && (
         <Card className="p-6">
           <h3 className="font-display text-sm mb-4">Search Performance Trend</h3>
-          <div style={{ height: 280 }}>
-            <ResponsiveContainer width="100%" height="100%">
+          <ChartWrap height={280}>
               <LineChart data={trendData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ece6d9" />
                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#999" }} />
@@ -1940,8 +1946,7 @@ function SearchConsoleTab({ gscConnected }: { gscConnected: boolean }) {
                   name="Impressions"
                 />
               </LineChart>
-            </ResponsiveContainer>
-          </div>
+          </ChartWrap>
           <div className="flex gap-4 mt-2 justify-center text-[0.78rem]">
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-0.5 rounded" style={{ backgroundColor: SCORE_HEX_GREEN }} />
