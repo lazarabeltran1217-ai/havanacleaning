@@ -33,6 +33,19 @@ const DEFAULTS = {
       "From Kendall to Coral Gables, from Brickell condos to Pinecrest estates — we bring the same level of care and professionalism to every job. Our team is background-checked and trained to deliver results that would make your abuela proud.",
     ],
   },
+  about_page: {
+    mission: "To deliver Miami families the kind of clean that feels like home — with heart, hustle, and Cuban pride.",
+    values: [
+      { title: "Family First", description: "We treat every home like our own. Our clients are family, and their trust is everything." },
+      { title: "Cuban Work Ethic", description: "Hard work, dedication, and pride in every detail — that's the Havana way." },
+      { title: "Trust & Transparency", description: "Background-checked teams, upfront pricing, and honest communication. Always." },
+      { title: "Community Roots", description: "Born in Miami, built for Miami. We're proud to serve our community every single day." },
+    ],
+  },
+  reviews_page: {
+    title: "What Miami Is Saying",
+    subtitle: "Real reviews from real families across Miami-Dade County.",
+  },
 };
 
 export function ContentManager({ initialContent, services = [] }: Props) {
@@ -70,6 +83,16 @@ export function ContentManager({ initialContent, services = [] }: Props) {
   const [aboutParagraphs, setAboutParagraphs] = useState<string[]>(
     get("about_section").paragraphs || DEFAULTS.about_section.paragraphs
   );
+
+  // About Page
+  const [aboutMission, setAboutMission] = useState(get("about_page").mission || "");
+  const [aboutValues, setAboutValues] = useState<{ title: string; description: string }[]>(
+    get("about_page").values || DEFAULTS.about_page.values
+  );
+
+  // Reviews Page
+  const [reviewsTitle, setReviewsTitle] = useState(get("reviews_page").title || "");
+  const [reviewsSubtitle, setReviewsSubtitle] = useState(get("reviews_page").subtitle || "");
 
   // Service page content
   const [selectedService, setSelectedService] = useState(services[0]?.slug || "");
@@ -117,6 +140,8 @@ export function ContentManager({ initialContent, services = [] }: Props) {
       { key: "hero_stats", dataEn: { items: stats } },
       { key: "trust_bar", dataEn: { items: trustItems } },
       { key: "about_section", dataEn: { label: aboutLabel, title: aboutTitle, paragraphs: aboutParagraphs } },
+      { key: "about_page", dataEn: { mission: aboutMission, values: aboutValues } },
+      { key: "reviews_page", dataEn: { title: reviewsTitle, subtitle: reviewsSubtitle } },
     ];
 
     // Include current service content if a service is selected
@@ -276,6 +301,71 @@ export function ContentManager({ initialContent, services = [] }: Props) {
               <textarea value={p} onChange={(e) => { const n = [...aboutParagraphs]; n[i] = e.target.value; setAboutParagraphs(n); }} rows={3} className={inputClass} />
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* ABOUT PAGE */}
+      <div className={sectionClass}>
+        <h3 className="font-display text-base mb-4">About Page</h3>
+        <p className="text-gray-400 text-[0.78rem] mb-4">Content for the standalone /about page.</p>
+        <div className="space-y-3">
+          <div>
+            <label className={labelClass}>Mission Statement</label>
+            <textarea value={aboutMission} onChange={(e) => setAboutMission(e.target.value)} rows={3} className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Values</label>
+            <div className="space-y-3">
+              {aboutValues.map((v, i) => (
+                <div key={i} className="border border-gray-100 rounded-lg p-3 space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={v.title}
+                      onChange={(e) => { const n = [...aboutValues]; n[i] = { ...n[i], title: e.target.value }; setAboutValues(n); }}
+                      className={inputClass}
+                      placeholder="Value title"
+                    />
+                    <button
+                      onClick={() => setAboutValues(aboutValues.filter((_, j) => j !== i))}
+                      className="text-red-400 hover:text-red-600 text-sm px-2"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <textarea
+                    value={v.description}
+                    onChange={(e) => { const n = [...aboutValues]; n[i] = { ...n[i], description: e.target.value }; setAboutValues(n); }}
+                    rows={2}
+                    className={inputClass}
+                    placeholder="Value description"
+                  />
+                </div>
+              ))}
+              <button
+                onClick={() => setAboutValues([...aboutValues, { title: "", description: "" }])}
+                className="text-green text-[0.82rem] font-medium hover:underline"
+              >
+                + Add Value
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* REVIEWS PAGE */}
+      <div className={sectionClass}>
+        <h3 className="font-display text-base mb-4">Reviews Page</h3>
+        <p className="text-gray-400 text-[0.78rem] mb-4">Content for the /reviews page header.</p>
+        <div className="space-y-3">
+          <div>
+            <label className={labelClass}>Page Title</label>
+            <input type="text" value={reviewsTitle} onChange={(e) => setReviewsTitle(e.target.value)} className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Page Subtitle</label>
+            <textarea value={reviewsSubtitle} onChange={(e) => setReviewsSubtitle(e.target.value)} rows={2} className={inputClass} />
+          </div>
         </div>
       </div>
 

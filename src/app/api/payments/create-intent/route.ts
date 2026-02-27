@@ -39,9 +39,11 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  const stripe = await getStripe();
+
   if (existingPayment?.stripePaymentIntentId) {
     // Retrieve existing intent
-    const intent = await getStripe().paymentIntents.retrieve(
+    const intent = await stripe.paymentIntents.retrieve(
       existingPayment.stripePaymentIntentId
     );
     return NextResponse.json({ clientSecret: intent.client_secret });
@@ -50,7 +52,7 @@ export async function POST(req: NextRequest) {
   // Create Stripe PaymentIntent
   const amountInCents = Math.round(booking.total * 100);
 
-  const paymentIntent = await getStripe().paymentIntents.create({
+  const paymentIntent = await stripe.paymentIntents.create({
     amount: amountInCents,
     currency: "usd",
     metadata: {

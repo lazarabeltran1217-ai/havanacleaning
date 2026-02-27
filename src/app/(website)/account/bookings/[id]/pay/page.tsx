@@ -25,110 +25,131 @@ export default async function BookingPayPage({ params, searchParams }: Props) {
   const { id } = await params;
   const { redirect_status } = await searchParams;
 
-  const booking = await prisma.booking.findUnique({
-    where: { id },
-    include: {
-      service: { select: { name: true, icon: true } },
-      address: true,
-      payments: { select: { status: true } },
-    },
-  });
+  const [booking, stripeSetting] = await Promise.all([
+    prisma.booking.findUnique({
+      where: { id },
+      include: {
+        service: { select: { name: true, icon: true } },
+        address: true,
+        payments: { select: { status: true } },
+      },
+    }),
+    prisma.setting.findUnique({ where: { key: "api_stripe_publishable" } }),
+  ]);
 
   if (!booking || booking.customerId !== session.user.id) notFound();
+
+  const stripeKey =
+    (typeof stripeSetting?.value === "string" ? stripeSetting.value : "") ||
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
+    "";
 
   const isPaid = booking.payments.some((p) => p.status === "SUCCEEDED");
 
   // Stripe redirected back after successful payment
   if (redirect_status === "succeeded" || isPaid) {
     return (
-      <section className="bg-ivory min-h-screen pt-36 pb-20 px-6 md:px-20">
-        <div className="max-w-lg mx-auto text-center">
-          <CheckCircle className="w-16 h-16 text-green mx-auto mb-6" />
-          <h1 className="font-display text-3xl mb-3">Payment Successful!</h1>
-          <p className="text-sand text-[0.85rem] mb-6">
-            Booking #{booking.bookingNumber}
-          </p>
-          <p className="text-[#5a4535] text-[0.95rem] leading-relaxed mb-8">
-            Thank you for your payment. Your cleaning is confirmed and our team
-            will be there on the scheduled date.
-          </p>
-          <Link
-            href="/account/bookings"
-            className="inline-block bg-green text-white px-8 py-3 rounded-[3px] font-semibold text-[0.9rem] hover:bg-green/90 transition-colors"
-          >
-            View My Bookings
-          </Link>
-        </div>
-      </section>
+      <div className="max-w-lg mx-auto text-center py-8">
+        <CheckCircle className="w-16 h-16 text-green mx-auto mb-6" />
+        <h2 className="font-display text-3xl mb-3">Payment Successful!</h2>
+        <p className="text-sand text-[0.85rem] mb-6">
+          Booking #{booking.bookingNumber}
+        </p>
+        <p className="text-[#5a4535] text-[0.95rem] leading-relaxed mb-8">
+          Thank you for your payment. Your cleaning is confirmed and our team
+          will be there on the scheduled date.
+        </p>
+        <Link
+          href="/account/bookings"
+          className="inline-block bg-green text-white px-8 py-3 rounded-[3px] font-semibold text-[0.9rem] hover:bg-green/90 transition-colors"
+        >
+          View My Bookings
+        </Link>
+      </div>
+    );
+  }
+
+  if (!stripeKey) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-red text-[0.9rem]">
+          Payment system is not configured yet. Please contact us to arrange payment.
+        </p>
+        <Link
+          href="/account/bookings"
+          className="mt-4 inline-block text-green hover:underline text-[0.9rem]"
+        >
+          ← Back to My Bookings
+        </Link>
+      </div>
     );
   }
 
   return (
-    <section className="bg-ivory min-h-screen pt-36 pb-20 px-6 md:px-20">
-      <div className="max-w-2xl mx-auto">
-        <Link
-          href="/account/bookings"
-          className="text-sand text-[0.82rem] hover:text-green transition-colors mb-6 inline-block"
-        >
-          ← Back to My Bookings
-        </Link>
+    <div>
+      <Link
+        href="/account/bookings"
+        className="text-sand text-[0.82rem] hover:text-green transition-colors mb-6 inline-block"
+      >
+        ← Back to My Bookings
+      </Link>
 
-        <h1 className="font-display text-3xl text-center mb-10">
-          Complete Payment
-        </h1>
+      <h2 className="font-display text-2xl text-center mb-8">
+        Complete Payment
+      </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* BOOKING SUMMARY */}
-          <div className="bg-white border border-tobacco/10 rounded-lg p-6">
-            <h2 className="font-display text-lg mb-4">Booking Details</h2>
-            <div className="flex items-center gap-3 mb-4">
-              <ServiceIcon emoji={booking.service.icon} className="w-6 h-6 text-green" />
-              <span className="font-display text-[1rem]">{booking.service.name}</span>
-            </div>
-            <dl className="space-y-3 text-[0.9rem]">
-              <div className="flex justify-between">
-                <dt className="text-sand">Date</dt>
-                <dd>{formatDate(booking.scheduledDate)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-sand">Time</dt>
-                <dd className="capitalize">{booking.scheduledTime}</dd>
-              </div>
-              {booking.bedrooms && (
-                <div className="flex justify-between">
-                  <dt className="text-sand">Size</dt>
-                  <dd>{booking.bedrooms} bed / {booking.bathrooms} bath</dd>
-                </div>
-              )}
-              {booking.address && (
-                <div className="flex justify-between">
-                  <dt className="text-sand">Address</dt>
-                  <dd className="text-right">
-                    {booking.address.street}
-                    {booking.address.unit && `, ${booking.address.unit}`}
-                    <br />
-                    {booking.address.city}, {booking.address.state}{" "}
-                    {booking.address.zipCode}
-                  </dd>
-                </div>
-              )}
-            </dl>
-            <div className="mt-4 pt-4 border-t border-tobacco/10 flex justify-between font-semibold text-lg">
-              <span>Total</span>
-              <span className="text-green">{formatCurrency(booking.total)}</span>
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* BOOKING SUMMARY */}
+        <div className="bg-white border border-tobacco/10 rounded-lg p-6">
+          <h3 className="font-display text-lg mb-4">Booking Details</h3>
+          <div className="flex items-center gap-3 mb-4">
+            <ServiceIcon emoji={booking.service.icon} className="w-6 h-6 text-green" />
+            <span className="font-display text-[1rem]">{booking.service.name}</span>
           </div>
-
-          {/* PAYMENT FORM */}
-          <div>
-            <BookingPayment
-              bookingId={booking.id}
-              amount={booking.total}
-              returnUrl={`/account/bookings/${booking.id}/pay`}
-            />
+          <dl className="space-y-3 text-[0.9rem]">
+            <div className="flex justify-between">
+              <dt className="text-sand">Date</dt>
+              <dd>{formatDate(booking.scheduledDate)}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-sand">Time</dt>
+              <dd className="capitalize">{booking.scheduledTime}</dd>
+            </div>
+            {booking.bedrooms && (
+              <div className="flex justify-between">
+                <dt className="text-sand">Size</dt>
+                <dd>{booking.bedrooms} bed / {booking.bathrooms} bath</dd>
+              </div>
+            )}
+            {booking.address && (
+              <div className="flex justify-between">
+                <dt className="text-sand">Address</dt>
+                <dd className="text-right">
+                  {booking.address.street}
+                  {booking.address.unit && `, ${booking.address.unit}`}
+                  <br />
+                  {booking.address.city}, {booking.address.state}{" "}
+                  {booking.address.zipCode}
+                </dd>
+              </div>
+            )}
+          </dl>
+          <div className="mt-4 pt-4 border-t border-tobacco/10 flex justify-between font-semibold text-lg">
+            <span>Total</span>
+            <span className="text-green">{formatCurrency(booking.total)}</span>
           </div>
         </div>
+
+        {/* PAYMENT FORM */}
+        <div>
+          <BookingPayment
+            bookingId={booking.id}
+            amount={booking.total}
+            returnUrl={`/account/bookings/${booking.id}/pay`}
+            stripeKey={stripeKey}
+          />
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

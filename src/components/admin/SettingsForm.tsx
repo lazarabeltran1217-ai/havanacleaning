@@ -27,6 +27,7 @@ const SOCIAL_FIELDS = [
 const API_FIELDS = [
   { key: "api_stripe_secret", label: "Stripe Secret Key", placeholder: "sk_live_..." },
   { key: "api_stripe_publishable", label: "Stripe Publishable Key", placeholder: "pk_live_..." },
+  { key: "api_stripe_webhook_secret", label: "Stripe Webhook Secret", placeholder: "whsec_..." },
   { key: "api_deepseek_key", label: "DeepSeek API Key", placeholder: "sk-..." },
   { key: "api_email_key", label: "Email Service API Key (Resend / SendGrid)", placeholder: "re_..." },
 ];

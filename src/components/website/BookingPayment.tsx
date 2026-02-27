@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -10,14 +10,11 @@ import {
 } from "@stripe/react-stripe-js";
 import { formatCurrency } from "@/lib/utils";
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
-
 interface Props {
   bookingId: string;
   amount: number;
   returnUrl?: string;
+  stripeKey: string;
 }
 
 function PaymentForm({ returnUrl }: { returnUrl: string }) {
@@ -65,9 +62,11 @@ function PaymentForm({ returnUrl }: { returnUrl: string }) {
   );
 }
 
-export function BookingPayment({ bookingId, amount, returnUrl = "/account/bookings" }: Props) {
+export function BookingPayment({ bookingId, amount, returnUrl = "/account/bookings", stripeKey }: Props) {
   const [clientSecret, setClientSecret] = useState("");
   const [error, setError] = useState("");
+
+  const stripePromise = useMemo(() => loadStripe(stripeKey), [stripeKey]);
 
   useEffect(() => {
     fetch("/api/payments/create-intent", {

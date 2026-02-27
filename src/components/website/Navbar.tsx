@@ -39,7 +39,7 @@ export function Navbar() {
         {/* Desktop nav */}
         <ul className="hidden lg:flex items-center gap-7">
           <li>
-            <Link href="/#services" className="text-cream text-[0.82rem] tracking-[0.1em] uppercase font-medium hover:text-amber transition-colors">
+            <Link href="/services" className="text-cream text-[0.82rem] tracking-[0.1em] uppercase font-medium hover:text-amber transition-colors">
               {t("services")}
             </Link>
           </li>
@@ -54,12 +54,12 @@ export function Navbar() {
             </Link>
           </li>
           <li>
-            <Link href="/#about" className="text-cream text-[0.82rem] tracking-[0.1em] uppercase font-medium hover:text-amber transition-colors">
+            <Link href="/about" className="text-cream text-[0.82rem] tracking-[0.1em] uppercase font-medium hover:text-amber transition-colors">
               {t("about")}
             </Link>
           </li>
           <li>
-            <Link href="/#testimonials" className="text-cream text-[0.82rem] tracking-[0.1em] uppercase font-medium hover:text-amber transition-colors">
+            <Link href="/reviews" className="text-cream text-[0.82rem] tracking-[0.1em] uppercase font-medium hover:text-amber transition-colors">
               {t("reviews")}
             </Link>
           </li>
@@ -86,7 +86,7 @@ export function Navbar() {
         <div className="lg:hidden bg-tobacco border-t border-white/10 px-6 pb-6 pt-2">
           <ul className="flex flex-col gap-1">
             <li>
-              <Link href="/#services" onClick={() => setMobileOpen(false)} className="block py-3 text-cream text-[0.9rem] tracking-[0.08em] uppercase font-medium hover:text-amber transition-colors border-b border-white/[0.06]">
+              <Link href="/services" onClick={() => setMobileOpen(false)} className="block py-3 text-cream text-[0.9rem] tracking-[0.08em] uppercase font-medium hover:text-amber transition-colors border-b border-white/[0.06]">
                 {t("services")}
               </Link>
             </li>
@@ -101,12 +101,12 @@ export function Navbar() {
               </Link>
             </li>
             <li>
-              <Link href="/#about" onClick={() => setMobileOpen(false)} className="block py-3 text-cream text-[0.9rem] tracking-[0.08em] uppercase font-medium hover:text-amber transition-colors border-b border-white/[0.06]">
+              <Link href="/about" onClick={() => setMobileOpen(false)} className="block py-3 text-cream text-[0.9rem] tracking-[0.08em] uppercase font-medium hover:text-amber transition-colors border-b border-white/[0.06]">
                 {t("about")}
               </Link>
             </li>
             <li>
-              <Link href="/#testimonials" onClick={() => setMobileOpen(false)} className="block py-3 text-cream text-[0.9rem] tracking-[0.08em] uppercase font-medium hover:text-amber transition-colors border-b border-white/[0.06]">
+              <Link href="/reviews" onClick={() => setMobileOpen(false)} className="block py-3 text-cream text-[0.9rem] tracking-[0.08em] uppercase font-medium hover:text-amber transition-colors border-b border-white/[0.06]">
                 {t("reviews")}
               </Link>
             </li>
