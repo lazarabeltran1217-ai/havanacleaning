@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Careers — Join Our Team",
   description:
-    "Apply to join the Havana Cleaning team. We're hiring professional cleaners in Miami-Dade County. Competitive pay, flexible hours, and a great culture.",
+    "Apply to join the Havana Cleaning team. We're hiring professional cleaners. Competitive pay, flexible hours, and a great culture.",
   alternates: { canonical: "/careers" },
 };
 
@@ -25,8 +25,8 @@ export default function CareersPage() {
           Work With Havana Cleaning
         </h1>
         <p className="text-sand max-w-[600px] mx-auto leading-relaxed">
-          We&apos;re growing our family of professional cleaners across
-          Miami-Dade. Competitive pay, flexible schedule, and a team that treats
+          We&apos;re growing our family of professional cleaners.
+          Competitive pay, flexible schedule, and a team that treats
           you right.
         </p>
       </section>

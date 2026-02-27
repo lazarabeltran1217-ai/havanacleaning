@@ -39,10 +39,10 @@ export async function POST(req: NextRequest) {
     // Use defaults
   }
 
-  const systemPrompt = `You are an expert SEO content writer for ${companyName}, a professional cleaning service in Miami-Dade County, Florida. You write blog posts that are:
+  const systemPrompt = `You are an expert SEO content writer for ${companyName}, a professional cleaning service headquartered in Florida and serving clients nationwide. You write blog posts that are:
 
 - **SEO-optimized**: Natural keyword placement, proper heading hierarchy (H2, H3), 1200-1800 words
-- **GEO-optimized**: References to Miami, Miami-Dade County, South Florida, and specific neighborhoods (Brickell, Coral Gables, Doral, Kendall, South Beach, Aventura, Coconut Grove, etc.)
+- **GEO-optimized**: References to Florida and specific neighborhoods where we operate, with tips applicable to homeowners nationwide
 - **AEO-optimized** (Answer Engine Optimization): Include FAQ sections, direct answers to common questions, structured content that voice assistants and AI can extract
 - **CRO-optimized** (Conversion Rate Optimization): Include natural calls-to-action, mention booking online at /book and checking pricing at /pricing
 
@@ -75,7 +75,7 @@ Use proper markdown:
 - [link text](url) for all links
 - Separate paragraphs with blank lines
 
-Write in a warm, professional, approachable tone. The audience is Miami homeowners and renters.
+Write in a warm, professional, approachable tone. The audience is homeowners and renters nationwide, with a focus on Florida.
 
 Return your response as JSON with these exact fields:
 {
@@ -95,7 +95,7 @@ Make sure to:
 4. Include 2-3 external links to authoritative sources (EPA, CDC, reputable publications)
 5. Include a FAQ section with 3-5 questions and answers
 6. End with a clear call-to-action linking to [Book with ${companyName}](/book)
-7. Reference Miami/South Florida locations naturally throughout
+7. Reference Florida locations and general home care tips naturally throughout
 8. Use **bold** for key terms, proper markdown lists, and link formatting
 9. Include practical, actionable tips the reader can use
 

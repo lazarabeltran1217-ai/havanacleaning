@@ -11,11 +11,11 @@
     "myAccount": "My Account"
   },
   "hero": {
-    "eyebrow": "Miami's Premier Cleaning Service",
+    "eyebrow": "Professional Home & Business Cleaning",
     "title1": "Clean Homes,",
-    "title2": "Cuban",
-    "title3": "Soul.",
-    "subtitle": "Family-owned and rooted in the heart of Cuban-American pride. We treat every home like our own — with care, passion, and the kind of clean your abuela would approve of.",
+    "title2": "Happy",
+    "title3": "Families.",
+    "subtitle": "Family-owned and driven by quality. We treat every home like our own — with care, precision, and the kind of clean you'll notice.",
     "bookCta": "Book a Cleaning",
     "pricingCta": "View Pricing",
     "homesCleaned": "Homes Cleaned",
@@ -31,10 +31,10 @@
   },
   "about": {
     "label": "Our Story",
-    "title": "Born in Havana, Built in Miami.",
-    "p1": "Havana Cleaning was founded by two sisters who brought their Cuban heritage — and their grandmother's relentless standards for cleanliness — to every home they touch.",
-    "p2": "We're not just a cleaning company. We're a family business with deep roots, and we bring that warmth and dedication into every space we clean.",
-    "p3": "From Kendall to Coral Gables, from Brickell condos to Hialeah family homes — we bring the same Cuban pride to every address."
+    "title": "Family-Owned. Quality-Driven.",
+    "p1": "Havana Cleaning was founded by a family who believes every home deserves to feel spotless. We bring care, pride, and attention to detail to every job.",
+    "p2": "We're not just a cleaning company. We're a family business built on trust, hard work, and the belief that a clean home is the foundation of a happy life.",
+    "p3": "From Florida neighborhoods to homes across the country — we bring the same level of care and professionalism to every job. Our team is background-checked and trained to deliver results you'll love."
   },
   "services": {
     "label": "What We Do",
@@ -69,21 +69,21 @@
   },
   "testimonials": {
     "label": "Happy Clients",
-    "title": "What Miami Is Saying"
+    "title": "What Our Clients Are Saying"
   },
   "areas": {
     "label": "Where We Clean",
-    "title": "Serving All of Miami-Dade",
-    "subtitle": "Click an area to see local pricing and availability."
+    "title": "Where We Clean",
+    "subtitle": "Explore our service areas. We're growing nationwide."
   },
   "careers": {
     "label": "Join the Family",
     "title": "We're Hiring Cleaners",
-    "subtitle": "Join a team that values hard work, respect, and Cuban pride. No paperwork — apply 100% online.",
+    "subtitle": "Join a team that values hard work, respect, and quality. No paperwork — apply 100% online.",
     "applyCta": "Apply Now — 100% Online"
   },
   "footer": {
-    "tagline": "Family-owned cleaning service rooted in Cuban-American pride. Serving all of Miami-Dade County.",
+    "tagline": "Family-owned professional cleaning service. Quality you can trust, from Florida to your front door.",
     "servicesTitle": "Services",
     "companyTitle": "Company",
     "careersTitle": "Careers",

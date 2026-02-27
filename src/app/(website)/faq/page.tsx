@@ -8,7 +8,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "FAQ — Frequently Asked Questions",
   description:
-    "Get answers to common questions about Havana Cleaning services, pricing, scheduling, and more. Serving all of Miami-Dade County.",
+    "Get answers to common questions about Havana Cleaning services, pricing, scheduling, and more.",
   alternates: { canonical: "/faq" },
 };
 

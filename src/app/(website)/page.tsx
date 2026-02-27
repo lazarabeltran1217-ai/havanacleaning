@@ -40,20 +40,20 @@ export default async function HomePage() {
   }
 
   // Editable content with fallbacks
-  const heroEyebrow = getContent(contentMap, "hero_eyebrow", { text: "Miami's Premier Cleaning Service" });
-  const heroHeadline = getContent(contentMap, "hero_headline", { line1: "Clean Homes,", line2: "Cuban", line3: "Soul." });
-  const heroSubtitle = getContent(contentMap, "hero_subtitle", { text: "Family-owned and rooted in the heart of Cuban-American pride. We treat every home like our own — with care, passion, and the kind of clean your abuela would approve of." });
+  const heroEyebrow = getContent(contentMap, "hero_eyebrow", { text: "Professional Home & Business Cleaning" });
+  const heroHeadline = getContent(contentMap, "hero_headline", { line1: "Clean Homes,", line2: "Happy", line3: "Families." });
+  const heroSubtitle = getContent(contentMap, "hero_subtitle", { text: "Family-owned and driven by quality. We treat every home like our own — with care, precision, and the kind of clean you'll notice." });
   const heroCta1 = getContent(contentMap, "hero_cta_primary", { text: "Book a Cleaning", href: "/book" });
   const heroCta2 = getContent(contentMap, "hero_cta_secondary", { text: "View Pricing", href: "/pricing" });
   const heroStats = getContent(contentMap, "hero_stats", { items: [{ value: "500+", label: "Homes Cleaned" }, { value: "4.9★", label: "Average Rating" }, { value: "20+", label: "Areas Served" }] });
-  const trustBar = getContent(contentMap, "trust_bar", { items: ["Background-Checked Staff", "Same-Day Availability", "Bilingual Team (EN/ES)", "Satisfaction Guaranteed", "Serving All Miami-Dade"] });
+  const trustBar = getContent(contentMap, "trust_bar", { items: ["Background-Checked Staff", "Same-Day Availability", "Bilingual Team (EN/ES)", "Satisfaction Guaranteed", "Serving Clients Nationwide"] });
   const aboutSection = getContent(contentMap, "about_section", {
     label: "Our Story",
-    title: "Born in Havana, Built in Miami.",
+    title: "Family-Owned. Quality-Driven.",
     paragraphs: [
-      "Havana Cleaning was founded by a family who brought their Cuban heritage and work ethic to Miami. We believe in treating every home like it's our own — with care, pride, and the kind of attention to detail that makes a real difference.",
+      "Havana Cleaning was founded by a family who believes every home deserves to feel spotless. We bring care, pride, and attention to detail to every job.",
       "We're not just a cleaning company. We're a family business built on trust, hard work, and the belief that a clean home is the foundation of a happy life.",
-      "From Kendall to Coral Gables, from Brickell condos to Pinecrest estates — we bring the same level of care and professionalism to every job. Our team is background-checked and trained to deliver results that would make your abuela proud.",
+      "From Florida neighborhoods to homes across the country — we bring the same level of care and professionalism to every job. Our team is background-checked and trained to deliver results you'll love.",
     ],
   });
 
@@ -192,7 +192,7 @@ export default async function HomePage() {
           <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center justify-center gap-3">
             <span className="w-8 h-px bg-green" />Happy Clients
           </div>
-          <h2 className="font-display mb-16" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>What Miami Is Saying</h2>
+          <h2 className="font-display mb-16" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>What Our Clients Are Saying</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
             {testimonials.map((t) => (
               <div key={t.id} className="bg-white border border-tobacco/10 rounded-md p-9 text-left relative">
@@ -246,8 +246,8 @@ export default async function HomePage() {
         <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center gap-3">
           <span className="w-8 h-px bg-green" />Where We Clean
         </div>
-        <h2 className="font-display mb-2" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>Serving All of Miami-Dade</h2>
-        <p className="text-[#7a6555] max-w-[500px] leading-relaxed mb-10">We proudly serve neighborhoods across Miami-Dade County.</p>
+        <h2 className="font-display mb-2" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>Where We Clean</h2>
+        <p className="text-[#7a6555] max-w-[500px] leading-relaxed mb-10">We proudly serve neighborhoods across the country, with deep roots in Florida.</p>
         <div className="flex flex-wrap gap-2.5">
           {SERVICE_AREAS.map((area) => {
             const slug = area.toLowerCase().replace(/\s+/g, "-");
@@ -285,7 +285,7 @@ export default async function HomePage() {
           Ready for a Spotless Home?
         </h2>
         <p className="text-white/80 max-w-lg mx-auto mb-8 text-lg leading-relaxed">
-          Join 500+ Miami families who trust Havana Cleaning. Book in minutes, pay securely online.
+          Join 500+ families who trust Havana Cleaning. Book in minutes, pay securely online.
         </p>
         <div className="flex gap-4 flex-wrap justify-center">
           <Link href="/book" className="bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber hover:-translate-y-0.5 transition-all">

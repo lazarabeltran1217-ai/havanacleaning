@@ -24,9 +24,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const description =
       baseDesc.length >= 120
         ? baseDesc
-        : `Professional ${service.name.toLowerCase()} services in Miami-Dade County. ${baseDesc || "Trusted by local families and businesses."} Book online with Havana Cleaning today.`;
+        : `Professional ${service.name.toLowerCase()} services. ${baseDesc || "Trusted by local families and businesses."} Book online with Havana Cleaning today.`;
     return {
-      title: `${service.name} in Miami`,
+      title: service.name,
       description: description.slice(0, 160),
       alternates: { canonical: `/services/${slug}` },
     };

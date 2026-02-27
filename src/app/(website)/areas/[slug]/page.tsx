@@ -19,7 +19,7 @@ export async function generateMetadata({
       title: area.metaTitle || `Cleaning Service in ${area.name}`,
       description:
         area.metaDescription ||
-        `Professional house cleaning and deep cleaning services in ${area.name}, Miami-Dade. Trusted by local families. Book online with Havana Cleaning today.`,
+        `Professional house cleaning and deep cleaning services in ${area.name}. Trusted by local families. Book online with Havana Cleaning today.`,
     };
   } catch {
     return {};
@@ -89,7 +89,7 @@ export default async function AreaPage({
       </h1>
       <p className="text-gray-600 text-lg mb-8">
         {area.description ||
-          `Havana Cleaning provides professional residential and commercial cleaning services throughout ${area.name}, Miami. Book today and experience the difference.`}
+          `Havana Cleaning provides professional residential and commercial cleaning services throughout ${area.name}. Book today and experience the difference.`}
       </p>
 
       {/* Content */}

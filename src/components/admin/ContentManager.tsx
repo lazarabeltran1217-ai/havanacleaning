@@ -17,34 +17,34 @@ interface Props {
 }
 
 const DEFAULTS = {
-  hero_eyebrow: { text: "Miami's Premier Cleaning Service" },
-  hero_headline: { line1: "Clean Homes,", line2: "Cuban", line3: "Soul." },
-  hero_subtitle: { text: "Family-owned and rooted in the heart of Cuban-American pride. We treat every home like our own — with care, passion, and the kind of clean your abuela would approve of." },
+  hero_eyebrow: { text: "Professional Home & Business Cleaning" },
+  hero_headline: { line1: "Clean Homes,", line2: "Happy", line3: "Families." },
+  hero_subtitle: { text: "Family-owned and driven by quality. We treat every home like our own — with care, precision, and the kind of clean you'll notice." },
   hero_cta_primary: { text: "Book a Cleaning", href: "/book" },
   hero_cta_secondary: { text: "View Pricing", href: "/pricing" },
   hero_stats: { items: [{ value: "500+", label: "Homes Cleaned" }, { value: "4.9★", label: "Average Rating" }, { value: "20+", label: "Areas Served" }] },
-  trust_bar: { items: ["Background-Checked Staff", "Same-Day Availability", "Bilingual Team (EN/ES)", "Satisfaction Guaranteed", "Serving All Miami-Dade"] },
+  trust_bar: { items: ["Background-Checked Staff", "Same-Day Availability", "Bilingual Team (EN/ES)", "Satisfaction Guaranteed", "Serving Clients Nationwide"] },
   about_section: {
     label: "Our Story",
-    title: "Born in Havana, Built in Miami.",
+    title: "Family-Owned. Quality-Driven.",
     paragraphs: [
-      "Havana Cleaning was founded by a family who brought their Cuban heritage and work ethic to Miami. We believe in treating every home like it's our own — with care, pride, and the kind of attention to detail that makes a real difference.",
+      "Havana Cleaning was founded by a family who believes every home deserves to feel spotless. We bring care, pride, and attention to detail to every job.",
       "We're not just a cleaning company. We're a family business built on trust, hard work, and the belief that a clean home is the foundation of a happy life.",
-      "From Kendall to Coral Gables, from Brickell condos to Pinecrest estates — we bring the same level of care and professionalism to every job. Our team is background-checked and trained to deliver results that would make your abuela proud.",
+      "From Florida neighborhoods to homes across the country — we bring the same level of care and professionalism to every job. Our team is background-checked and trained to deliver results you'll love.",
     ],
   },
   about_page: {
-    mission: "To deliver Miami families the kind of clean that feels like home — with heart, hustle, and Cuban pride.",
+    mission: "To deliver families the kind of clean that feels like home — with heart, hustle, and pride.",
     values: [
       { title: "Family First", description: "We treat every home like our own. Our clients are family, and their trust is everything." },
-      { title: "Cuban Work Ethic", description: "Hard work, dedication, and pride in every detail — that's the Havana way." },
+      { title: "Strong Work Ethic", description: "Hard work, dedication, and pride in every detail — that's the Havana way." },
       { title: "Trust & Transparency", description: "Background-checked teams, upfront pricing, and honest communication. Always." },
-      { title: "Community Roots", description: "Born in Miami, built for Miami. We're proud to serve our community every single day." },
+      { title: "Community Roots", description: "Founded in Florida, growing nationwide. We're proud to serve our communities every single day." },
     ],
   },
   reviews_page: {
-    title: "What Miami Is Saying",
-    subtitle: "Real reviews from real families across Miami-Dade County.",
+    title: "What Our Clients Are Saying",
+    subtitle: "Real reviews from real families across the country.",
   },
 };
 

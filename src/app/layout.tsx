@@ -3,7 +3,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Providers } from "@/components/Providers";
 import { JsonLd } from "@/components/website/JsonLd";
-import { localBusinessSchema, organizationSchema, websiteSchema, speakableSchema } from "@/lib/schema";
+import { organizationSchema, websiteSchema, speakableSchema } from "@/lib/schema";
 import { GoogleAnalytics } from "@/components/website/GoogleAnalytics";
 import "./globals.css";
 
@@ -16,30 +16,31 @@ export const metadata: Metadata = {
     template: "%s | Havana Cleaning",
   },
   description:
-    "Miami's premier family-owned cleaning service. Residential, deep clean, commercial, and specialty cleaning. Book online with instant pricing.",
+    "Professional cleaning service for homes and businesses. Residential, deep clean, commercial, and specialty cleaning. Book online with instant pricing.",
   keywords: [
-    "cleaning service miami",
-    "house cleaning miami",
-    "maid service miami",
-    "deep cleaning miami",
-    "professional cleaning miami",
+    "professional cleaning service",
+    "house cleaning near me",
+    "maid service",
+    "deep cleaning service",
+    "home cleaning",
+    "cleaning company",
+    "cleaning service florida",
+    "miami cleaning service",
     "havana cleaning",
-    "cuban cleaning service miami",
-    "house cleaning near me miami",
-    "miami dade cleaning company",
+    "house cleaning miami",
   ],
   openGraph: {
     type: "website",
     locale: "en_US",
     siteName: "Havana Cleaning",
-    title: "Havana Cleaning — Miami's Premier Cleaning Service",
-    description: "Family-owned cleaning service rooted in Cuban-American pride. Residential, deep clean, commercial, and specialty cleaning in Miami-Dade.",
+    title: "Havana Cleaning — Professional Home & Business Cleaning",
+    description: "Family-owned professional cleaning service. Residential, deep clean, commercial, and specialty cleaning. Book online today.",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Havana Cleaning — Where Spotless Meets Soul" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Havana Cleaning — Miami's Premier Cleaning Service",
-    description: "Family-owned cleaning service rooted in Cuban-American pride. Book online with instant pricing.",
+    title: "Havana Cleaning — Professional Home & Business Cleaning",
+    description: "Family-owned professional cleaning service. Book online with instant pricing.",
     images: ["/og-image.jpg"],
   },
   robots: {
@@ -76,7 +77,6 @@ export default async function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
-        <JsonLd data={localBusinessSchema()} />
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema()} />
         <JsonLd data={speakableSchema()} />

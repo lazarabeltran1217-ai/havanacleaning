@@ -7,7 +7,7 @@ export interface ServiceContent {
 export const SERVICE_DEFAULTS: Record<string, ServiceContent> = {
   "residential-cleaning": {
     longDescription:
-      "Our residential cleaning service is designed to keep your Miami home spotless week after week. We handle everything from floors to ceilings so you can spend your time enjoying the Magic City instead of scrubbing countertops. Whether you live in a Brickell condo or a Coral Gables family home, our trained team delivers a consistent, thorough clean every visit.",
+      "Our residential cleaning service is designed to keep your home spotless week after week. We handle everything from floors to ceilings so you can spend your time doing what you love instead of scrubbing countertops. Whether you live in a condo or a family home, our trained team delivers a consistent, thorough clean every visit.",
     features: [
       "Vacuuming and mopping all floors",
       "Dusting all surfaces, shelves, and decor",
@@ -25,7 +25,7 @@ export const SERVICE_DEFAULTS: Record<string, ServiceContent> = {
   },
   "deep-cleaning": {
     longDescription:
-      "A deep clean goes beyond the surface. We tackle the grime that builds up over time — inside appliances, behind furniture, along baseboards, and in every hard-to-reach corner. Perfect as a first-time clean, seasonal refresh, or move-in preparation. Our Miami deep cleaning teams bring commercial-grade equipment and the patience to make your home truly shine.",
+      "A deep clean goes beyond the surface. We tackle the grime that builds up over time — inside appliances, behind furniture, along baseboards, and in every hard-to-reach corner. Perfect as a first-time clean, seasonal refresh, or move-in preparation. Our deep cleaning teams bring commercial-grade equipment and the patience to make your home truly shine.",
     features: [
       "Everything in a standard clean, plus:",
       "Inside oven, microwave, and refrigerator",
@@ -44,7 +44,7 @@ export const SERVICE_DEFAULTS: Record<string, ServiceContent> = {
   },
   "move-in-move-out": {
     longDescription:
-      "Moving is stressful enough without worrying about cleaning. Our move-in/move-out service ensures the property is spotless for the next chapter — whether you're handing keys to a landlord, welcoming new tenants, or settling into your new Miami home. We work with homeowners, renters, property managers, and realtors across Miami-Dade County.",
+      "Moving is stressful enough without worrying about cleaning. Our move-in/move-out service ensures the property is spotless for the next chapter — whether you're handing keys to a landlord, welcoming new tenants, or settling into your new home. We work with homeowners, renters, property managers, and realtors.",
     features: [
       "Complete deep clean of all rooms",
       "Inside all cabinets, closets, and drawers",
@@ -63,7 +63,7 @@ export const SERVICE_DEFAULTS: Record<string, ServiceContent> = {
   },
   "commercial-cleaning": {
     longDescription:
-      "Keep your Miami business looking its best with our professional commercial cleaning service. From offices and retail spaces to medical facilities and restaurants, we deliver reliable, thorough cleaning that creates a healthy environment for your employees and customers. We offer customized plans to match your business needs and schedule.",
+      "Keep your business looking its best with our professional commercial cleaning service. From offices and retail spaces to medical facilities and restaurants, we deliver reliable, thorough cleaning that creates a healthy environment for your employees and customers. We offer customized plans to match your business needs and schedule.",
     features: [
       "Office and workspace cleaning",
       "Lobby and reception area maintenance",
@@ -82,7 +82,7 @@ export const SERVICE_DEFAULTS: Record<string, ServiceContent> = {
   },
   "post-construction": {
     longDescription:
-      "Renovating or building in Miami? Post-construction cleanup is a specialized job that requires the right equipment and expertise. We remove construction dust, debris, adhesive residue, and paint splatters, then deep clean every surface until the space is move-in ready. We work with homeowners, contractors, and property managers across Miami-Dade County.",
+      "Renovating or building? Post-construction cleanup is a specialized job that requires the right equipment and expertise. We remove construction dust, debris, adhesive residue, and paint splatters, then deep clean every surface until the space is move-in ready. We work with homeowners, contractors, and property managers.",
     features: [
       "Construction dust and debris removal",
       "Adhesive and sticker residue removal",
@@ -101,7 +101,7 @@ export const SERVICE_DEFAULTS: Record<string, ServiceContent> = {
   },
   "airbnb-turnover": {
     longDescription:
-      "Keep your Miami short-term rental running smoothly with our Airbnb turnover service. We handle the full clean between guests — laundry, restocking, staging, and a thorough cleaning — so your property is always five-star ready. Our team understands the urgency of same-day turnarounds and the importance of guest-ready presentation.",
+      "Keep your short-term rental running smoothly with our Airbnb turnover service. We handle the full clean between guests — laundry, restocking, staging, and a thorough cleaning — so your property is always five-star ready. Our team understands the urgency of same-day turnarounds and the importance of guest-ready presentation.",
     features: [
       "Full clean of all rooms between guests",
       "Linen change and laundry service",
@@ -147,7 +147,7 @@ export function getServiceDefaults(slug: string): ServiceContent {
     ],
     benefits: [
       { title: "Professional Service", text: "Trained, background-checked cleaning professionals." },
-      { title: "Serving All Miami-Dade", text: "From Aventura to Homestead, we cover the entire county." },
+      { title: "Nationwide Coverage", text: "Headquartered in Florida, serving communities across the country." },
       { title: "Bilingual Team", text: "Fully bilingual team — English and Spanish." },
     ],
   };

@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About Us — Our Story",
   description:
-    "Family-owned and rooted in Cuban-American pride. Learn about Havana Cleaning — Miami's trusted residential and commercial cleaning service since day one.",
+    "Family-owned professional cleaning service. Learn about Havana Cleaning — trusted for quality residential and commercial cleaning since day one.",
   alternates: { canonical: "/about" },
 };
 
@@ -28,21 +28,21 @@ export default async function AboutPage() {
 
   const aboutSection = getContent(contentMap, "about_section", {
     label: "Our Story",
-    title: "Born in Havana, Built in Miami.",
+    title: "Family-Owned. Quality-Driven.",
     paragraphs: [
-      "Havana Cleaning was founded by a family who brought their Cuban heritage and work ethic to Miami. We believe in treating every home like it's our own — with care, pride, and the kind of attention to detail that makes a real difference.",
+      "Havana Cleaning was founded by a family who believes every home deserves to feel spotless. We bring care, pride, and attention to detail to every job.",
       "We're not just a cleaning company. We're a family business built on trust, hard work, and the belief that a clean home is the foundation of a happy life.",
-      "From Kendall to Coral Gables, from Brickell condos to Pinecrest estates — we bring the same level of care and professionalism to every job. Our team is background-checked and trained to deliver results that would make your abuela proud.",
+      "From Florida neighborhoods to homes across the country — we bring the same level of care and professionalism to every job. Our team is background-checked and trained to deliver results you'll love.",
     ],
   });
 
   const aboutPage = getContent(contentMap, "about_page", {
-    mission: "To deliver Miami families the kind of clean that feels like home — with heart, hustle, and Cuban pride.",
+    mission: "To deliver families the kind of clean that feels like home — with heart, hustle, and pride.",
     values: [
       { title: "Family First", description: "We treat every home like our own. Our clients are family, and their trust is everything." },
-      { title: "Cuban Work Ethic", description: "Hard work, dedication, and pride in every detail — that's the Havana way." },
+      { title: "Strong Work Ethic", description: "Hard work, dedication, and pride in every detail — that's the Havana way." },
       { title: "Trust & Transparency", description: "Background-checked teams, upfront pricing, and honest communication. Always." },
-      { title: "Community Roots", description: "Born in Miami, built for Miami. We're proud to serve our community every single day." },
+      { title: "Community Roots", description: "Founded in Florida, growing nationwide. We're proud to serve our communities every single day." },
     ],
   });
 
@@ -129,7 +129,7 @@ export default async function AboutPage() {
           Ready to Experience the Havana Difference?
         </h2>
         <p className="text-white/80 mb-8 max-w-md mx-auto">
-          Join hundreds of Miami families who trust us with their homes.
+          Join hundreds of happy families who trust us with their homes.
         </p>
         <Link
           href="/book"

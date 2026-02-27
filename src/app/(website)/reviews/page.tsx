@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Customer Reviews & Ratings",
   description:
-    "See what Miami families say about Havana Cleaning. Real reviews from real customers across Miami-Dade County — rated 5 stars for quality and reliability.",
+    "See what families say about Havana Cleaning. Real reviews from real customers — rated 5 stars for quality and reliability.",
   alternates: { canonical: "/reviews" },
 };
 
@@ -50,11 +50,11 @@ export default async function ReviewsPage() {
           className="font-display text-cream mb-6"
           style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
         >
-          {pageContent.title || "What Miami Is Saying"}
+          {pageContent.title || "What Our Clients Are Saying"}
         </h1>
         <p className="text-sand max-w-[600px] mx-auto leading-relaxed">
           {pageContent.subtitle ||
-            "Real reviews from real families across Miami-Dade County."}
+            "Real reviews from real families across the country."}
         </p>
         {testimonials.length > 0 && (
           <div className="flex items-center justify-center gap-3 mt-8">
@@ -113,7 +113,7 @@ export default async function ReviewsPage() {
           Ready for a Spotless Home?
         </h2>
         <p className="text-white/80 mb-8 max-w-md mx-auto">
-          Join hundreds of happy Miami families. Book in minutes, pay securely
+          Join hundreds of happy families. Book in minutes, pay securely
           online.
         </p>
         <Link

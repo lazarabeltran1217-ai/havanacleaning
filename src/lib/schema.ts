@@ -9,7 +9,7 @@ export function localBusinessSchema() {
     "@id": "https://havanacleaning.com/#business",
     name: BUSINESS.name,
     description:
-      "Miami's premier family-owned cleaning service. Residential, deep clean, commercial, and specialty cleaning.",
+      "Professional cleaning service for homes and businesses. Residential, deep clean, commercial, and specialty cleaning.",
     url: "https://havanacleaning.com",
     address: {
       "@type": "PostalAddress",
@@ -77,15 +77,39 @@ export function speakableSchema() {
 export function organizationSchema() {
   return {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": ["Organization", "ProfessionalService"],
     name: BUSINESS.name,
     url: "https://havanacleaning.com",
     logo: "https://havanacleaning.com/logo.png",
+    description:
+      "Professional cleaning service for homes and businesses. Residential, deep clean, commercial, and specialty cleaning. Book online with instant pricing.",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Miami",
+      addressRegion: "FL",
+      addressCountry: "US",
+    },
+    areaServed: {
+      "@type": "Country",
+      name: "United States",
+    },
     contactPoint: {
       "@type": "ContactPoint",
       url: "https://havanacleaning.com/book",
       contactType: "customer service",
       availableLanguage: ["English", "Spanish"],
+    },
+    knowsLanguage: ["en", "es"],
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Cleaning Services",
+      itemListElement: [
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Residential Cleaning" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Deep Cleaning" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Commercial Cleaning" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Move-In/Move-Out Cleaning" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Airbnb Turnover Cleaning" } },
+      ],
     },
   };
 }
@@ -116,8 +140,8 @@ export function serviceSchema(service: {
       name: BUSINESS.name,
     },
     areaServed: {
-      "@type": "City",
-      name: "Miami",
+      "@type": "Country",
+      name: "United States",
     },
     ...(service.basePrice > 0 && {
       offers: {

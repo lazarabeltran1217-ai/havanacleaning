@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Commercial Cleaning",
   description:
-    "Professional commercial cleaning services for Miami businesses. Offices, retail, medical, restaurants. Get a custom quote today.",
+    "Professional commercial cleaning services for businesses. Offices, retail, medical, restaurants. Get a custom quote today.",
   alternates: { canonical: "/commercial" },
 };
 

@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Book a Cleaning",
   description:
-    "Book your professional cleaning in Miami in minutes. Choose your service, pick a date and time, and pay securely online. Same-week availability.",
+    "Book your professional cleaning in minutes. Choose your service, pick a date and time, and pay securely online. Same-week availability.",
   alternates: { canonical: "/book" },
 };
 

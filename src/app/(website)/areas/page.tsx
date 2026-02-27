@@ -4,9 +4,9 @@ import { SERVICE_AREAS } from "@/lib/constants";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Service Areas — Miami-Dade Cleaning Coverage",
+  title: "Service Areas — Cleaning Coverage",
   description:
-    "Havana Cleaning serves all of Miami-Dade County. Find professional cleaning services in Brickell, Coral Gables, Kendall, Doral, Miami Beach, and 15+ more neighborhoods.",
+    "Havana Cleaning serves neighborhoods across Florida and beyond. Find professional cleaning services in Brickell, Coral Gables, Kendall, Doral, Miami Beach, and more.",
   alternates: { canonical: "/areas" },
 };
 
@@ -28,11 +28,11 @@ export default async function AreasPage() {
       {/* Hero */}
       <section className="text-center mb-12">
         <h1 className="font-display text-4xl text-tobacco mb-4">
-          We Clean All of Miami-Dade
+          Our Service Areas
         </h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          From Brickell high-rises to Kendall family homes, Havana Cleaning brings
-          spotless service to every corner of Miami-Dade County.
+          From Florida neighborhoods to communities nationwide, Havana Cleaning brings
+          spotless service wherever you call home.
         </p>
       </section>
 

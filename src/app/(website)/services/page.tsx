@@ -7,7 +7,7 @@ import { ServiceIcon } from "@/lib/service-icons";
 export const metadata: Metadata = {
   title: "Our Services",
   description:
-    "Professional cleaning services in Miami-Dade: residential, deep clean, move-in/out, commercial, post-construction, Airbnb turnover, and recurring plans.",
+    "Professional cleaning services: residential, deep clean, move-in/out, commercial, post-construction, Airbnb turnover, and recurring plans.",
   alternates: { canonical: "/services" },
 };
 
@@ -39,7 +39,7 @@ export default async function ServicesPage() {
         </h1>
         <p className="text-sand max-w-[600px] mx-auto leading-relaxed">
           From everyday cleans to deep sanitization — we handle every type of
-          home and business space in Miami-Dade County.
+          home and business space.
         </p>
       </section>
 

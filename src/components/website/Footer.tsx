@@ -62,7 +62,7 @@ export function Footer() {
         <div>
           <h4 className="text-green-light text-[0.72rem] tracking-[0.2em] uppercase mb-5 font-semibold">{t("contactTitle")}</h4>
           <ul className="space-y-2.5">
-            <li><span className="text-sand text-[0.88rem]">Miami, FL</span></li>
+            <li><span className="text-sand text-[0.88rem]">Miami, FL (HQ)</span></li>
             <li><Link href="/book" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Book Online</Link></li>
             <li><Link href="/faq" className="text-sand text-[0.88rem] hover:text-cream transition-colors">FAQ</Link></li>
           </ul>
@@ -72,9 +72,9 @@ export function Footer() {
       <div className="border-t border-white/[0.08] pt-7 flex flex-col md:flex-row justify-between items-center text-[0.8rem] text-sand/50 gap-4">
         <span>{t("copyright", { year: new Date().getFullYear() })}</span>
         <div className="flex gap-3 items-center">
-          <Link href="?locale=en" className="text-green-light text-[0.82rem] font-semibold">English</Link>
+          <a href="/api/locale?locale=en" className="text-green-light text-[0.82rem] font-semibold">English</a>
           <span className="opacity-30">|</span>
-          <Link href="?locale=es" className="text-sand text-[0.82rem] hover:text-white">Español</Link>
+          <a href="/api/locale?locale=es" className="text-sand text-[0.82rem] hover:text-white">Español</a>
         </div>
         <span>{t("madeWith")}</span>
       </div>

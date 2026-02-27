@@ -1,6 +1,6 @@
 export const BUSINESS = {
   name: "Havana Cleaning",
-  address: "Miami, FL",
+  address: "Miami, FL (HQ)",
   hours: "Mon-Sat 7AM - 7PM",
   taxRate: 0.07, // 7% Florida sales tax
 } as const;
@@ -32,6 +32,12 @@ export const TIME_SLOTS = [
   { label: "Morning (8am - 11am)", value: "morning" },
   { label: "Midday (11am - 2pm)", value: "midday" },
   { label: "Afternoon (2pm - 5pm)", value: "afternoon" },
+] as const;
+
+export const SERVICE_REGIONS = [
+  { name: "South Florida", areas: ["Miami-Dade", "Broward", "Palm Beach"] },
+  { name: "Central Florida", areas: ["Orlando", "Tampa Bay"] },
+  { name: "Nationwide", areas: [] },
 ] as const;
 
 export const LOCALES = ["en", "es"] as const;

@@ -11,11 +11,11 @@
     "myAccount": "Mi Cuenta"
   },
   "hero": {
-    "eyebrow": "El Mejor Servicio de Limpieza de Miami",
+    "eyebrow": "Limpieza Profesional para Hogares y Negocios",
     "title1": "Hogares Limpios,",
-    "title2": "Alma",
-    "title3": "Cubana.",
-    "subtitle": "Un negocio familiar arraigado en el orgullo cubano-americano. Tratamos cada hogar como el nuestro — con cariño, pasión y la limpieza que tu abuela aprobaría.",
+    "title2": "Familias",
+    "title3": "Felices.",
+    "subtitle": "Un negocio familiar impulsado por la calidad. Tratamos cada hogar como el nuestro — con cariño, precisión y una limpieza que se nota.",
     "bookCta": "Reservar Limpieza",
     "pricingCta": "Ver Precios",
     "homesCleaned": "Hogares Limpiados",
@@ -31,10 +31,10 @@
   },
   "about": {
     "label": "Nuestra Historia",
-    "title": "Nacidos en La Habana, Hechos en Miami.",
-    "p1": "Havana Cleaning fue fundada por dos hermanas que trajeron su herencia cubana — y los estándares implacables de su abuela — a cada hogar que tocan.",
+    "title": "Empresa Familiar. Impulsada por la Calidad.",
+    "p1": "Havana Cleaning fue fundada por una familia que cree que cada hogar merece sentirse impecable. Aportamos cuidado, orgullo y atención al detalle en cada trabajo.",
     "p2": "No somos solo una empresa de limpieza. Somos un negocio familiar con raíces profundas, y llevamos esa calidez a cada espacio que limpiamos.",
-    "p3": "De Kendall a Coral Gables, de condos en Brickell a hogares en Hialeah — llevamos el mismo orgullo cubano a cada dirección."
+    "p3": "Desde vecindarios en Florida hasta hogares en todo el país — llevamos el mismo nivel de cuidado y profesionalismo a cada trabajo. Nuestro equipo está verificado y capacitado para entregar resultados que te encantarán."
   },
   "services": {
     "label": "Lo Que Hacemos",
@@ -69,21 +69,21 @@
   },
   "testimonials": {
     "label": "Clientes Felices",
-    "title": "Lo Que Dice Miami"
+    "title": "Lo Que Dicen Nuestros Clientes"
   },
   "areas": {
     "label": "Dónde Limpiamos",
-    "title": "Sirviendo Todo Miami-Dade",
-    "subtitle": "Haz clic en un área para ver precios y disponibilidad local."
+    "title": "Dónde Limpiamos",
+    "subtitle": "Explora nuestras áreas de servicio. Estamos creciendo a nivel nacional."
   },
   "careers": {
     "label": "Únete a la Familia",
     "title": "Estamos Contratando",
-    "subtitle": "Únete a un equipo que valora el trabajo duro, el respeto y el orgullo cubano. Sin papeleo — aplica 100% en línea.",
+    "subtitle": "Únete a un equipo que valora el trabajo duro, el respeto y la calidad. Sin papeleo — aplica 100% en línea.",
     "applyCta": "Aplicar Ahora — 100% En Línea"
   },
   "footer": {
-    "tagline": "Servicio de limpieza familiar arraigado en el orgullo cubano-americano. Sirviendo todo el condado de Miami-Dade.",
+    "tagline": "Servicio de limpieza profesional familiar. Calidad en la que puedes confiar, desde Florida hasta tu puerta.",
     "servicesTitle": "Servicios",
     "companyTitle": "Compañía",
     "careersTitle": "Carreras",
