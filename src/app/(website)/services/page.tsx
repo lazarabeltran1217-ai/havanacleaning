@@ -80,6 +80,22 @@ export default async function ServicesPage() {
               </div>
             </Link>
           ))}
+          {services.length % 2 !== 0 && (
+            <Link
+              href="/book"
+              className="bg-white border border-tobacco/10 rounded-lg p-8 hover:shadow-lg hover:border-green/30 transition-all group flex flex-col items-center justify-center text-center"
+            >
+              <h2 className="font-display text-xl mb-2 group-hover:text-green transition-colors">
+                Need a Custom Clean?
+              </h2>
+              <p className="text-[#7a6555] text-[0.9rem] leading-relaxed mb-4">
+                Tell us what you need and we&apos;ll create a plan just for you.
+              </p>
+              <span className="text-green text-[0.85rem] font-medium group-hover:translate-x-1 transition-transform">
+                Get a Free Quote →
+              </span>
+            </Link>
+          )}
         </div>
       </section>
 
