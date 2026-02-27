@@ -640,9 +640,9 @@ export async function runSiteAudit(baseUrl: string): Promise<AuditResult> {
   for (let i = 0; i < urls.length; i++) {
     const result = await auditPage(urls[i], baseUrl);
     pages.push(result);
-    // Wait 500ms between pages so DB connections from previous SSR can be released
+    // Wait 1s between pages so DB connections from previous SSR can be released
     if (i < urls.length - 1) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
 
