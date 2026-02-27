@@ -12,8 +12,8 @@ function createPrismaClient() {
   if (!globalForPrisma.pgPool) {
     globalForPrisma.pgPool = new Pool({
       connectionString: process.env.DATABASE_URL!,
-      max: 2, // Limit connections per serverless instance to avoid pool exhaustion
-      idleTimeoutMillis: 30_000,
+      max: 5, // Allow a few concurrent queries per serverless instance
+      idleTimeoutMillis: 10_000,
       connectionTimeoutMillis: 10_000,
     });
   }

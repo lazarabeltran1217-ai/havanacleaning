@@ -634,11 +634,16 @@ export async function runSiteAudit(baseUrl: string): Promise<AuditResult> {
   // Discover all public URLs
   const urls = await discoverUrls(baseUrl);
 
-  // Audit pages sequentially to avoid hammering the server
+  // Audit pages sequentially with delay between each to avoid exhausting
+  // Supabase connection pool (each fetched page triggers SSR with DB queries)
   const pages: PageResult[] = [];
-  for (const url of urls) {
-    const result = await auditPage(url, baseUrl);
+  for (let i = 0; i < urls.length; i++) {
+    const result = await auditPage(urls[i], baseUrl);
     pages.push(result);
+    // Wait 500ms between pages so DB connections from previous SSR can be released
+    if (i < urls.length - 1) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
   }
 
   // Calculate overall scores (average across all pages per category)
