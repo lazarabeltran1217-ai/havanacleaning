@@ -12,7 +12,7 @@ function createPrismaClient() {
   if (!globalForPrisma.pgPool) {
     globalForPrisma.pgPool = new Pool({
       connectionString: process.env.DATABASE_URL!,
-      max: 1, // Single connection per serverless instance to stay within Supabase pool_size
+      max: 2, // Two connections per serverless instance (pool exhaustion fixed via createMany)
       idleTimeoutMillis: 5_000,
       connectionTimeoutMillis: 10_000,
     });

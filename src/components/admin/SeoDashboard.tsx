@@ -277,6 +277,8 @@ export function SeoDashboard({
   const [tab, setTab] = useState<TabName>("Overview");
   const [running, setRunning] = useState(false);
   const [auditError, setAuditError] = useState<string | null>(null);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
 
   const allIssues = useMemo(() => {
     if (!latestAudit) return [];
@@ -356,7 +358,7 @@ export function SeoDashboard({
             />
             <StatCard
               label="Last Audit"
-              value={timeAgo(latestAudit.createdAt)}
+              value={hydrated ? timeAgo(latestAudit.createdAt) : "—"}
               sub={latestAudit.durationMs ? `took ${(latestAudit.durationMs / 1000).toFixed(1)}s` : undefined}
             />
           </div>

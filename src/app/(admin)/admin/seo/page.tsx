@@ -52,23 +52,24 @@ export default async function AdminSeoPage() {
   let previousAudits: { id: string; overallScore: number; totalIssues: number; createdAt: string }[] = [];
 
   try {
-    // Sequential queries to avoid exhausting Supabase connection pool (max: 1 per instance)
-    const f = await fetchFaqs();
-    const k = await fetchKeywords();
-    const d = await fetchDirectories();
-    const gaSetting = await prisma.setting.findUnique({ where: { key: "google_analytics_id" } });
-    const gscSetting = await prisma.setting.findUnique({ where: { key: "google_search_console_key" } });
-    const auditRaw = await prisma.siteAudit.findFirst({
-      where: { status: "completed" },
-      orderBy: { createdAt: "desc" },
-      include: { pages: { orderBy: { pageUrl: "asc" } } },
-    });
-    const prevAuditsRaw = await prisma.siteAudit.findMany({
-      where: { status: "completed" },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-      select: { id: true, overallScore: true, totalIssues: true, createdAt: true },
-    });
+    const [f, k, d, gaSetting, gscSetting, auditRaw, prevAuditsRaw] = await Promise.all([
+      fetchFaqs(),
+      fetchKeywords(),
+      fetchDirectories(),
+      prisma.setting.findUnique({ where: { key: "google_analytics_id" } }),
+      prisma.setting.findUnique({ where: { key: "google_search_console_key" } }),
+      prisma.siteAudit.findFirst({
+        where: { status: "completed" },
+        orderBy: { createdAt: "desc" },
+        include: { pages: { orderBy: { pageUrl: "asc" } } },
+      }),
+      prisma.siteAudit.findMany({
+        where: { status: "completed" },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        select: { id: true, overallScore: true, totalIssues: true, createdAt: true },
+      }),
+    ]);
 
     faqs = f;
     keywords = k;
