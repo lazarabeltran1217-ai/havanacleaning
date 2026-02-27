@@ -3,6 +3,8 @@ import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import type { Metadata } from "next";
 import { ServiceIcon } from "@/lib/service-icons";
+import { getTranslations, getLocale } from "next-intl/server";
+import { localized } from "@/lib/i18n-content";
 
 export const metadata: Metadata = {
   title: "Our Services",
@@ -12,6 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default async function ServicesPage() {
+  const locale = await getLocale();
+  const t = await getTranslations();
+
   let services: Awaited<ReturnType<typeof prisma.service.findMany>> = [];
   try {
     services = await prisma.service.findMany({
@@ -28,18 +33,19 @@ export default async function ServicesPage() {
       <section className="bg-tobacco pt-36 pb-20 px-6 md:px-20 text-center">
         <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center justify-center gap-3">
           <span className="w-8 h-px bg-green-light" />
-          What We Do
+          {t("services.label")}
           <span className="w-8 h-px bg-green-light" />
         </div>
         <h1
           className="font-display text-cream mb-6"
           style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
         >
-          Our Services
+          {t("services.title")}
         </h1>
         <p className="text-sand max-w-[600px] mx-auto leading-relaxed">
-          From everyday cleans to deep sanitization — we handle every type of
-          home and business space.
+          {locale === "es"
+            ? "Desde limpiezas diarias hasta sanitización profunda — manejamos todo tipo de hogar y espacio comercial."
+            : "From everyday cleans to deep sanitization — we handle every type of home and business space."}
         </p>
       </section>
 
@@ -56,24 +62,24 @@ export default async function ServicesPage() {
                 <ServiceIcon emoji={service.icon || "✨"} className="w-10 h-10 text-green shrink-0" />
                 <div className="flex-1">
                   <h2 className="font-display text-xl mb-2 group-hover:text-green transition-colors">
-                    {service.name}
+                    {localized(service.name, service.nameEs, locale)}
                   </h2>
                   <p className="text-[#7a6555] text-[0.9rem] leading-relaxed mb-4">
-                    {service.description}
+                    {localized(service.description, service.descriptionEs, locale)}
                   </p>
                   <div className="flex items-center justify-between">
                     <span className="text-amber font-semibold text-[0.9rem]">
                       {service.basePrice > 0
-                        ? `Starting at ${formatCurrency(service.basePrice)}`
-                        : "Custom Quote"}
+                        ? t("services.startingAt", { price: formatCurrency(service.basePrice) })
+                        : t("services.customQuote")}
                     </span>
                     <span className="text-green text-[0.8rem] font-medium group-hover:translate-x-1 transition-transform">
-                      Learn More →
+                      {t("services.learnMore")}
                     </span>
                   </div>
                   {service.estimatedHours > 0 && (
                     <div className="text-sand text-[0.78rem] mt-2">
-                      ~{service.estimatedHours} hours estimated
+                      {t("services.hoursEstimated", { hours: service.estimatedHours })}
                     </div>
                   )}
                 </div>
@@ -86,13 +92,13 @@ export default async function ServicesPage() {
               className="bg-white border border-tobacco/10 rounded-lg p-8 hover:shadow-lg hover:border-green/30 transition-all group flex flex-col items-center justify-center text-center"
             >
               <h2 className="font-display text-xl mb-2 group-hover:text-green transition-colors">
-                Need a Custom Clean?
+                {t("services.customClean")}
               </h2>
               <p className="text-[#7a6555] text-[0.9rem] leading-relaxed mb-4">
-                Tell us what you need and we&apos;ll create a plan just for you.
+                {t("services.customCleanDesc")}
               </p>
               <span className="text-green text-[0.85rem] font-medium group-hover:translate-x-1 transition-transform">
-                Get a Free Quote →
+                {t("services.freeQuote")}
               </span>
             </Link>
           )}
@@ -102,17 +108,18 @@ export default async function ServicesPage() {
       {/* CTA */}
       <section className="bg-green py-16 px-6 text-center">
         <h2 className="font-display text-white text-3xl mb-4">
-          Ready for a Spotless Home?
+          {t("cta.readySpotless")}
         </h2>
         <p className="text-white/80 mb-8 max-w-md mx-auto">
-          Book online in minutes. Pick your service, choose a time, and we
-          handle the rest.
+          {locale === "es"
+            ? "Reserve en línea en minutos. Elija su servicio, escoja un horario y nosotros nos encargamos del resto."
+            : "Book online in minutes. Pick your service, choose a time, and we handle the rest."}
         </p>
         <Link
           href="/book"
           className="inline-block bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber transition-colors"
         >
-          Book a Cleaning
+          {t("cta.bookCleaning")}
         </Link>
       </section>
     </>

@@ -6,6 +6,8 @@ import { JsonLd } from "@/components/website/JsonLd";
 import { aggregateRatingSchema, reviewSchema, faqPageSchema } from "@/lib/schema";
 import { Check } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
+import { getTranslations, getLocale } from "next-intl/server";
+import { buildContentMap, localized } from "@/lib/i18n-content";
 
 // Helper to get content with fallback
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,47 +16,44 @@ function getContent(contentMap: Record<string, unknown>, key: string, fallback: 
 }
 
 export default async function HomePage() {
+  const locale = await getLocale();
+  const t = await getTranslations();
+
   let services: Awaited<ReturnType<typeof prisma.service.findMany>> = [];
   let testimonials: Awaited<ReturnType<typeof prisma.testimonial.findMany>> = [];
-  let allTestimonials: { rating: number; customerName: string; content: string; location: string | null }[] = [];
-  let faqs: { question: string; answer: string }[] = [];
+  let allTestimonials: { rating: number; customerName: string; content: string; contentEs: string | null; location: string | null }[] = [];
+  let faqs: { question: string; questionEs: string | null; answer: string; answerEs: string | null }[] = [];
   let areaPages: { slug: string; name: string }[] = [];
-  const contentMap: Record<string, unknown> = {};
+  let contentMap: Record<string, unknown> = {};
 
   try {
     [services, testimonials, allTestimonials, faqs, areaPages] = await Promise.all([
       prisma.service.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
       prisma.testimonial.findMany({ where: { isApproved: true, isFeatured: true }, take: 3, orderBy: { createdAt: "desc" } }),
-      prisma.testimonial.findMany({ where: { isApproved: true }, select: { rating: true, customerName: true, content: true, location: true } }),
-      prisma.fAQ.findMany({ where: { isPublished: true, pageType: "general" }, orderBy: { sortOrder: "asc" }, select: { question: true, answer: true }, take: 6 }),
+      prisma.testimonial.findMany({ where: { isApproved: true }, select: { rating: true, customerName: true, content: true, contentEs: true, location: true } }),
+      prisma.fAQ.findMany({ where: { isPublished: true, pageType: "general" }, orderBy: { sortOrder: "asc" }, select: { question: true, questionEs: true, answer: true, answerEs: true }, take: 6 }),
       prisma.areaPage.findMany({ where: { isPublished: true }, select: { slug: true, name: true } }),
     ]);
 
-    // Load editable content
+    // Load editable content (locale-aware)
     const contentRows = await prisma.content.findMany({ where: { published: true } });
-    for (const row of contentRows) {
-      contentMap[row.key] = row.dataEn;
-    }
+    contentMap = buildContentMap(contentRows, locale);
   } catch (error) {
     console.error("Failed to fetch data from database:", error);
   }
 
   // Editable content with fallbacks
-  const heroEyebrow = getContent(contentMap, "hero_eyebrow", { text: "Professional Home & Business Cleaning" });
-  const heroHeadline = getContent(contentMap, "hero_headline", { line1: "Clean Homes,", line2: "Happy", line3: "Families." });
-  const heroSubtitle = getContent(contentMap, "hero_subtitle", { text: "Family-owned and driven by quality. We treat every home like our own — with care, precision, and the kind of clean you'll notice." });
-  const heroCta1 = getContent(contentMap, "hero_cta_primary", { text: "Book a Cleaning", href: "/book" });
-  const heroCta2 = getContent(contentMap, "hero_cta_secondary", { text: "View Pricing", href: "/pricing" });
-  const heroStats = getContent(contentMap, "hero_stats", { items: [{ value: "500+", label: "Homes Cleaned" }, { value: "4.9★", label: "Average Rating" }, { value: "20+", label: "Areas Served" }] });
-  const trustBar = getContent(contentMap, "trust_bar", { items: ["Background-Checked Staff", "Same-Day Availability", "Bilingual Team (EN/ES)", "Satisfaction Guaranteed", "Serving Clients Nationwide"] });
+  const heroEyebrow = getContent(contentMap, "hero_eyebrow", { text: t("hero.eyebrow") });
+  const heroHeadline = getContent(contentMap, "hero_headline", { line1: t("hero.title1"), line2: t("hero.title2"), line3: t("hero.title3") });
+  const heroSubtitle = getContent(contentMap, "hero_subtitle", { text: t("hero.subtitle") });
+  const heroCta1 = getContent(contentMap, "hero_cta_primary", { text: t("hero.bookCta"), href: "/book" });
+  const heroCta2 = getContent(contentMap, "hero_cta_secondary", { text: t("hero.pricingCta"), href: "/pricing" });
+  const heroStats = getContent(contentMap, "hero_stats", { items: [{ value: "500+", label: t("hero.homesCleaned") }, { value: "4.9★", label: t("hero.avgRating") }, { value: "20+", label: t("hero.areasServed") }] });
+  const trustBar = getContent(contentMap, "trust_bar", { items: [t("trust.background"), t("trust.sameDay"), t("trust.bilingual"), t("trust.guaranteed"), t("trust.nationwide")] });
   const aboutSection = getContent(contentMap, "about_section", {
-    label: "Our Story",
-    title: "Family-Owned. Quality-Driven.",
-    paragraphs: [
-      "Havana Cleaning was founded by a family who believes every home deserves to feel spotless. We bring care, pride, and attention to detail to every job.",
-      "We're not just a cleaning company. We're a family business built on trust, hard work, and the belief that a clean home is the foundation of a happy life.",
-      "From Florida neighborhoods to homes across the country — we bring the same level of care and professionalism to every job. Our team is background-checked and trained to deliver results you'll love.",
-    ],
+    label: t("about.label"),
+    title: t("about.title"),
+    paragraphs: [t("about.p1"), t("about.p2"), t("about.p3")],
   });
 
   const avgRating = allTestimonials.length > 0
@@ -64,8 +63,8 @@ export default async function HomePage() {
   return (
     <>
       <JsonLd data={aggregateRatingSchema(Math.round(avgRating * 10) / 10, allTestimonials.length)} />
-      {allTestimonials.slice(0, 3).map((t, i) => (
-        <JsonLd key={i} data={reviewSchema({ author: t.customerName, content: t.content, rating: t.rating, location: t.location || undefined })} />
+      {allTestimonials.slice(0, 3).map((testimonial, i) => (
+        <JsonLd key={i} data={reviewSchema({ author: testimonial.customerName, content: testimonial.content, rating: testimonial.rating, location: testimonial.location || undefined })} />
       ))}
 
       {/* HERO */}
@@ -128,13 +127,13 @@ export default async function HomePage() {
       {/* SERVICES */}
       <section id="services" className="bg-tobacco py-24 px-6 md:px-20">
         <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center gap-3">
-          <span className="w-8 h-px bg-green-light" />What We Do
+          <span className="w-8 h-px bg-green-light" />{t("services.label")}
         </div>
-        <h2 className="font-display text-cream mb-4" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>Our Services</h2>
+        <h2 className="font-display text-cream mb-4" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>{t("services.title")}</h2>
         {allTestimonials.length > 0 && (
           <div className="flex items-center gap-2 mb-12 text-sand text-[0.85rem]">
             <span className="text-gold">★★★★★</span>
-            <span>{(Math.round(avgRating * 10) / 10).toFixed(1)} stars from {allTestimonials.length} reviews</span>
+            <span>{(Math.round(avgRating * 10) / 10).toFixed(1)} {t("testimonials.fromReviews", { count: allTestimonials.length })}</span>
           </div>
         )}
         {allTestimonials.length === 0 && <div className="mb-12" />}
@@ -142,18 +141,18 @@ export default async function HomePage() {
           {services.map((service) => (
             <Link key={service.id} href={`/services/${service.slug}`} className="bg-white/[0.04] border border-gold/15 p-10 hover:bg-green-light/10 hover:border-green-light transition-colors">
               <ServiceIcon emoji={service.icon || "✨"} className="w-10 h-10 text-green-light mb-4" />
-              <div className="font-display text-lg text-cream mb-2.5">{service.name}</div>
-              <p className="text-sand text-[0.88rem] leading-relaxed mb-4">{service.description}</p>
+              <div className="font-display text-lg text-cream mb-2.5">{localized(service.name, service.nameEs, locale)}</div>
+              <p className="text-sand text-[0.88rem] leading-relaxed mb-4">{localized(service.description, service.descriptionEs, locale)}</p>
               <div className="text-amber text-[0.85rem] font-medium tracking-wide">
-                {service.basePrice > 0 ? `Starting at ${formatCurrency(service.basePrice)}` : "Custom Quote"}
+                {service.basePrice > 0 ? t("services.startingAt", { price: formatCurrency(service.basePrice) }) : t("services.customQuote")}
               </div>
             </Link>
           ))}
           {services.length % 4 !== 0 && (
             <Link href="/book" className="bg-green-light/[0.06] border border-gold/15 p-10 flex flex-col items-center justify-center text-center hover:bg-green-light/10 hover:border-green-light transition-colors">
-              <div className="font-display text-xl text-cream mb-3">Need a Custom Clean?</div>
-              <p className="text-sand text-[0.88rem] leading-relaxed mb-4">Tell us what you need and we&apos;ll create a plan just for you.</p>
-              <span className="text-amber text-[0.85rem] font-medium tracking-wide">Get a Free Quote →</span>
+              <div className="font-display text-xl text-cream mb-3">{t("services.customClean")}</div>
+              <p className="text-sand text-[0.88rem] leading-relaxed mb-4">{t("services.customCleanDesc")}</p>
+              <span className="text-amber text-[0.85rem] font-medium tracking-wide">{t("services.freeQuote")}</span>
             </Link>
           )}
         </div>
@@ -179,7 +178,7 @@ export default async function HomePage() {
                 <p key={i} className="text-[#5a4535] text-[0.95rem] leading-relaxed">{p}</p>
               ))}
               <Link href="/book" className="inline-block bg-green text-white px-8 py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-green-light hover:text-tobacco transition-colors">
-                Book a Cleaning Today
+                {t("about.bookToday")}
               </Link>
             </div>
           </div>
@@ -190,16 +189,16 @@ export default async function HomePage() {
       {testimonials.length > 0 && (
         <section id="testimonials" className="bg-ivory py-24 px-6 md:px-20 text-center">
           <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center justify-center gap-3">
-            <span className="w-8 h-px bg-green" />Happy Clients
+            <span className="w-8 h-px bg-green" />{t("testimonials.label")}
           </div>
-          <h2 className="font-display mb-16" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>What Our Clients Are Saying</h2>
+          <h2 className="font-display mb-16" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>{t("testimonials.title")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
-            {testimonials.map((t) => (
-              <div key={t.id} className="bg-white border border-tobacco/10 rounded-md p-9 text-left relative">
-                <div className="text-gold text-lg mb-3">{"★".repeat(t.rating)}</div>
-                <p className="font-serif italic text-[#5a4535] leading-relaxed mb-6">{t.content}</p>
-                <div className="font-semibold text-[0.85rem]">{t.customerName}</div>
-                <div className="text-green text-[0.78rem]">{t.location}</div>
+            {testimonials.map((testimonial) => (
+              <div key={testimonial.id} className="bg-white border border-tobacco/10 rounded-md p-9 text-left relative">
+                <div className="text-gold text-lg mb-3">{"★".repeat(testimonial.rating)}</div>
+                <p className="font-serif italic text-[#5a4535] leading-relaxed mb-6">{localized(testimonial.content, testimonial.contentEs, locale)}</p>
+                <div className="font-semibold text-[0.85rem]">{testimonial.customerName}</div>
+                <div className="text-green text-[0.78rem]">{testimonial.location}</div>
               </div>
             ))}
           </div>
@@ -213,27 +212,27 @@ export default async function HomePage() {
           <section id="faq" className="bg-ivory py-24 px-6 md:px-20">
             <div className="max-w-3xl mx-auto">
               <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center justify-center gap-3">
-                <span className="w-8 h-px bg-green" />Common Questions
+                <span className="w-8 h-px bg-green" />{t("faq.label")}
               </div>
               <h2 className="font-display text-center mb-12" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>
-                Frequently Asked Questions
+                {t("faq.title")}
               </h2>
               <div className="space-y-4">
                 {faqs.map((faq, i) => (
                   <details key={i} className="bg-white border border-tobacco/10 rounded-lg group">
                     <summary className="px-6 py-5 cursor-pointer font-semibold text-[0.95rem] text-tobacco flex items-center justify-between hover:text-green transition-colors">
-                      {faq.question}
+                      {localized(faq.question, faq.questionEs, locale)}
                       <span className="text-green ml-4 group-open:rotate-180 transition-transform">▼</span>
                     </summary>
                     <div className="px-6 pb-5 text-[#5a4535] text-[0.9rem] leading-relaxed border-t border-tobacco/5 pt-4">
-                      {faq.answer}
+                      {localized(faq.answer, faq.answerEs, locale)}
                     </div>
                   </details>
                 ))}
               </div>
               <div className="text-center mt-8">
                 <Link href="/faq" className="text-green font-medium hover:underline text-[0.9rem]">
-                  View All FAQs →
+                  {t("faq.viewAll")}
                 </Link>
               </div>
             </div>
@@ -244,10 +243,10 @@ export default async function HomePage() {
       {/* SERVICE AREAS */}
       <section id="areas" className="bg-cream py-24 px-6 md:px-20">
         <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center gap-3">
-          <span className="w-8 h-px bg-green" />Where We Clean
+          <span className="w-8 h-px bg-green" />{t("areas.label")}
         </div>
-        <h2 className="font-display mb-2" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>Where We Clean</h2>
-        <p className="text-[#7a6555] max-w-[500px] leading-relaxed mb-10">We proudly serve neighborhoods across the country, with deep roots in Florida.</p>
+        <h2 className="font-display mb-2" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>{t("areas.title")}</h2>
+        <p className="text-[#7a6555] max-w-[500px] leading-relaxed mb-10">{t("areas.bodySubtitle")}</p>
         <div className="flex flex-wrap gap-2.5">
           {SERVICE_AREAS.map((area) => {
             const slug = area.toLowerCase().replace(/\s+/g, "-");
@@ -274,7 +273,7 @@ export default async function HomePage() {
         </div>
         <div className="mt-6">
           <Link href="/areas" className="text-green font-medium hover:underline text-[0.9rem]">
-            View All Service Areas →
+            {t("areas.viewAll")}
           </Link>
         </div>
       </section>
@@ -282,17 +281,17 @@ export default async function HomePage() {
       {/* FINAL CTA — CRO */}
       <section className="bg-green py-20 px-6 text-center">
         <h2 className="font-display text-white mb-4" style={{ fontSize: "clamp(2rem, 4vw, 3rem)" }}>
-          Ready for a Spotless Home?
+          {t("cta.readySpotless")}
         </h2>
         <p className="text-white/80 max-w-lg mx-auto mb-8 text-lg leading-relaxed">
-          Join 500+ families who trust Havana Cleaning. Book in minutes, pay securely online.
+          {t("cta.joinFamilies")}
         </p>
         <div className="flex gap-4 flex-wrap justify-center">
           <Link href="/book" className="bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber hover:-translate-y-0.5 transition-all">
-            Book Now — Free Estimate
+            {t("cta.bookNowEstimate")}
           </Link>
           <Link href="/pricing" className="border-[1.5px] border-white/40 text-white px-9 py-4 text-[0.9rem] font-medium tracking-[0.08em] uppercase rounded-[3px] hover:border-white transition-colors">
-            View Pricing
+            {t("cta.viewPricing")}
           </Link>
         </div>
       </section>

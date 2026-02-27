@@ -3,6 +3,8 @@ import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import type { Metadata } from "next";
 import { ServiceIcon } from "@/lib/service-icons";
+import { getTranslations, getLocale } from "next-intl/server";
+import { localized } from "@/lib/i18n-content";
 
 export const metadata: Metadata = {
   title: "Cleaning Prices & Rates",
@@ -19,6 +21,9 @@ const fetchPricingData = () =>
   });
 
 export default async function PricingPage() {
+  const locale = await getLocale();
+  const t = await getTranslations();
+
   let services: Awaited<ReturnType<typeof fetchPricingData>> = [];
   let addOns: Awaited<ReturnType<typeof prisma.serviceAddOn.findMany>> = [];
   try {
@@ -37,18 +42,17 @@ export default async function PricingPage() {
       <section className="bg-tobacco pt-36 pb-20 px-6 md:px-20 text-center">
         <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center justify-center gap-3">
           <span className="w-8 h-px bg-green-light" />
-          Transparent Pricing
+          {t("pricing.label")}
           <span className="w-8 h-px bg-green-light" />
         </div>
         <h1
           className="font-display text-cream mb-6"
           style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
         >
-          Simple, Honest Pricing
+          {t("pricing.title")}
         </h1>
         <p className="text-sand max-w-[600px] mx-auto leading-relaxed">
-          No hidden fees. No surprises. Prices vary by home size, service type,
-          and add-ons. Florida sales tax (7%) applies.
+          {t("pricing.heroSubtitle")}
         </p>
       </section>
 
@@ -63,13 +67,13 @@ export default async function PricingPage() {
               <div className="bg-tobacco/[0.03] px-8 py-5 border-b border-tobacco/10 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <ServiceIcon emoji={service.icon || "✨"} className="w-6 h-6 text-green" />
-                  <h2 className="font-display text-xl">{service.name}</h2>
+                  <h2 className="font-display text-xl">{localized(service.name, service.nameEs, locale)}</h2>
                 </div>
                 <Link
                   href={`/book?service=${service.slug}`}
                   className="bg-gold text-tobacco px-5 py-2 text-[0.8rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-amber transition-colors"
                 >
-                  Book Now
+                  {t("pricing.bookNow")}
                 </Link>
               </div>
 
@@ -80,13 +84,13 @@ export default async function PricingPage() {
                       <thead>
                         <tr className="border-b border-tobacco/10">
                           <th className="pb-3 text-[0.75rem] uppercase tracking-wider text-sand">
-                            Bedrooms
+                            {t("pricing.bedrooms")}
                           </th>
                           <th className="pb-3 text-[0.75rem] uppercase tracking-wider text-sand">
-                            Bathrooms
+                            {t("pricing.bathrooms")}
                           </th>
                           <th className="pb-3 text-[0.75rem] uppercase tracking-wider text-sand text-right">
-                            Price
+                            {t("pricing.price")}
                           </th>
                         </tr>
                       </thead>
@@ -98,13 +102,13 @@ export default async function PricingPage() {
                           >
                             <td className="py-3">
                               {rule.bedroomsMin === rule.bedroomsMax
-                                ? `${rule.bedroomsMin} bed`
-                                : `${rule.bedroomsMin}-${rule.bedroomsMax} bed`}
+                                ? `${rule.bedroomsMin} ${t("pricing.bed")}`
+                                : `${rule.bedroomsMin}-${rule.bedroomsMax} ${t("pricing.bed")}`}
                             </td>
                             <td className="py-3">
                               {rule.bathroomsMin === rule.bathroomsMax
-                                ? `${rule.bathroomsMin} bath`
-                                : `${rule.bathroomsMin}-${rule.bathroomsMax} bath`}
+                                ? `${rule.bathroomsMin} ${t("pricing.bath")}`
+                                : `${rule.bathroomsMin}-${rule.bathroomsMax} ${t("pricing.bath")}`}
                             </td>
                             <td className="py-3 text-right font-semibold text-green">
                               {formatCurrency(rule.price)}
@@ -118,12 +122,12 @@ export default async function PricingPage() {
                   <div className="text-center py-4">
                     <span className="text-amber text-lg font-semibold">
                       {service.basePrice > 0
-                        ? `Starting at ${formatCurrency(service.basePrice)}`
-                        : "Custom Quote — Contact Us"}
+                        ? t("services.startingAt", { price: formatCurrency(service.basePrice) })
+                        : t("pricing.customQuoteContact")}
                     </span>
                     {service.estimatedHours > 0 && (
                       <p className="text-sand text-[0.85rem] mt-1">
-                        ~{service.estimatedHours} hours estimated
+                        {t("services.hoursEstimated", { hours: service.estimatedHours })}
                       </p>
                     )}
                   </div>
@@ -141,10 +145,10 @@ export default async function PricingPage() {
             className="font-display mb-2 text-center"
             style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)" }}
           >
-            Add-On Services
+            {t("pricing.addOns")}
           </h2>
           <p className="text-[#7a6555] text-center mb-10 max-w-md mx-auto">
-            Customize your clean with these popular extras.
+            {t("pricing.addOnsSubtitle")}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {addOns.map((addon) => (
@@ -152,7 +156,7 @@ export default async function PricingPage() {
                 key={addon.id}
                 className="bg-white border border-tobacco/10 rounded-lg px-6 py-4 flex items-center justify-between"
               >
-                <span className="text-[0.9rem]">{addon.name}</span>
+                <span className="text-[0.9rem]">{localized(addon.name, addon.nameEs, locale)}</span>
                 <span className="text-amber font-semibold text-[0.9rem]">
                   +{formatCurrency(addon.price)}
                 </span>
@@ -165,31 +169,30 @@ export default async function PricingPage() {
       {/* RECURRING DISCOUNT */}
       <section className="bg-green py-16 px-6 text-center">
         <h2 className="font-display text-white text-3xl mb-4">
-          Save Up to 20% with a Recurring Plan
+          {t("pricing.saveRecurring")}
         </h2>
         <p className="text-white/80 mb-3 max-w-lg mx-auto">
-          Weekly, bi-weekly, or monthly — pick a schedule and save on every
-          clean.
+          {t("pricing.saveRecurringDesc")}
         </p>
         <div className="flex justify-center gap-8 mt-8 mb-8">
           <div className="text-center">
             <div className="text-white text-2xl font-bold">20%</div>
-            <div className="text-green-mint text-[0.8rem]">Weekly</div>
+            <div className="text-green-mint text-[0.8rem]">{t("pricing.weekly")}</div>
           </div>
           <div className="text-center">
             <div className="text-white text-2xl font-bold">15%</div>
-            <div className="text-green-mint text-[0.8rem]">Bi-Weekly</div>
+            <div className="text-green-mint text-[0.8rem]">{t("pricing.biWeekly")}</div>
           </div>
           <div className="text-center">
             <div className="text-white text-2xl font-bold">10%</div>
-            <div className="text-green-mint text-[0.8rem]">Monthly</div>
+            <div className="text-green-mint text-[0.8rem]">{t("pricing.monthly")}</div>
           </div>
         </div>
         <Link
           href="/book"
           className="inline-block bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber transition-colors"
         >
-          Get Started
+          {t("pricing.getStarted")}
         </Link>
       </section>
     </>

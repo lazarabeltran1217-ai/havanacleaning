@@ -1,5 +1,6 @@
 import { CommercialForm } from "@/components/website/CommercialForm";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Commercial Cleaning",
@@ -8,39 +9,41 @@ export const metadata: Metadata = {
   alternates: { canonical: "/commercial" },
 };
 
-export default function CommercialPage() {
+export default async function CommercialPage() {
+  const t = await getTranslations("commercial");
+
+  const trustItems = [
+    t("trust1"),
+    t("trust2"),
+    t("trust3"),
+    t("trust4"),
+    t("trust5"),
+  ];
+
   return (
     <>
       {/* HERO */}
       <section className="bg-tobacco pt-36 pb-16 px-6 md:px-20 text-center">
         <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center justify-center gap-3">
           <span className="w-8 h-px bg-green-light" />
-          For Businesses
+          {t("label")}
           <span className="w-8 h-px bg-green-light" />
         </div>
         <h1
           className="font-display text-cream mb-6"
           style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
         >
-          Commercial Cleaning
+          {t("title")}
         </h1>
         <p className="text-sand max-w-[600px] mx-auto leading-relaxed">
-          Offices, retail spaces, medical facilities, restaurants — we keep your
-          business looking professional and hygienic. Tell us about your space
-          and we&apos;ll put together a custom plan.
+          {t("subtitle")}
         </p>
       </section>
 
       {/* TRUST SIGNALS */}
       <section className="bg-green py-8 px-6 md:px-20">
         <div className="max-w-4xl mx-auto flex flex-wrap justify-center gap-10 text-white text-[0.85rem] font-medium">
-          {[
-            "Professional-Grade Cleaning",
-            "Flexible Scheduling",
-            "Custom Plans Available",
-            "Background-Checked Staff",
-            "Green Products Available",
-          ].map((item) => (
+          {trustItems.map((item) => (
             <div key={item} className="flex items-center gap-2">
               ✓ {item}
             </div>
@@ -55,11 +58,10 @@ export default function CommercialPage() {
             className="font-display text-center mb-2"
             style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)" }}
           >
-            Request a Quote
+            {t("requestQuote")}
           </h2>
           <p className="text-center text-sand text-[0.9rem] mb-10">
-            Fill out the form below and we&apos;ll get back to you within 24 hours
-            with a custom quote.
+            {t("requestQuoteDesc")}
           </p>
           <CommercialForm />
         </div>

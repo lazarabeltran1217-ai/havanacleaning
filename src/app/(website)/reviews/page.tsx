@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { getTranslations, getLocale } from "next-intl/server";
+import { buildContentMap, localized } from "@/lib/i18n-content";
 
 export const metadata: Metadata = {
   title: "Customer Reviews & Ratings",
@@ -10,8 +12,11 @@ export const metadata: Metadata = {
 };
 
 export default async function ReviewsPage() {
+  const locale = await getLocale();
+  const t = await getTranslations();
+
   let testimonials: Awaited<ReturnType<typeof prisma.testimonial.findMany>> = [];
-  const contentMap: Record<string, unknown> = {};
+  let contentMap: Record<string, unknown> = {};
 
   try {
     [testimonials] = await Promise.all([
@@ -20,7 +25,7 @@ export default async function ReviewsPage() {
         orderBy: { createdAt: "desc" },
       }),
       prisma.content.findMany({ where: { published: true } }).then((rows) => {
-        for (const row of rows) contentMap[row.key] = row.dataEn;
+        contentMap = buildContentMap(rows, locale);
       }),
     ]);
   } catch (error) {
@@ -43,18 +48,17 @@ export default async function ReviewsPage() {
       <section className="bg-tobacco pt-36 pb-20 px-6 md:px-20 text-center">
         <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center justify-center gap-3">
           <span className="w-8 h-px bg-green-light" />
-          Happy Clients
+          {t("testimonials.label")}
           <span className="w-8 h-px bg-green-light" />
         </div>
         <h1
           className="font-display text-cream mb-6"
           style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
         >
-          {pageContent.title || "What Our Clients Are Saying"}
+          {pageContent.title || t("testimonials.title")}
         </h1>
         <p className="text-sand max-w-[600px] mx-auto leading-relaxed">
-          {pageContent.subtitle ||
-            "Real reviews from real families across the country."}
+          {pageContent.subtitle || t("testimonials.subtitle")}
         </p>
         {testimonials.length > 0 && (
           <div className="flex items-center justify-center gap-3 mt-8">
@@ -63,7 +67,7 @@ export default async function ReviewsPage() {
               {(Math.round(avgRating * 10) / 10).toFixed(1)}
             </span>
             <span className="text-sand text-[0.9rem]">
-              from {testimonials.length} reviews
+              {t("testimonials.fromReviews", { count: testimonials.length })}
             </span>
           </div>
         )}
@@ -74,29 +78,29 @@ export default async function ReviewsPage() {
         <div className="max-w-6xl mx-auto">
           {testimonials.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-sand text-[0.9rem]">No reviews yet. Be the first!</p>
+              <p className="text-sand text-[0.9rem]">{t("testimonials.noReviews")}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {testimonials.map((t) => (
+              {testimonials.map((testimonial) => (
                 <div
-                  key={t.id}
+                  key={testimonial.id}
                   className="bg-white border border-tobacco/10 rounded-lg p-8"
                 >
                   <div className="text-gold text-lg mb-3">
-                    {"★".repeat(t.rating)}
-                    {"☆".repeat(5 - t.rating)}
+                    {"★".repeat(testimonial.rating)}
+                    {"☆".repeat(5 - testimonial.rating)}
                   </div>
                   <p className="font-serif italic text-[#5a4535] text-[0.92rem] leading-relaxed mb-6">
-                    &ldquo;{t.content}&rdquo;
+                    &ldquo;{localized(testimonial.content, testimonial.contentEs, locale)}&rdquo;
                   </p>
                   <div className="border-t border-tobacco/10 pt-4">
                     <div className="font-semibold text-[0.85rem]">
-                      {t.customerName}
+                      {testimonial.customerName}
                     </div>
-                    {t.location && (
+                    {testimonial.location && (
                       <div className="text-green text-[0.78rem]">
-                        {t.location}
+                        {testimonial.location}
                       </div>
                     )}
                   </div>
@@ -110,17 +114,16 @@ export default async function ReviewsPage() {
       {/* CTA */}
       <section className="bg-green py-16 px-6 text-center">
         <h2 className="font-display text-white text-3xl mb-4">
-          Ready for a Spotless Home?
+          {t("cta.readySpotless")}
         </h2>
         <p className="text-white/80 mb-8 max-w-md mx-auto">
-          Join hundreds of happy families. Book in minutes, pay securely
-          online.
+          {t("cta.joinHappy")}
         </p>
         <Link
           href="/book"
           className="inline-block bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber transition-colors"
         >
-          Book a Cleaning
+          {t("cta.bookCleaning")}
         </Link>
       </section>
     </>

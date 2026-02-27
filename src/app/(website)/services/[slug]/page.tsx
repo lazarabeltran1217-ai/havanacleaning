@@ -9,6 +9,8 @@ import { JsonLd } from "@/components/website/JsonLd";
 import { serviceSchema, breadcrumbSchema, faqPageSchema } from "@/lib/schema";
 import { getServiceDefaults, type ServiceContent } from "@/lib/service-defaults";
 import { FAQSection } from "@/components/website/FAQSection";
+import { getTranslations, getLocale } from "next-intl/server";
+import { localized } from "@/lib/i18n-content";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -37,6 +39,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ServiceDetailPage({ params }: Props) {
   const { slug } = await params;
+  const locale = await getLocale();
+  const t = await getTranslations();
 
   let service = null;
   try {
@@ -58,36 +62,50 @@ export default async function ServiceDetailPage({ params }: Props) {
   let content: ServiceContent = defaults;
   try {
     const contentRecord = await prisma.content.findUnique({ where: { key: `service_${slug}` } });
-    if (contentRecord?.dataEn) {
-      const data = contentRecord.dataEn as Record<string, unknown>;
-      content = {
-        longDescription: (data.longDescription as string) || defaults.longDescription,
-        features: Array.isArray(data.features) && data.features.length > 0 ? data.features as string[] : defaults.features,
-        benefits: Array.isArray(data.benefits) && data.benefits.length > 0 ? data.benefits as ServiceContent["benefits"] : defaults.benefits,
-      };
+    if (contentRecord) {
+      // Pick locale-aware content
+      const data = (locale === "es" && contentRecord.dataEs != null
+        ? contentRecord.dataEs
+        : contentRecord.dataEn) as Record<string, unknown>;
+      if (data) {
+        content = {
+          longDescription: (data.longDescription as string) || defaults.longDescription,
+          features: Array.isArray(data.features) && data.features.length > 0 ? data.features as string[] : defaults.features,
+          benefits: Array.isArray(data.benefits) && data.benefits.length > 0 ? data.benefits as ServiceContent["benefits"] : defaults.benefits,
+        };
+      }
     }
   } catch {
     // Use defaults
   }
 
   // Fetch service-related FAQs
-  let faqs: { id: string; question: string; answer: string }[] = [];
+  let faqs: Awaited<ReturnType<typeof prisma.fAQ.findMany>> = [];
   try {
     faqs = await prisma.fAQ.findMany({
       where: { pageType: "service", isPublished: true },
       orderBy: { sortOrder: "asc" },
       take: 5,
-      select: { id: true, question: true, answer: true },
     });
   } catch {
     // No FAQs
   }
 
+  const serviceName = localized(service.name, service.nameEs, locale);
+  const serviceDesc = localized(service.description, service.descriptionEs, locale);
+
   const breadcrumbs = [
-    { name: "Home", url: "/" },
-    { name: "Services", url: "/services" },
-    { name: service.name, url: `/services/${service.slug}` },
+    { name: locale === "es" ? "Inicio" : "Home", url: "/" },
+    { name: t("services.title"), url: "/services" },
+    { name: serviceName, url: `/services/${service.slug}` },
   ];
+
+  // Localize FAQs for display
+  const localizedFaqs = faqs.map((f) => ({
+    ...f,
+    question: localized(f.question, f.questionEs, locale),
+    answer: localized(f.answer, f.answerEs, locale),
+  }));
 
   return (
     <>
@@ -102,7 +120,7 @@ export default async function ServiceDetailPage({ params }: Props) {
             href="/services"
             className="text-sand text-[0.82rem] hover:text-cream transition-colors mb-6 inline-block"
           >
-            ← Back to Services
+            {t("services.backToServices")}
           </Link>
           <div className="flex items-center gap-4 mb-4">
             <ServiceIcon emoji={service.icon || "✨"} className="w-12 h-12 text-green-light" />
@@ -110,21 +128,21 @@ export default async function ServiceDetailPage({ params }: Props) {
               className="font-display text-cream"
               style={{ fontSize: "clamp(2.2rem, 4vw, 3.5rem)" }}
             >
-              {service.name}
+              {serviceName}
             </h1>
           </div>
           <p className="text-sand text-lg leading-relaxed max-w-2xl">
-            {service.description}
+            {serviceDesc}
           </p>
           <div className="mt-6 flex items-center gap-6">
             <span className="text-amber text-xl font-semibold">
               {service.basePrice > 0
-                ? `Starting at ${formatCurrency(service.basePrice)}`
-                : "Custom Quote"}
+                ? t("services.startingAt", { price: formatCurrency(service.basePrice) })
+                : t("services.customQuote")}
             </span>
             {service.estimatedHours > 0 && (
               <span className="text-sand text-[0.85rem]">
-                ~{service.estimatedHours} hours estimated
+                {t("services.hoursEstimated", { hours: service.estimatedHours })}
               </span>
             )}
           </div>
@@ -149,14 +167,14 @@ export default async function ServiceDetailPage({ params }: Props) {
             {/* PRICING TABLE */}
             {service.pricingRules.length > 0 && (
               <div className="bg-white border border-tobacco/10 rounded-lg p-8">
-                <h2 className="font-display text-xl mb-6">Pricing by Home Size</h2>
+                <h2 className="font-display text-xl mb-6">{t("services.pricingBySize")}</h2>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
                       <tr className="border-b border-tobacco/10">
-                        <th className="pb-3 text-[0.78rem] uppercase tracking-wider text-sand">Bedrooms</th>
-                        <th className="pb-3 text-[0.78rem] uppercase tracking-wider text-sand">Bathrooms</th>
-                        <th className="pb-3 text-[0.78rem] uppercase tracking-wider text-sand text-right">Price</th>
+                        <th className="pb-3 text-[0.78rem] uppercase tracking-wider text-sand">{t("pricing.bedrooms")}</th>
+                        <th className="pb-3 text-[0.78rem] uppercase tracking-wider text-sand">{t("pricing.bathrooms")}</th>
+                        <th className="pb-3 text-[0.78rem] uppercase tracking-wider text-sand text-right">{t("pricing.price")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -185,7 +203,7 @@ export default async function ServiceDetailPage({ params }: Props) {
 
             {/* WHAT'S INCLUDED */}
             <div className="bg-white border border-tobacco/10 rounded-lg p-8">
-              <h2 className="font-display text-xl mb-4">What&apos;s Included</h2>
+              <h2 className="font-display text-xl mb-4">{t("services.whatsIncluded")}</h2>
               <ul className="space-y-3 text-[0.9rem] text-[#5a4535]">
                 {content.features.map((feature, i) => (
                   <li key={i} className="flex items-start gap-2.5">
@@ -199,7 +217,7 @@ export default async function ServiceDetailPage({ params }: Props) {
             {/* WHY CHOOSE US */}
             {content.benefits.length > 0 && (
               <div>
-                <h2 className="font-display text-xl mb-5">Why Choose Havana Cleaning</h2>
+                <h2 className="font-display text-xl mb-5">{t("services.whyChoose")}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {content.benefits.map((benefit, i) => (
                     <div key={i} className="bg-white border border-tobacco/10 rounded-lg p-5">
@@ -215,23 +233,23 @@ export default async function ServiceDetailPage({ params }: Props) {
           {/* SIDEBAR */}
           <div>
             <div className="bg-white border border-tobacco/10 rounded-lg p-6 sticky top-28">
-              <h3 className="font-display text-lg mb-4">Book This Service</h3>
+              <h3 className="font-display text-lg mb-4">{t("services.bookThisService")}</h3>
               <Link
                 href={`/book?service=${service.slug}`}
                 className="block w-full bg-gold text-tobacco text-center py-3.5 text-[0.9rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-amber transition-colors mb-6"
               >
-                Book Now
+                {t("cta.bookNow")}
               </Link>
 
               {service.addOns.length > 0 && (
                 <>
                   <h4 className="text-[0.78rem] uppercase tracking-wider text-sand mb-3">
-                    Available Add-Ons
+                    {t("services.availableAddOns")}
                   </h4>
                   <ul className="space-y-2">
                     {service.addOns.map((addon) => (
                       <li key={addon.id} className="flex items-center justify-between text-[0.85rem]">
-                        <span>{addon.name}</span>
+                        <span>{localized(addon.name, addon.nameEs, locale)}</span>
                         <span className="text-amber font-medium">+{formatCurrency(addon.price)}</span>
                       </li>
                     ))}
@@ -241,7 +259,7 @@ export default async function ServiceDetailPage({ params }: Props) {
 
               <div className="mt-4 pt-4 border-t border-tobacco/10">
                 <p className="text-[0.78rem] text-sand">
-                  Additional add-ons available during booking
+                  {t("services.addOnsNote")}
                 </p>
               </div>
             </div>
@@ -250,10 +268,10 @@ export default async function ServiceDetailPage({ params }: Props) {
       </section>
 
       {/* SERVICE FAQs */}
-      {faqs.length > 0 && (
+      {localizedFaqs.length > 0 && (
         <section className="bg-cream py-16 px-6 md:px-20">
           <div className="max-w-3xl mx-auto">
-            <FAQSection faqs={faqs} title={`${service.name} FAQ`} />
+            <FAQSection faqs={localizedFaqs} title={t("services.serviceFaq", { service: serviceName })} />
           </div>
         </section>
       )}
@@ -261,16 +279,16 @@ export default async function ServiceDetailPage({ params }: Props) {
       {/* CTA */}
       <section className="bg-green py-16 px-6 text-center">
         <h2 className="font-display text-white text-3xl mb-4">
-          Ready to Book Your {service.name}?
+          {t("services.readyToBook", { service: serviceName })}
         </h2>
         <p className="text-white/80 mb-8 max-w-md mx-auto">
-          Book online in minutes. Pick your time and we handle the rest.
+          {t("services.bookOnline")}
         </p>
         <Link
           href={`/book?service=${service.slug}`}
           className="inline-block bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber transition-colors"
         >
-          Book Now
+          {t("cta.bookNow")}
         </Link>
       </section>
     </>

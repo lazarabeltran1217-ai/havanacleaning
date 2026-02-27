@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { getTranslations, getLocale } from "next-intl/server";
+import { buildContentMap } from "@/lib/i18n-content";
 
 export const metadata: Metadata = {
   title: "About Us — Our Story",
@@ -15,30 +17,33 @@ function getContent(contentMap: Record<string, unknown>, key: string, fallback: 
 }
 
 export default async function AboutPage() {
-  const contentMap: Record<string, unknown> = {};
+  const locale = await getLocale();
+  const t = await getTranslations();
+  let contentMap: Record<string, unknown> = {};
 
   try {
     const contentRows = await prisma.content.findMany({ where: { published: true } });
-    for (const row of contentRows) {
-      contentMap[row.key] = row.dataEn;
-    }
+    contentMap = buildContentMap(contentRows, locale);
   } catch (error) {
     console.error("Failed to fetch content:", error);
   }
 
   const aboutSection = getContent(contentMap, "about_section", {
-    label: "Our Story",
-    title: "Family-Owned. Quality-Driven.",
-    paragraphs: [
-      "Havana Cleaning was founded by a family who believes every home deserves to feel spotless. We bring care, pride, and attention to detail to every job.",
-      "We're not just a cleaning company. We're a family business built on trust, hard work, and the belief that a clean home is the foundation of a happy life.",
-      "From Florida neighborhoods to homes across the country — we bring the same level of care and professionalism to every job. Our team is background-checked and trained to deliver results you'll love.",
-    ],
+    label: t("about.label"),
+    title: t("about.title"),
+    paragraphs: [t("about.p1"), t("about.p2"), t("about.p3")],
   });
 
   const aboutPage = getContent(contentMap, "about_page", {
-    mission: "To deliver families the kind of clean that feels like home — with heart, hustle, and pride.",
-    values: [
+    mission: locale === "es"
+      ? "Ofrecer a las familias el tipo de limpieza que se siente como hogar — con corazón, esfuerzo y orgullo."
+      : "To deliver families the kind of clean that feels like home — with heart, hustle, and pride.",
+    values: locale === "es" ? [
+      { title: "La Familia Primero", description: "Tratamos cada hogar como el nuestro. Nuestros clientes son familia, y su confianza lo es todo." },
+      { title: "Fuerte Ética de Trabajo", description: "Trabajo duro, dedicación y orgullo en cada detalle — esa es la manera Havana." },
+      { title: "Confianza y Transparencia", description: "Equipos verificados, precios claros y comunicación honesta. Siempre." },
+      { title: "Raíces Comunitarias", description: "Fundada en Florida, creciendo a nivel nacional. Estamos orgullosos de servir a nuestras comunidades todos los días." },
+    ] : [
       { title: "Family First", description: "We treat every home like our own. Our clients are family, and their trust is everything." },
       { title: "Strong Work Ethic", description: "Hard work, dedication, and pride in every detail — that's the Havana way." },
       { title: "Trust & Transparency", description: "Background-checked teams, upfront pricing, and honest communication. Always." },
@@ -52,7 +57,7 @@ export default async function AboutPage() {
       <section className="bg-tobacco pt-36 pb-20 px-6 md:px-20 text-center">
         <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center justify-center gap-3">
           <span className="w-8 h-px bg-green-light" />
-          {aboutSection.label || "Our Story"}
+          {aboutSection.label || t("about.label")}
           <span className="w-8 h-px bg-green-light" />
         </div>
         <h1
@@ -86,7 +91,7 @@ export default async function AboutPage() {
         <div className="max-w-4xl mx-auto text-center">
           <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center justify-center gap-3">
             <span className="w-8 h-px bg-green" />
-            Our Mission
+            {t("about.missionLabel")}
             <span className="w-8 h-px bg-green" />
           </div>
           <p className="font-display text-2xl md:text-3xl leading-snug max-w-2xl mx-auto mb-16">
@@ -100,10 +105,10 @@ export default async function AboutPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center gap-3">
             <span className="w-8 h-px bg-green" />
-            Our Values
+            {t("about.valuesLabel")}
           </div>
           <h2 className="font-display mb-12" style={{ fontSize: "clamp(2rem, 4vw, 2.8rem)" }}>
-            What Drives Us
+            {t("about.valuesTitle")}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {(aboutPage.values as { title: string; description: string }[]).map(
@@ -126,16 +131,16 @@ export default async function AboutPage() {
       {/* CTA */}
       <section className="bg-green py-16 px-6 text-center">
         <h2 className="font-display text-white text-3xl mb-4">
-          Ready to Experience the Havana Difference?
+          {t("about.ctaTitle")}
         </h2>
         <p className="text-white/80 mb-8 max-w-md mx-auto">
-          Join hundreds of happy families who trust us with their homes.
+          {t("about.ctaSubtitle")}
         </p>
         <Link
           href="/book"
           className="inline-block bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber transition-colors"
         >
-          Book a Cleaning
+          {t("about.ctaButton")}
         </Link>
       </section>
     </>

@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { SERVICE_AREAS } from "@/lib/constants";
 import type { Metadata } from "next";
+import { getTranslations, getLocale } from "next-intl/server";
+import { localized } from "@/lib/i18n-content";
 
 export const metadata: Metadata = {
   title: "Service Areas — Cleaning Coverage",
@@ -11,6 +13,9 @@ export const metadata: Metadata = {
 };
 
 export default async function AreasPage() {
+  const locale = await getLocale();
+  const t = await getTranslations("areas");
+
   let areaPages: Awaited<ReturnType<typeof prisma.areaPage.findMany>> = [];
   try {
     areaPages = await prisma.areaPage.findMany({
@@ -28,11 +33,10 @@ export default async function AreasPage() {
       {/* Hero */}
       <section className="text-center mb-12">
         <h1 className="font-display text-4xl text-tobacco mb-4">
-          Our Service Areas
+          {t("heroTitle")}
         </h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          From Florida neighborhoods to communities nationwide, Havana Cleaning brings
-          spotless service wherever you call home.
+          {t("heroSubtitle")}
         </p>
       </section>
 
@@ -54,7 +58,7 @@ export default async function AreasPage() {
               </div>
               {areaPage?.description && (
                 <p className="text-gray-400 text-[0.78rem] mt-1 line-clamp-2">
-                  {areaPage.description}
+                  {localized(areaPage.description, areaPage.descriptionEs, locale)}
                 </p>
               )}
             </Link>
@@ -65,7 +69,7 @@ export default async function AreasPage() {
             >
               <div className="font-display text-lg text-tobacco">{area}</div>
               <p className="text-gray-400 text-[0.78rem] mt-1">
-                Professional cleaning services available
+                {t("professionalAvailable")}
               </p>
             </div>
           );
@@ -75,13 +79,13 @@ export default async function AreasPage() {
       {/* CTA */}
       <section className="text-center mt-12">
         <p className="text-gray-600 mb-4">
-          Don&apos;t see your neighborhood? We likely serve your area too!
+          {t("dontSeeArea")}
         </p>
         <Link
           href="/book"
           className="inline-block bg-green text-white px-8 py-3 rounded-xl font-semibold hover:bg-green/90 transition-colors"
         >
-          Book Your Cleaning
+          {locale === "es" ? "Reserve Su Limpieza" : "Book Your Cleaning"}
         </Link>
       </section>
     </div>

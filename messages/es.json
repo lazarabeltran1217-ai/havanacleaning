@@ -20,38 +20,80 @@
     "pricingCta": "Ver Precios",
     "homesCleaned": "Hogares Limpiados",
     "avgRating": "Calificación Promedio",
-    "ecoFriendly": "Ecológico"
+    "areasServed": "Áreas Servidas"
   },
   "trust": {
-    "insured": "Totalmente Asegurado",
     "background": "Personal Verificado",
     "sameDay": "Disponibilidad el Mismo Día",
-    "eco": "Productos Ecológicos",
-    "guaranteed": "Satisfacción Garantizada"
+    "bilingual": "Equipo Bilingüe (EN/ES)",
+    "guaranteed": "Satisfacción Garantizada",
+    "nationwide": "Servicio a Nivel Nacional"
   },
   "about": {
     "label": "Nuestra Historia",
     "title": "Empresa Familiar. Impulsada por la Calidad.",
     "p1": "Havana Cleaning fue fundada por una familia que cree que cada hogar merece sentirse impecable. Aportamos cuidado, orgullo y atención al detalle en cada trabajo.",
     "p2": "No somos solo una empresa de limpieza. Somos un negocio familiar con raíces profundas, y llevamos esa calidez a cada espacio que limpiamos.",
-    "p3": "Desde vecindarios en Florida hasta hogares en todo el país — llevamos el mismo nivel de cuidado y profesionalismo a cada trabajo. Nuestro equipo está verificado y capacitado para entregar resultados que te encantarán."
+    "p3": "Desde vecindarios en Florida hasta hogares en todo el país — llevamos el mismo nivel de cuidado y profesionalismo a cada trabajo. Nuestro equipo está verificado y capacitado para entregar resultados que te encantarán.",
+    "bookToday": "Reserve Su Limpieza Hoy",
+    "missionLabel": "Nuestra Misión",
+    "valuesLabel": "Nuestros Valores",
+    "valuesTitle": "Lo Que Nos Impulsa",
+    "ctaTitle": "¿Listo para Experimentar la Diferencia Havana?",
+    "ctaSubtitle": "Únase a cientos de familias felices que nos confían sus hogares.",
+    "ctaButton": "Reservar Limpieza"
   },
   "services": {
     "label": "Lo Que Hacemos",
-    "title": "Nuestros Servicios"
+    "title": "Nuestros Servicios",
+    "startingAt": "Desde {price}",
+    "customQuote": "Cotización Personalizada",
+    "customClean": "¿Necesita una Limpieza Personalizada?",
+    "customCleanDesc": "Díganos lo que necesita y crearemos un plan solo para usted.",
+    "freeQuote": "Cotización Gratis →",
+    "learnMore": "Más Información →",
+    "hoursEstimated": "~{hours} horas estimadas",
+    "backToServices": "← Volver a Servicios",
+    "pricingBySize": "Precios por Tamaño de Hogar",
+    "whatsIncluded": "Qué Incluye",
+    "whyChoose": "Por Qué Elegir Havana Cleaning",
+    "bookThisService": "Reservar Este Servicio",
+    "availableAddOns": "Extras Disponibles",
+    "addOnsNote": "Extras adicionales disponibles durante la reserva",
+    "readyToBook": "¿Listo para Reservar su {service}?",
+    "bookOnline": "Reserve en línea en minutos. Elija su horario y nosotros nos encargamos del resto.",
+    "serviceFaq": "Preguntas Frecuentes — {service}"
   },
   "pricing": {
     "label": "Precios Transparentes",
     "title": "Tarifas Simples y Honestas",
     "subtitle": "Sin cargos ocultos, sin sorpresas. Precio por tamaño de hogar.",
+    "heroSubtitle": "Sin cargos ocultos. Sin sorpresas. Los precios varían según el tamaño del hogar, tipo de servicio y extras. Se aplica impuesto de ventas de Florida (7%).",
     "perVisit": "por visita",
     "bookPlan": "Reservar Este Plan",
-    "mostPopular": "Más Popular"
+    "mostPopular": "Más Popular",
+    "bookNow": "Reservar Ahora",
+    "bedrooms": "Habitaciones",
+    "bathrooms": "Baños",
+    "price": "Precio",
+    "bed": "hab",
+    "bath": "baño",
+    "customQuoteContact": "Cotización Personalizada — Contáctenos",
+    "addOns": "Servicios Adicionales",
+    "addOnsSubtitle": "Personalice su limpieza con estos extras populares.",
+    "saveRecurring": "Ahorre Hasta 20% con un Plan Recurrente",
+    "saveRecurringDesc": "Semanal, quincenal o mensual — elija un horario y ahorre en cada limpieza.",
+    "weekly": "Semanal",
+    "biWeekly": "Quincenal",
+    "monthly": "Mensual",
+    "getStarted": "Comenzar"
   },
   "booking": {
     "label": "Reserva Tu Limpieza",
     "title": "Reserva en Línea. Paga Seguro.",
     "subtitle": "Llena el formulario, elige tu servicio y confirmaremos tu cita dentro de la hora.",
+    "heroTitle": "Reserve Su Limpieza",
+    "heroSubtitle": "3 pasos simples y listo. Nosotros nos encargamos del resto.",
     "firstName": "Nombre",
     "lastName": "Apellido",
     "email": "Correo Electrónico",
@@ -69,18 +111,82 @@
   },
   "testimonials": {
     "label": "Clientes Felices",
-    "title": "Lo Que Dicen Nuestros Clientes"
+    "title": "Lo Que Dicen Nuestros Clientes",
+    "starsFrom": "{rating} estrellas de {count} reseñas",
+    "fromReviews": "de {count} reseñas",
+    "noReviews": "Aún no hay reseñas. ¡Sé el primero!",
+    "subtitle": "Reseñas reales de familias reales en todo el país."
+  },
+  "faq": {
+    "label": "Preguntas Frecuentes",
+    "title": "Preguntas Frecuentes",
+    "viewAll": "Ver Todas las Preguntas →",
+    "subtitle": "Todo lo que necesitas saber sobre los servicios, precios, horarios y más de Havana Cleaning.",
+    "generalQuestions": "Preguntas Generales",
+    "servicesAndCleaning": "Servicios y Limpieza",
+    "pricingAndPayment": "Precios y Pagos",
+    "serviceAreas": "Áreas de Servicio",
+    "stillHaveQuestions": "¿Aún Tiene Preguntas?",
+    "teamHappy": "Nuestro equipo está feliz de ayudar. Contáctenos en cualquier momento.",
+    "beingPrepared": "Las preguntas frecuentes se están preparando. ¡Vuelva pronto!",
+    "bookYourCleaning": "Reserve Su Limpieza",
+    "viewPricing": "Ver Precios"
   },
   "areas": {
     "label": "Dónde Limpiamos",
     "title": "Dónde Limpiamos",
-    "subtitle": "Explora nuestras áreas de servicio. Estamos creciendo a nivel nacional."
+    "subtitle": "Explora nuestras áreas de servicio. Estamos creciendo a nivel nacional.",
+    "bodySubtitle": "Orgullosamente servimos vecindarios en todo el país, con raíces profundas en Florida.",
+    "viewAll": "Ver Todas las Áreas de Servicio →",
+    "servicesAvailable": "Servicios Disponibles en {area}",
+    "faqTitle": "Preguntas Frecuentes — Limpieza en {area}",
+    "readyCta": "¿Listo para un Hogar Impecable en {area}?",
+    "bookDesc": "Reserve su limpieza en menos de 2 minutos. Disponibilidad esta semana.",
+    "professionalAvailable": "Servicios de limpieza profesional disponibles",
+    "dontSeeArea": "¿No ve su vecindario? ¡Probablemente también servimos su área!",
+    "heroTitle": "Nuestras Áreas de Servicio",
+    "heroSubtitle": "Desde vecindarios en Florida hasta comunidades en todo el país, Havana Cleaning lleva un servicio impecable donde sea que usted llame hogar.",
+    "home": "Inicio",
+    "serviceAreas": "Áreas de Servicio"
   },
   "careers": {
     "label": "Únete a la Familia",
     "title": "Estamos Contratando",
     "subtitle": "Únete a un equipo que valora el trabajo duro, el respeto y la calidad. Sin papeleo — aplica 100% en línea.",
-    "applyCta": "Aplicar Ahora — 100% En Línea"
+    "applyCta": "Aplicar Ahora — 100% En Línea",
+    "heroLabel": "Únete a Nuestro Equipo",
+    "heroTitle": "Trabaja Con Havana Cleaning",
+    "heroSubtitle": "Estamos creciendo nuestro equipo de limpiadores profesionales. Pago competitivo, horario flexible y un equipo que te trata bien.",
+    "applyNow": "Aplicar Ahora",
+    "applyDesc": "Complete la solicitud a continuación. Revisamos las solicitudes dentro de 48 horas.",
+    "benefit1": "Pago Competitivo ($18-25/hr)",
+    "benefit2": "Horario Flexible",
+    "benefit3": "Entrenamiento Pagado",
+    "benefit4": "Nómina Semanal",
+    "benefit5": "Oportunidades de Crecimiento",
+    "benefit6": "Suministros Incluidos"
+  },
+  "commercial": {
+    "label": "Para Negocios",
+    "title": "Limpieza Comercial",
+    "subtitle": "Oficinas, espacios comerciales, instalaciones médicas, restaurantes — mantenemos su negocio con apariencia profesional e higiénica. Cuéntenos sobre su espacio y crearemos un plan personalizado.",
+    "trust1": "Limpieza de Grado Profesional",
+    "trust2": "Horario Flexible",
+    "trust3": "Planes Personalizados",
+    "trust4": "Personal Verificado",
+    "trust5": "Productos Ecológicos",
+    "requestQuote": "Solicitar Cotización",
+    "requestQuoteDesc": "Complete el formulario a continuación y nos pondremos en contacto dentro de 24 horas con una cotización personalizada."
+  },
+  "cta": {
+    "readySpotless": "¿Listo para un Hogar Impecable?",
+    "joinFamilies": "Únase a más de 500 familias que confían en Havana Cleaning. Reserve en minutos, pague seguro en línea.",
+    "bookNowEstimate": "Reserve Ahora — Cotización Gratis",
+    "bookCleaning": "Reservar Limpieza",
+    "bookYourCleaning": "Reserve Su Limpieza",
+    "bookNow": "Reservar Ahora",
+    "viewPricing": "Ver Precios",
+    "joinHappy": "Únase a cientos de familias felices. Reserve en minutos, pague seguro en línea."
   },
   "footer": {
     "tagline": "Servicio de limpieza profesional familiar. Calidad en la que puedes confiar, desde Florida hasta tu puerta.",
@@ -107,6 +213,7 @@
     "edit": "Editar",
     "back": "Atrás",
     "next": "Siguiente",
-    "submit": "Enviar"
+    "submit": "Enviar",
+    "home": "Inicio"
   }
 }

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { BookingWizard } from "@/components/website/BookingWizard";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Book a Cleaning",
@@ -10,6 +11,8 @@ export const metadata: Metadata = {
 };
 
 export default async function BookPage() {
+  const t = await getTranslations("booking");
+
   let services: { id: string; name: string; slug: string; icon: string | null; basePrice: number; estimatedHours: number }[] = [];
   let addOns: { id: string; name: string; price: number }[] = [];
   try {
@@ -41,10 +44,10 @@ export default async function BookPage() {
           className="font-display text-cream mb-4"
           style={{ fontSize: "clamp(2.2rem, 4vw, 3.5rem)" }}
         >
-          Book Your Cleaning
+          {t("heroTitle")}
         </h1>
         <p className="text-sand max-w-md mx-auto">
-          3 simple steps and you&apos;re done. We&apos;ll take it from here.
+          {t("heroSubtitle")}
         </p>
       </section>
 

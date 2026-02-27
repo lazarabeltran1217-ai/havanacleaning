@@ -20,38 +20,80 @@
     "pricingCta": "View Pricing",
     "homesCleaned": "Homes Cleaned",
     "avgRating": "Average Rating",
-    "ecoFriendly": "Eco-Friendly"
+    "areasServed": "Areas Served"
   },
   "trust": {
-    "insured": "Fully Insured & Bonded",
     "background": "Background-Checked Staff",
     "sameDay": "Same-Day Availability",
-    "eco": "Eco-Friendly Products",
-    "guaranteed": "Satisfaction Guaranteed"
+    "bilingual": "Bilingual Team (EN/ES)",
+    "guaranteed": "Satisfaction Guaranteed",
+    "nationwide": "Serving Clients Nationwide"
   },
   "about": {
     "label": "Our Story",
     "title": "Family-Owned. Quality-Driven.",
     "p1": "Havana Cleaning was founded by a family who believes every home deserves to feel spotless. We bring care, pride, and attention to detail to every job.",
     "p2": "We're not just a cleaning company. We're a family business built on trust, hard work, and the belief that a clean home is the foundation of a happy life.",
-    "p3": "From Florida neighborhoods to homes across the country — we bring the same level of care and professionalism to every job. Our team is background-checked and trained to deliver results you'll love."
+    "p3": "From Florida neighborhoods to homes across the country — we bring the same level of care and professionalism to every job. Our team is background-checked and trained to deliver results you'll love.",
+    "bookToday": "Book a Cleaning Today",
+    "missionLabel": "Our Mission",
+    "valuesLabel": "Our Values",
+    "valuesTitle": "What Drives Us",
+    "ctaTitle": "Ready to Experience the Havana Difference?",
+    "ctaSubtitle": "Join hundreds of happy families who trust us with their homes.",
+    "ctaButton": "Book a Cleaning"
   },
   "services": {
     "label": "What We Do",
-    "title": "Our Services"
+    "title": "Our Services",
+    "startingAt": "Starting at {price}",
+    "customQuote": "Custom Quote",
+    "customClean": "Need a Custom Clean?",
+    "customCleanDesc": "Tell us what you need and we'll create a plan just for you.",
+    "freeQuote": "Get a Free Quote →",
+    "learnMore": "Learn More →",
+    "hoursEstimated": "~{hours} hours estimated",
+    "backToServices": "← Back to Services",
+    "pricingBySize": "Pricing by Home Size",
+    "whatsIncluded": "What's Included",
+    "whyChoose": "Why Choose Havana Cleaning",
+    "bookThisService": "Book This Service",
+    "availableAddOns": "Available Add-Ons",
+    "addOnsNote": "Additional add-ons available during booking",
+    "readyToBook": "Ready to Book Your {service}?",
+    "bookOnline": "Book online in minutes. Pick your time and we handle the rest.",
+    "serviceFaq": "{service} FAQ"
   },
   "pricing": {
     "label": "Transparent Pricing",
-    "title": "Simple, Honest Rates",
+    "title": "Simple, Honest Pricing",
     "subtitle": "No hidden fees, no surprises. Priced by your home size — choose the plan that fits.",
+    "heroSubtitle": "No hidden fees. No surprises. Prices vary by home size, service type, and add-ons. Florida sales tax (7%) applies.",
     "perVisit": "per visit",
     "bookPlan": "Book This Plan",
-    "mostPopular": "Most Popular"
+    "mostPopular": "Most Popular",
+    "bookNow": "Book Now",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "price": "Price",
+    "bed": "bed",
+    "bath": "bath",
+    "customQuoteContact": "Custom Quote — Contact Us",
+    "addOns": "Add-On Services",
+    "addOnsSubtitle": "Customize your clean with these popular extras.",
+    "saveRecurring": "Save Up to 20% with a Recurring Plan",
+    "saveRecurringDesc": "Weekly, bi-weekly, or monthly — pick a schedule and save on every clean.",
+    "weekly": "Weekly",
+    "biWeekly": "Bi-Weekly",
+    "monthly": "Monthly",
+    "getStarted": "Get Started"
   },
   "booking": {
     "label": "Reserve Your Clean",
     "title": "Book Online. Pay Securely.",
     "subtitle": "Fill out the form, choose your service, and we'll confirm your appointment within the hour.",
+    "heroTitle": "Book Your Cleaning",
+    "heroSubtitle": "3 simple steps and you're done. We'll take it from here.",
     "firstName": "First Name",
     "lastName": "Last Name",
     "email": "Email Address",
@@ -69,18 +111,82 @@
   },
   "testimonials": {
     "label": "Happy Clients",
-    "title": "What Our Clients Are Saying"
+    "title": "What Our Clients Are Saying",
+    "starsFrom": "{rating} stars from {count} reviews",
+    "fromReviews": "from {count} reviews",
+    "noReviews": "No reviews yet. Be the first!",
+    "subtitle": "Real reviews from real families across the country."
+  },
+  "faq": {
+    "label": "Common Questions",
+    "title": "Frequently Asked Questions",
+    "viewAll": "View All FAQs →",
+    "subtitle": "Everything you need to know about Havana Cleaning services, pricing, scheduling, and more.",
+    "generalQuestions": "General Questions",
+    "servicesAndCleaning": "Services & Cleaning",
+    "pricingAndPayment": "Pricing & Payment",
+    "serviceAreas": "Service Areas",
+    "stillHaveQuestions": "Still Have Questions?",
+    "teamHappy": "Our team is happy to help. Reach out anytime.",
+    "beingPrepared": "FAQs are being prepared. Check back soon!",
+    "bookYourCleaning": "Book Your Cleaning",
+    "viewPricing": "View Pricing"
   },
   "areas": {
     "label": "Where We Clean",
     "title": "Where We Clean",
-    "subtitle": "Explore our service areas. We're growing nationwide."
+    "subtitle": "Explore our service areas. We're growing nationwide.",
+    "bodySubtitle": "We proudly serve neighborhoods across the country, with deep roots in Florida.",
+    "viewAll": "View All Service Areas →",
+    "servicesAvailable": "Services Available in {area}",
+    "faqTitle": "FAQ — Cleaning in {area}",
+    "readyCta": "Ready for a Spotless Home in {area}?",
+    "bookDesc": "Book your cleaning in under 2 minutes. Same-week availability.",
+    "professionalAvailable": "Professional cleaning services available",
+    "dontSeeArea": "Don't see your neighborhood? We likely serve your area too!",
+    "heroTitle": "Our Service Areas",
+    "heroSubtitle": "From Florida neighborhoods to communities nationwide, Havana Cleaning brings spotless service wherever you call home.",
+    "home": "Home",
+    "serviceAreas": "Service Areas"
   },
   "careers": {
     "label": "Join the Family",
     "title": "We're Hiring Cleaners",
     "subtitle": "Join a team that values hard work, respect, and quality. No paperwork — apply 100% online.",
-    "applyCta": "Apply Now — 100% Online"
+    "applyCta": "Apply Now — 100% Online",
+    "heroLabel": "Join Our Team",
+    "heroTitle": "Work With Havana Cleaning",
+    "heroSubtitle": "We're growing our family of professional cleaners. Competitive pay, flexible schedule, and a team that treats you right.",
+    "applyNow": "Apply Now",
+    "applyDesc": "Complete the application below. We review applications within 48 hours.",
+    "benefit1": "Competitive Pay ($18-25/hr)",
+    "benefit2": "Flexible Hours",
+    "benefit3": "Paid Training",
+    "benefit4": "Weekly Payroll",
+    "benefit5": "Growth Opportunities",
+    "benefit6": "Supplies Provided"
+  },
+  "commercial": {
+    "label": "For Businesses",
+    "title": "Commercial Cleaning",
+    "subtitle": "Offices, retail spaces, medical facilities, restaurants — we keep your business looking professional and hygienic. Tell us about your space and we'll put together a custom plan.",
+    "trust1": "Professional-Grade Cleaning",
+    "trust2": "Flexible Scheduling",
+    "trust3": "Custom Plans Available",
+    "trust4": "Background-Checked Staff",
+    "trust5": "Green Products Available",
+    "requestQuote": "Request a Quote",
+    "requestQuoteDesc": "Fill out the form below and we'll get back to you within 24 hours with a custom quote."
+  },
+  "cta": {
+    "readySpotless": "Ready for a Spotless Home?",
+    "joinFamilies": "Join 500+ families who trust Havana Cleaning. Book in minutes, pay securely online.",
+    "bookNowEstimate": "Book Now — Free Estimate",
+    "bookCleaning": "Book a Cleaning",
+    "bookYourCleaning": "Book Your Cleaning",
+    "bookNow": "Book Now",
+    "viewPricing": "View Pricing",
+    "joinHappy": "Join hundreds of happy families. Book in minutes, pay securely online."
   },
   "footer": {
     "tagline": "Family-owned professional cleaning service. Quality you can trust, from Florida to your front door.",
@@ -107,6 +213,7 @@
     "edit": "Edit",
     "back": "Back",
     "next": "Next",
-    "submit": "Submit"
+    "submit": "Submit",
+    "home": "Home"
   }
 }
