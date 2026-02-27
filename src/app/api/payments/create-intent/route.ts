@@ -30,6 +30,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const stripe = await getStripe();
+
   // Check for existing payment intent
   const existingPayment = await prisma.payment.findFirst({
     where: {
@@ -39,17 +41,45 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  const stripe = await getStripe();
-
   if (existingPayment?.stripePaymentIntentId) {
-    // Retrieve existing intent
     const intent = await stripe.paymentIntents.retrieve(
       existingPayment.stripePaymentIntentId
     );
-    return NextResponse.json({ clientSecret: intent.client_secret });
+
+    // Intent already succeeded — update DB and tell client it's paid
+    if (intent.status === "succeeded") {
+      await prisma.payment.update({
+        where: { id: existingPayment.id },
+        data: { status: "SUCCEEDED", paidAt: new Date() },
+      });
+      await prisma.booking.update({
+        where: { id: booking.id },
+        data: { status: "CONFIRMED" },
+      });
+      return NextResponse.json({ alreadyPaid: true });
+    }
+
+    // Intent is still usable (requires_payment_method, requires_confirmation, etc.)
+    if (intent.status === "requires_payment_method" || intent.status === "requires_confirmation" || intent.status === "requires_action") {
+      return NextResponse.json({ clientSecret: intent.client_secret });
+    }
+
+    // Intent is in a terminal state (canceled, etc.) — mark old payment failed, create new one
+    await prisma.payment.update({
+      where: { id: existingPayment.id },
+      data: { status: "FAILED" },
+    });
   }
 
-  // Create Stripe PaymentIntent
+  // Also check if booking is already fully paid
+  const succeededPayment = await prisma.payment.findFirst({
+    where: { bookingId: booking.id, status: "SUCCEEDED" },
+  });
+  if (succeededPayment) {
+    return NextResponse.json({ alreadyPaid: true });
+  }
+
+  // Create new Stripe PaymentIntent
   const amountInCents = Math.round(booking.total * 100);
 
   const paymentIntent = await stripe.paymentIntents.create({

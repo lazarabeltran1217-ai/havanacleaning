@@ -76,7 +76,9 @@ export function BookingPayment({ bookingId, amount, returnUrl = "/account/bookin
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.clientSecret) {
+        if (data.alreadyPaid) {
+          window.location.reload();
+        } else if (data.clientSecret) {
           setClientSecret(data.clientSecret);
         } else {
           setError(data.error || "Failed to initialize payment");
