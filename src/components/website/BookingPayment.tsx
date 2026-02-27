@@ -65,6 +65,7 @@ function PaymentForm({ returnUrl }: { returnUrl: string }) {
 export function BookingPayment({ bookingId, amount, returnUrl = "/account/bookings", stripeKey }: Props) {
   const [clientSecret, setClientSecret] = useState("");
   const [error, setError] = useState("");
+  const [paid, setPaid] = useState(false);
 
   const stripePromise = useMemo(() => loadStripe(stripeKey), [stripeKey]);
 
@@ -77,7 +78,7 @@ export function BookingPayment({ bookingId, amount, returnUrl = "/account/bookin
       .then((res) => res.json())
       .then((data) => {
         if (data.alreadyPaid) {
-          window.location.reload();
+          setPaid(true);
         } else if (data.clientSecret) {
           setClientSecret(data.clientSecret);
         } else {
@@ -86,6 +87,17 @@ export function BookingPayment({ bookingId, amount, returnUrl = "/account/bookin
       })
       .catch(() => setError("Failed to connect to payment service"));
   }, [bookingId]);
+
+  if (paid) {
+    return (
+      <div className="bg-white border border-tobacco/10 rounded-lg p-6 text-center py-8">
+        <div className="text-green font-semibold text-[1rem] mb-3">Payment Already Completed!</div>
+        <a href="/account/bookings" className="text-green hover:underline text-[0.9rem]">
+          View My Bookings →
+        </a>
+      </div>
+    );
+  }
 
   if (error) {
     return (
