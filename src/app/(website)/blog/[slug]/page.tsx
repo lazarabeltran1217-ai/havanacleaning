@@ -20,7 +20,7 @@ export async function generateMetadata({
     return {
       // Use absolute title to avoid the layout template appending " | Havana Cleaning"
       // which pushes long blog titles well past the 60-char recommendation
-      title: { absolute: rawTitle },
+      title: { absolute: rawTitle.length > 60 ? rawTitle.slice(0, 57) + "..." : rawTitle },
       description: rawDesc.length > 160 ? rawDesc.slice(0, 157) + "..." : rawDesc,
     };
   } catch {
