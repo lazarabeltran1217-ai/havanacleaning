@@ -57,7 +57,7 @@ export default async function AdminSeoPage() {
       fetchKeywords(),
       fetchDirectories(),
       prisma.setting.findUnique({ where: { key: "google_analytics_id" } }),
-      prisma.setting.findUnique({ where: { key: "gsc_connected" } }),
+      prisma.setting.findUnique({ where: { key: "google_search_console_key" } }),
       prisma.siteAudit.findFirst({
         where: { status: "completed" },
         orderBy: { createdAt: "desc" },
@@ -75,7 +75,7 @@ export default async function AdminSeoPage() {
     keywords = k;
     directories = d;
     gaId = typeof gaSetting?.value === "string" ? gaSetting.value : "";
-    gscConnected = gscSetting?.value === "true" || gscSetting?.value === true;
+    gscConnected = typeof gscSetting?.value === "string" && gscSetting.value.length > 10;
 
     if (auditRaw) {
       latestAudit = {
