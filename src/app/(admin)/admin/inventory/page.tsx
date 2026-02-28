@@ -11,7 +11,7 @@ export default async function AdminInventoryPage() {
       orderBy: [{ category: "asc" }, { name: "asc" }],
       include: {
         assignedTo: { select: { id: true, name: true } },
-        inventoryCheckouts: {
+        checkouts: {
           where: { returnedAt: null },
           select: {
             id: true,
@@ -49,7 +49,7 @@ export default async function AdminInventoryPage() {
       <div className="md:hidden space-y-3">
         {items.map((item) => {
           const isLow = item.currentStock <= item.minStock;
-          const activeCheckouts = item.inventoryCheckouts;
+          const activeCheckouts = item.checkouts;
           const totalCheckedOut = activeCheckouts.reduce((sum, c) => sum + (c.quantity - c.returnedQty), 0);
           return (
             <div key={item.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
@@ -160,7 +160,7 @@ export default async function AdminInventoryPage() {
           <tbody>
             {items.map((item) => {
               const isLow = item.currentStock <= item.minStock;
-              const activeCheckouts = item.inventoryCheckouts;
+              const activeCheckouts = item.checkouts;
               const totalCheckedOut = activeCheckouts.reduce((sum, c) => sum + (c.quantity - c.returnedQty), 0);
               return (
                 <tr key={item.id} className="border-b border-gray-50 hover:bg-ivory/30">
