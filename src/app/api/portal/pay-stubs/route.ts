@@ -6,18 +6,23 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "EMPLOYEE") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const payStubs = await prisma.payroll.findMany({
+      where: {
+        employeeId: session.user.id,
+        status: "PAID",
+      },
+      orderBy: { periodEnd: "desc" },
+    });
+
+    return NextResponse.json({ payStubs });
+  } catch (err) {
+    console.error("Portal pay-stubs GET error:", err);
+    return NextResponse.json({ payStubs: [] });
   }
-
-  const payStubs = await prisma.payroll.findMany({
-    where: {
-      employeeId: session.user.id,
-      status: "PAID",
-    },
-    orderBy: { periodEnd: "desc" },
-  });
-
-  return NextResponse.json({ payStubs });
 }
