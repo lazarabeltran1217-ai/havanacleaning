@@ -2,7 +2,7 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { ChevronDown, ChevronUp, MapPin, Clock, Package, DollarSign, Calendar, User, Sun, Moon } from "lucide-react";
+import { ChevronDown, ChevronUp, MapPin, Clock, Package, DollarSign, Calendar, User } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
 import { useTranslations } from "next-intl";
 
@@ -123,9 +123,6 @@ export default function EmployeeDashboard() {
   const [time, setTime] = useState(new Date());
   const [loading, setLoading] = useState(true);
 
-  // Dark mode state
-  const [isDark, setIsDark] = useState(false);
-
   // Clock state
   const [isClockedIn, setIsClockedIn] = useState(false);
   const [clockInTime, setClockInTime] = useState<Date | null>(null);
@@ -160,27 +157,6 @@ export default function EmployeeDashboard() {
   const [profileLocale, setProfileLocale] = useState("en");
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMessage, setProfileMessage] = useState("");
-
-  /* ─── Dark Mode Init ─── */
-  useEffect(() => {
-    const saved = localStorage.getItem("portal-theme");
-    if (saved === "dark") {
-      setIsDark(true);
-      document.documentElement.classList.add("dark");
-    }
-  }, []);
-
-  const toggleDarkMode = () => {
-    const next = !isDark;
-    setIsDark(next);
-    if (next) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("portal-theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("portal-theme", "light");
-    }
-  };
 
   /* ─── Live Clock ─── */
   useEffect(() => {
@@ -337,13 +313,7 @@ export default function EmployeeDashboard() {
       body: JSON.stringify({ name: profileName, phone: profilePhone, locale: profileLocale }),
     });
     setProfileSaving(false);
-    if (res.ok) {
-      setProfileMessage(t("profile_saved"));
-      // Reload to apply locale change
-      window.location.reload();
-    } else {
-      setProfileMessage(t("profile_failed"));
-    }
+    setProfileMessage(res.ok ? t("profile_saved") : t("profile_failed"));
   };
 
   /* ─── Schedule Helpers ─── */
@@ -824,7 +794,7 @@ export default function EmployeeDashboard() {
 
           {/* Edit fields */}
           <div className="flex-1 space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <label className={`text-[0.72rem] font-medium text-gray-500 dark:text-sand/60 block mb-1`}>{t("profile_name")}</label>
                 <input
@@ -854,23 +824,6 @@ export default function EmployeeDashboard() {
                   <option value="es">Espa&ntilde;ol</option>
                 </select>
               </div>
-              <div>
-                <label className={`text-[0.72rem] font-medium text-gray-500 dark:text-sand/60 block mb-1`}>{t("profile_theme")}</label>
-                <div className="flex rounded-lg border border-gray-200 dark:border-[#3a2f25] overflow-hidden">
-                  <button
-                    onClick={() => { if (isDark) toggleDarkMode(); }}
-                    className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors ${!isDark ? "bg-green text-white" : "bg-white dark:bg-[#1a1410] text-gray-500 dark:text-sand/70"}`}
-                  >
-                    <Sun className="w-3.5 h-3.5" /> {t("profile_light")}
-                  </button>
-                  <button
-                    onClick={() => { if (!isDark) toggleDarkMode(); }}
-                    className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors ${isDark ? "bg-green text-white" : "bg-white dark:bg-[#1a1410] text-gray-500 dark:text-sand/70"}`}
-                  >
-                    <Moon className="w-3.5 h-3.5" /> {t("profile_dark")}
-                  </button>
-                </div>
-              </div>
             </div>
 
             <div className="flex items-center gap-3">
@@ -882,7 +835,7 @@ export default function EmployeeDashboard() {
                 {profileSaving ? t("profile_saving") : t("profile_save")}
               </button>
               {profileMessage && (
-                <span className={`text-sm ${profileMessage.includes("Failed") || profileMessage.includes(t("profile_failed")) ? "text-red" : "text-green"}`}>{profileMessage}</span>
+                <span className={`text-sm ${profileMessage === t("profile_failed") ? "text-red" : "text-green"}`}>{profileMessage}</span>
               )}
               <button
                 onClick={() => signOut({ callbackUrl: "/login" })}
