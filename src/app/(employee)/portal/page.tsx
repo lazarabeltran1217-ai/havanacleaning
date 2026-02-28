@@ -435,7 +435,7 @@ export default function EmployeeDashboard() {
               <button
                 onClick={() => setShowCompletePrompt(true)}
                 disabled={clockLoading}
-                className="w-full py-3 bg-red text-white rounded-xl font-semibold text-sm transition-colors hover:bg-red/90 disabled:opacity-50"
+                className="w-full py-3 bg-[#C0392B] text-white rounded-xl font-semibold text-sm transition-colors hover:bg-[#A93226] disabled:opacity-50"
               >
                 {clockLoading ? "..." : t("clock_out")}
               </button>
