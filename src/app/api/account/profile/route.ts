@@ -25,7 +25,7 @@ export async function GET() {
     });
 
     return NextResponse.json({ user });
-  } catch (e) {
+  } catch {
     // Fallback: locale column might not exist in DB yet
     try {
       const user = await prisma.$queryRawUnsafe<
@@ -70,7 +70,7 @@ export async function PATCH(req: NextRequest) {
       res.cookies.set("locale", body.locale, { path: "/", maxAge: 365 * 24 * 60 * 60 });
     }
     return res;
-  } catch (e) {
+  } catch {
     // Fallback: locale column might not exist — save what we can
     try {
       const body = await req.json().catch(() => null);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sun, Moon, Globe } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export default function PortalToolbar() {
