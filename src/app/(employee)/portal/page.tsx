@@ -429,7 +429,7 @@ export default function EmployeeDashboard() {
 
               <div className="text-center mb-4">
                 <div className={`${TEXT_MUTED} text-[0.72rem] uppercase tracking-wider mb-0.5`}>{t("clock_time_worked")}</div>
-                <div className="font-mono text-xl text-green font-bold">{elapsed}</div>
+                <div className="font-mono text-2xl text-green font-bold tabular-nums tracking-widest">{elapsed}</div>
               </div>
 
               <button
