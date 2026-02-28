@@ -9,7 +9,18 @@ export default async function AdminInventoryPage() {
     prisma.inventoryItem.findMany({
       where: { isActive: true },
       orderBy: [{ category: "asc" }, { name: "asc" }],
-      include: { assignedTo: { select: { id: true, name: true } } },
+      include: {
+        assignedTo: { select: { id: true, name: true } },
+        inventoryCheckouts: {
+          where: { returnedAt: null },
+          select: {
+            id: true,
+            quantity: true,
+            returnedQty: true,
+            employee: { select: { name: true } },
+          },
+        },
+      },
     });
   let items: Awaited<ReturnType<typeof fetchItems>> = [];
   try {
@@ -38,6 +49,8 @@ export default async function AdminInventoryPage() {
       <div className="md:hidden space-y-3">
         {items.map((item) => {
           const isLow = item.currentStock <= item.minStock;
+          const activeCheckouts = item.inventoryCheckouts;
+          const totalCheckedOut = activeCheckouts.reduce((sum, c) => sum + (c.quantity - c.returnedQty), 0);
           return (
             <div key={item.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
               <div className="flex items-center justify-between mb-3">
@@ -61,6 +74,12 @@ export default async function AdminInventoryPage() {
                   <span className="text-sand">Stock</span>
                   <span className={`font-medium ${isLow ? "text-red" : ""}`}>{item.currentStock} {item.unit}</span>
                 </div>
+                {totalCheckedOut > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-sand">Checked Out</span>
+                    <span className="font-medium text-tobacco">{totalCheckedOut} {item.unit}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-sand">Min Stock</span>
                   <span className="text-gray-400">{item.minStock}</span>
@@ -83,6 +102,19 @@ export default async function AdminInventoryPage() {
                     )}
                   </span>
                 </div>
+                {activeCheckouts.length > 0 && (
+                  <div className="pt-2 border-t border-gray-100">
+                    <span className="text-sand text-[0.75rem]">With Employees:</span>
+                    <div className="mt-1 space-y-1">
+                      {activeCheckouts.map((c) => (
+                        <div key={c.id} className="flex justify-between text-[0.78rem]">
+                          <span className="text-teal font-medium">{c.employee.name}</span>
+                          <span className="text-gray-500">{c.quantity - c.returnedQty} {item.unit}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div className="pt-2 border-t border-gray-100 flex items-center justify-end gap-3">
                   <InventoryEditButton item={{
                     id: item.id,
@@ -117,10 +149,10 @@ export default async function AdminInventoryPage() {
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">SKU</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Category</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Stock</th>
+              <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Checked Out</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Min</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Cost/Unit</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Supplier</th>
-              <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Assigned To</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Status</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium"></th>
             </tr>
@@ -128,6 +160,8 @@ export default async function AdminInventoryPage() {
           <tbody>
             {items.map((item) => {
               const isLow = item.currentStock <= item.minStock;
+              const activeCheckouts = item.inventoryCheckouts;
+              const totalCheckedOut = activeCheckouts.reduce((sum, c) => sum + (c.quantity - c.returnedQty), 0);
               return (
                 <tr key={item.id} className="border-b border-gray-50 hover:bg-ivory/30">
                   <td className="px-4 py-3 font-medium">{item.name}</td>
@@ -136,16 +170,26 @@ export default async function AdminInventoryPage() {
                   <td className={`px-4 py-3 font-medium ${isLow ? "text-red" : ""}`}>
                     {item.currentStock} {item.unit}
                   </td>
-                  <td className="px-4 py-3 text-gray-400">{item.minStock}</td>
-                  <td className="px-4 py-3">{formatCurrency(item.costPerUnit)}</td>
-                  <td className="px-4 py-3 text-gray-500">{item.supplier || "—"}</td>
                   <td className="px-4 py-3">
-                    {item.assignedTo ? (
-                      <span className="text-[0.78rem] font-medium text-teal">{item.assignedTo.name}</span>
+                    {totalCheckedOut > 0 ? (
+                      <div className="group relative">
+                        <span className="font-medium text-tobacco">{totalCheckedOut} {item.unit}</span>
+                        <div className="absolute left-0 top-full mt-1 bg-tobacco text-white text-[0.72rem] rounded-lg p-3 hidden group-hover:block z-10 min-w-[160px] shadow-lg">
+                          {activeCheckouts.map((c) => (
+                            <div key={c.id} className="flex justify-between gap-4 py-0.5">
+                              <span>{c.employee.name}</span>
+                              <span className="text-gold">{c.quantity - c.returnedQty} {item.unit}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     ) : (
                       <span className="text-gray-400">—</span>
                     )}
                   </td>
+                  <td className="px-4 py-3 text-gray-400">{item.minStock}</td>
+                  <td className="px-4 py-3">{formatCurrency(item.costPerUnit)}</td>
+                  <td className="px-4 py-3 text-gray-500">{item.supplier || "—"}</td>
                   <td className="px-4 py-3">
                     <span
                       className={`text-[0.7rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${

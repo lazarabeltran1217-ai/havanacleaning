@@ -52,6 +52,8 @@ enum InventoryTransactionType {
   USAGE
   ADJUSTMENT
   DAMAGED
+  CHECKOUT
+  RETURN
 }
 
 enum PayrollStatus {
@@ -115,7 +117,8 @@ model User {
   notifications     Notification[]
   referralsGiven    Referral[]        @relation("ReferrerUser")
   referralsReceived Referral[]        @relation("RefereeUser")
-  assignedInventory InventoryItem[]   @relation("AssignedInventory")
+  assignedInventory    InventoryItem[]      @relation("AssignedInventory")
+  inventoryCheckouts   InventoryCheckout[]
 
   @@index([role])
   @@index([email])
@@ -230,7 +233,8 @@ model Booking {
   assignments       JobAssignment[]
   payments          Payment[]
   timeEntries       TimeEntry[]
-  inventoryUsage    InventoryTransaction[]
+  inventoryUsage      InventoryTransaction[]
+  inventoryCheckouts  InventoryCheckout[]
 
   @@index([customerId])
   @@index([serviceId])
@@ -329,6 +333,7 @@ model InventoryItem {
 
   assignedTo   User?    @relation("AssignedInventory", fields: [assignedToId], references: [id])
   transactions InventoryTransaction[]
+  checkouts    InventoryCheckout[]
 
   @@index([category])
   @@index([assignedToId])
@@ -352,6 +357,25 @@ model InventoryTransaction {
 
   @@index([inventoryItemId])
   @@index([createdAt])
+}
+
+model InventoryCheckout {
+  id              String    @id @default(cuid())
+  inventoryItemId String
+  employeeId      String
+  bookingId       String?
+  quantity        Float
+  returnedQty     Float     @default(0)
+  checkedOutAt    DateTime  @default(now())
+  returnedAt      DateTime?
+  notes           String?
+
+  inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id])
+  employee      User          @relation(fields: [employeeId], references: [id])
+  booking       Booking?      @relation(fields: [bookingId], references: [id])
+
+  @@index([employeeId])
+  @@index([inventoryItemId])
 }
 
 model Payroll {

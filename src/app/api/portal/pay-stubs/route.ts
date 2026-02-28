@@ -11,21 +11,13 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const openEntry = await prisma.timeEntry.findFirst({
-    where: { employeeId: session.user.id, clockOut: null },
-    include: {
-      booking: {
-        select: {
-          bookingNumber: true,
-          service: { select: { name: true, icon: true } },
-          address: { select: { street: true, city: true } },
-        },
-      },
+  const payStubs = await prisma.payroll.findMany({
+    where: {
+      employeeId: session.user.id,
+      status: "PAID",
     },
+    orderBy: { periodEnd: "desc" },
   });
 
-  return NextResponse.json({
-    isClockedIn: !!openEntry,
-    currentEntry: openEntry,
-  });
+  return NextResponse.json({ payStubs });
 }

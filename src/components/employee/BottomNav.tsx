@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
-import { Home, ClipboardList, Timer, CalendarDays, DollarSign } from "lucide-react";
+import { Home, ClipboardList, Timer, CalendarDays, FileText } from "lucide-react";
 
 const tabs: { label: string; href: string; icon: LucideIcon; elevated?: boolean }[] = [
   { label: "Today", href: "/portal", icon: Home },
   { label: "Jobs", href: "/portal/jobs", icon: ClipboardList },
   { label: "Clock", href: "/portal/clock", icon: Timer, elevated: true },
   { label: "Schedule", href: "/portal/schedule", icon: CalendarDays },
-  { label: "Hours", href: "/portal/hours", icon: DollarSign },
+  { label: "Pay", href: "/portal/pay-stubs", icon: FileText },
 ];
 
 export function BottomNav() {

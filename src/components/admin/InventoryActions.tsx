@@ -15,10 +15,16 @@ interface BookingOption {
   customer: { name: string };
 }
 
+interface EmployeeOption {
+  id: string;
+  name: string;
+}
+
 export function InventoryActions({ items }: Props) {
   const router = useRouter();
   const [showAdd, setShowAdd] = useState(false);
   const [showTransaction, setShowTransaction] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // Add item form
@@ -39,7 +45,15 @@ export function InventoryActions({ items }: Props) {
   const [txBookingId, setTxBookingId] = useState("");
   const [bookings, setBookings] = useState<BookingOption[]>([]);
 
-  // Fetch upcoming bookings when transaction modal opens
+  // Checkout form
+  const [coItemId, setCoItemId] = useState("");
+  const [coEmployeeId, setCoEmployeeId] = useState("");
+  const [coBookingId, setCoBookingId] = useState("");
+  const [coQuantity, setCoQuantity] = useState("");
+  const [coNotes, setCoNotes] = useState("");
+  const [employees, setEmployees] = useState<EmployeeOption[]>([]);
+
+  // Fetch bookings when transaction modal opens
   useEffect(() => {
     if (!showTransaction) return;
     fetch("/api/bookings?status=CONFIRMED")
@@ -47,6 +61,19 @@ export function InventoryActions({ items }: Props) {
       .then((d) => setBookings(d.bookings || []))
       .catch(() => {});
   }, [showTransaction]);
+
+  // Fetch employees and bookings when checkout modal opens
+  useEffect(() => {
+    if (!showCheckout) return;
+    fetch("/api/employees")
+      .then((r) => r.json())
+      .then((d) => setEmployees(d.employees || []))
+      .catch(() => {});
+    fetch("/api/bookings?status=CONFIRMED")
+      .then((r) => r.json())
+      .then((d) => setBookings(d.bookings || []))
+      .catch(() => {});
+  }, [showCheckout]);
 
   const handleAddItem = async () => {
     if (!name) return;
@@ -89,6 +116,26 @@ export function InventoryActions({ items }: Props) {
     router.refresh();
   };
 
+  const handleCheckout = async () => {
+    if (!coItemId || !coEmployeeId || !coQuantity) return;
+    setSaving(true);
+    await fetch("/api/inventory/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        inventoryItemId: coItemId,
+        employeeId: coEmployeeId,
+        bookingId: coBookingId || null,
+        quantity: Number(coQuantity),
+        notes: coNotes || null,
+      }),
+    });
+    setSaving(false);
+    setShowCheckout(false);
+    setCoItemId(""); setCoEmployeeId(""); setCoBookingId(""); setCoQuantity(""); setCoNotes("");
+    router.refresh();
+  };
+
   const formatDate = (d: string) => {
     return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
   };
@@ -96,14 +143,20 @@ export function InventoryActions({ items }: Props) {
   return (
     <div className="flex gap-2">
       <button
+        onClick={() => setShowCheckout(true)}
+        className="px-4 py-2 bg-green text-white text-sm rounded-lg font-medium hover:bg-green/90"
+      >
+        Check Out to Employee
+      </button>
+      <button
         onClick={() => setShowTransaction(true)}
         className="px-4 py-2 bg-teal text-white text-sm rounded-lg font-medium hover:bg-teal/90"
       >
-        Assign to Job
+        Log Transaction
       </button>
       <button
         onClick={() => setShowAdd(true)}
-        className="px-4 py-2 bg-green text-white text-sm rounded-lg font-medium hover:bg-green/90"
+        className="px-4 py-2 border border-gray-300 text-sm rounded-lg font-medium hover:bg-gray-50"
       >
         + Add Item
       </button>
@@ -139,13 +192,62 @@ export function InventoryActions({ items }: Props) {
         </div>
       )}
 
-      {/* Assign to Job / Log Transaction Modal */}
+      {/* Check Out to Employee Modal */}
+      {showCheckout && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowCheckout(false)}>
+          <div className="bg-white rounded-xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-display text-lg mb-4">Check Out to Employee</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Item *</label>
+                <select value={coItemId} onChange={(e) => setCoItemId(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm">
+                  <option value="">Select item...</option>
+                  {items.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Employee *</label>
+                <select value={coEmployeeId} onChange={(e) => setCoEmployeeId(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm">
+                  <option value="">Select employee...</option>
+                  {employees.map((emp) => <option key={emp.id} value={emp.id}>{emp.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">For Job (optional)</label>
+                <select value={coBookingId} onChange={(e) => setCoBookingId(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm">
+                  <option value="">General (no specific job)</option>
+                  {bookings.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.bookingNumber} — {b.service.name} — {b.customer.name} ({formatDate(b.scheduledDate)})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Quantity *</label>
+                <input type="number" value={coQuantity} onChange={(e) => setCoQuantity(e.target.value)} placeholder="e.g. 5" className="w-full px-3 py-2 border rounded-lg text-sm" />
+              </div>
+              <div>
+                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Notes</label>
+                <input placeholder="Optional" value={coNotes} onChange={(e) => setCoNotes(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm" />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-5">
+              <button onClick={() => setShowCheckout(false)} className="flex-1 px-4 py-2 border rounded-lg text-sm">Cancel</button>
+              <button onClick={handleCheckout} disabled={saving || !coItemId || !coEmployeeId || !coQuantity} className="flex-1 px-4 py-2 bg-green text-white rounded-lg text-sm font-medium disabled:opacity-50">
+                {saving ? "Checking Out..." : "Check Out"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Log Transaction Modal */}
       {showTransaction && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowTransaction(false)}>
           <div className="bg-white rounded-xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-display text-lg mb-4">Assign Items to Job</h3>
+            <h3 className="font-display text-lg mb-4">Log Transaction</h3>
             <div className="space-y-3">
-              {/* Item selector */}
               <div>
                 <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Item *</label>
                 <select value={txItemId} onChange={(e) => setTxItemId(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm">
@@ -153,10 +255,8 @@ export function InventoryActions({ items }: Props) {
                   {items.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
                 </select>
               </div>
-
-              {/* Booking/Job selector */}
               <div>
-                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Assign to Job</label>
+                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Job (optional)</label>
                 <select value={txBookingId} onChange={(e) => setTxBookingId(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm">
                   <option value="">No job (general stock change)</option>
                   {bookings.map((b) => (
@@ -166,8 +266,6 @@ export function InventoryActions({ items }: Props) {
                   ))}
                 </select>
               </div>
-
-              {/* Transaction type */}
               <div>
                 <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Type</label>
                 <select value={txType} onChange={(e) => setTxType(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm">
@@ -177,8 +275,6 @@ export function InventoryActions({ items }: Props) {
                   <option value="ADJUSTMENT">Adjustment (set stock level)</option>
                 </select>
               </div>
-
-              {/* Quantity */}
               <div>
                 <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">
                   {txType === "ADJUSTMENT" ? "New Stock Level *" : "Quantity *"}
@@ -191,8 +287,6 @@ export function InventoryActions({ items }: Props) {
                   className="w-full px-3 py-2 border rounded-lg text-sm"
                 />
               </div>
-
-              {/* Notes */}
               <div>
                 <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Notes</label>
                 <input
@@ -206,7 +300,7 @@ export function InventoryActions({ items }: Props) {
             <div className="flex gap-2 mt-5">
               <button onClick={() => setShowTransaction(false)} className="flex-1 px-4 py-2 border rounded-lg text-sm">Cancel</button>
               <button onClick={handleTransaction} disabled={saving || !txItemId || !txQuantity} className="flex-1 px-4 py-2 bg-teal text-white rounded-lg text-sm font-medium disabled:opacity-50">
-                {saving ? "Saving..." : txBookingId ? "Assign to Job" : "Log Transaction"}
+                {saving ? "Saving..." : "Log Transaction"}
               </button>
             </div>
           </div>

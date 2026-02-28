@@ -3,16 +3,23 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// POST — Clock in/out
+// POST — Clock in/out (job-based)
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "EMPLOYEE") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { action, lat, lng, bookingId } = await req.json();
+  const { action, lat, lng, bookingId, completeJob } = await req.json();
 
   if (action === "clock-in") {
+    if (!bookingId) {
+      return NextResponse.json(
+        { error: "You must select a job to clock in" },
+        { status: 400 }
+      );
+    }
+
     // Check if already clocked in
     const openEntry = await prisma.timeEntry.findFirst({
       where: { employeeId: session.user.id, clockOut: null },
@@ -25,15 +32,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const entry = await prisma.timeEntry.create({
-      data: {
-        employeeId: session.user.id,
-        bookingId: bookingId || null,
-        clockIn: new Date(),
-        clockInLat: lat || null,
-        clockInLng: lng || null,
-      },
-    });
+    // Create time entry and update booking status to IN_PROGRESS
+    const [entry] = await prisma.$transaction([
+      prisma.timeEntry.create({
+        data: {
+          employeeId: session.user.id,
+          bookingId,
+          clockIn: new Date(),
+          clockInLat: lat || null,
+          clockInLng: lng || null,
+        },
+      }),
+      prisma.booking.update({
+        where: { id: bookingId },
+        data: { status: "IN_PROGRESS" },
+      }),
+    ]);
 
     return NextResponse.json({ entry, status: "clocked-in" });
   }
@@ -63,6 +77,14 @@ export async function POST(req: NextRequest) {
         hoursWorked: Math.round(hoursWorked * 100) / 100,
       },
     });
+
+    // If employee marks job as completed, update booking status
+    if (completeJob && openEntry.bookingId) {
+      await prisma.booking.update({
+        where: { id: openEntry.bookingId },
+        data: { status: "COMPLETED", completedAt: clockOut },
+      });
+    }
 
     return NextResponse.json({ entry, status: "clocked-out" });
   }

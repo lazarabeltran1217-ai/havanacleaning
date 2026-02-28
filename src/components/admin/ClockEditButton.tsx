@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface EntryData {
@@ -10,6 +10,13 @@ interface EntryData {
   clockOut: string | null;
   hoursWorked: number | null;
   notes: string | null;
+  bookingId: string | null;
+}
+
+interface BookingOption {
+  id: string;
+  bookingNumber: string;
+  service: { name: string };
 }
 
 export function ClockEditButton({ entry }: { entry: EntryData }) {
@@ -26,6 +33,16 @@ export function ClockEditButton({ entry }: { entry: EntryData }) {
   const [clockIn, setClockIn] = useState(formatForInput(entry.clockIn));
   const [clockOut, setClockOut] = useState(entry.clockOut ? formatForInput(entry.clockOut) : "");
   const [notes, setNotes] = useState(entry.notes || "");
+  const [bookingId, setBookingId] = useState(entry.bookingId || "");
+  const [bookings, setBookings] = useState<BookingOption[]>([]);
+
+  useEffect(() => {
+    if (!open) return;
+    fetch("/api/bookings?limit=50")
+      .then((r) => r.json())
+      .then((d) => setBookings(d.bookings || []))
+      .catch(() => {});
+  }, [open]);
 
   async function handleSave() {
     setSaving(true);
@@ -37,6 +54,7 @@ export function ClockEditButton({ entry }: { entry: EntryData }) {
         clockIn: new Date(clockIn).toISOString(),
         clockOut: clockOut ? new Date(clockOut).toISOString() : null,
         notes: notes || null,
+        bookingId: bookingId || null,
       }),
     });
     const data = await res.json();
@@ -68,6 +86,21 @@ export function ClockEditButton({ entry }: { entry: EntryData }) {
             <p className="text-gray-400 text-[0.78rem] mb-4">{entry.employeeName}</p>
 
             <div className="space-y-3">
+              <div>
+                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Job</label>
+                <select
+                  value={bookingId}
+                  onChange={(e) => setBookingId(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg text-sm"
+                >
+                  <option value="">No job assigned</option>
+                  {bookings.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.bookingNumber} — {b.service.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Clock In</label>
                 <input type="datetime-local" value={clockIn} onChange={(e) => setClockIn(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm" />

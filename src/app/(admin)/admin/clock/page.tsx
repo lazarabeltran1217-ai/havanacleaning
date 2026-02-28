@@ -71,7 +71,7 @@ export default async function AdminClockPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-sand">Job</span>
-                <span className="text-gray-500">{e.booking ? e.booking.bookingNumber : "—"}</span>
+                <span className="text-gray-500">{e.booking ? `${e.booking.bookingNumber} — ${e.booking.service.name}` : "—"}</span>
               </div>
               <div className="pt-2 border-t border-gray-100 flex justify-end">
                 <ClockEditButton entry={{
@@ -81,6 +81,7 @@ export default async function AdminClockPage() {
                   clockOut: e.clockOut?.toISOString() || null,
                   hoursWorked: e.hoursWorked,
                   notes: e.notes,
+                  bookingId: e.bookingId,
                 }} />
               </div>
             </div>
@@ -114,7 +115,7 @@ export default async function AdminClockPage() {
                 <td className="px-4 py-3">{e.clockOut ? formatTime(e.clockOut) : <span className="text-green font-medium">Active</span>}</td>
                 <td className="px-4 py-3 font-medium">{e.hoursWorked ? `${e.hoursWorked.toFixed(1)}h` : "—"}</td>
                 <td className="px-4 py-3 text-gray-500">
-                  {e.booking ? `${e.booking.bookingNumber}` : "—"}
+                  {e.booking ? `${e.booking.bookingNumber} — ${e.booking.service.name}` : "—"}
                 </td>
                 <td className="px-4 py-3">
                   <ClockEditButton entry={{

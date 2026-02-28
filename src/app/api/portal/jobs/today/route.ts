@@ -27,6 +27,7 @@ export async function GET() {
     include: {
       booking: {
         select: {
+          id: true,
           bookingNumber: true,
           scheduledTime: true,
           status: true,

@@ -30,6 +30,7 @@ export async function PATCH(
       ...(clockIn && { clockIn }),
       clockOut,
       hoursWorked,
+      ...(body.bookingId !== undefined && { bookingId: body.bookingId || null }),
       notes: body.notes !== undefined ? body.notes : undefined,
       isEdited: true,
       editedById: session.user.id,

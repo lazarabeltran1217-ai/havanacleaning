@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import type { LucideIcon } from "lucide-react";
-import { Home, ClipboardList, Timer, CalendarDays, DollarSign, User } from "lucide-react";
+import { Home, ClipboardList, Timer, CalendarDays, DollarSign, FileText, User } from "lucide-react";
 
 const navItems: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Today", href: "/portal", icon: Home },
@@ -12,6 +12,7 @@ const navItems: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Clock In/Out", href: "/portal/clock", icon: Timer },
   { label: "Schedule", href: "/portal/schedule", icon: CalendarDays },
   { label: "Hours & Pay", href: "/portal/hours", icon: DollarSign },
+  { label: "Pay Stubs", href: "/portal/pay-stubs", icon: FileText },
   { label: "Profile", href: "/portal/profile", icon: User },
 ];
 
