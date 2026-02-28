@@ -373,11 +373,11 @@ export default function EmployeeDashboard() {
   return (
     <div className="space-y-5">
       {/* ═══ WELCOME BANNER ═══ */}
-      <div className="bg-gradient-to-r from-tobacco to-tobacco/80 dark:from-[#231c16] dark:to-[#1a1410] rounded-2xl p-6 text-white dark:text-cream text-center">
+      <div className="bg-gradient-to-r from-green-light to-green dark:from-green dark:to-[#1a3a2a] rounded-2xl p-6 text-white text-center">
         <h1 className="font-display text-2xl">
           {greeting}, {firstName}
         </h1>
-        <p className="text-sand text-sm mt-1">
+        <p className="text-white/70 text-sm mt-1">
           {time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
         </p>
         <div className="flex flex-wrap justify-center gap-2 mt-3">
