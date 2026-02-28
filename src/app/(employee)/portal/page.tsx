@@ -266,25 +266,38 @@ export default function EmployeeDashboard() {
     setShowCompletePrompt(false);
     setClockLoading(true);
     setClockMessage("");
-    const { lat, lng } = await getGPS();
-    const res = await fetch("/api/clock", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "clock-out", lat, lng, completeJob }),
-    });
-    const data = await res.json();
-    setClockLoading(false);
-    if (!res.ok) {
-      setClockMessage(data.error || t("clock_failed_out"));
-      return;
-    }
+
+    // Reset clock state IMMEDIATELY so timer stops
     setIsClockedIn(false);
     setClockInTime(null);
     setCurrentEntry(null);
     setSelectedJobId(null);
-    const hours = data.entry.hoursWorked?.toFixed(1) || "0";
-    setClockMessage(`Clocked out! ${hours}h worked.${completeJob ? " Job completed." : ""}`);
-    fetch("/api/portal/jobs/today").then((r) => r.json()).then((d) => setTodayJobs(d.jobs || [])).catch(() => {});
+    setElapsed("00:00:00");
+
+    try {
+      const { lat, lng } = await getGPS();
+      const res = await fetch("/api/clock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "clock-out", lat, lng, completeJob }),
+      });
+      const data = await res.json();
+      setClockLoading(false);
+      if (!res.ok) {
+        setClockMessage(data.error || t("clock_failed_out"));
+        return;
+      }
+      const hours = data.entry?.hoursWorked?.toFixed(1) || "0";
+      setClockMessage(`Clocked out! ${hours}h worked.${completeJob ? " Job completed." : ""}`);
+      // Refresh today's jobs from dashboard to avoid extra serverless connection
+      fetch("/api/portal/dashboard")
+        .then((r) => r.json())
+        .then((d) => { if (!d.error) setTodayJobs(d.todayJobs || []); })
+        .catch(() => {});
+    } catch {
+      setClockLoading(false);
+      setClockMessage(t("clock_failed_out"));
+    }
   }, [t]);
 
   /* ─── Supply Return ─── */
