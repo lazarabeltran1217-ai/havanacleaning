@@ -22,7 +22,7 @@ export async function GET() {
         employeeId: session.user.id,
         booking: {
           scheduledDate: { gte: today, lt: tomorrow },
-          status: { in: ["CONFIRMED", "IN_PROGRESS"] },
+          status: { in: ["CONFIRMED", "IN_PROGRESS", "COMPLETED"] },
         },
       },
       include: {

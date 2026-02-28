@@ -452,35 +452,38 @@ export default function EmployeeDashboard() {
             </>
           ) : (
             <>
-              {todayJobs.length === 0 ? (
-                <div className="text-center py-4">
-                  <p className={`${TEXT_MUTED} text-sm`}>{t("clock_no_jobs")}</p>
-                  <p className={`${TEXT_FAINT} text-[0.72rem] mt-1`}>{t("clock_no_jobs_sub")}</p>
-                </div>
-              ) : (
-                <div className="mb-3">
-                  <div className={`text-[0.7rem] uppercase tracking-wider ${TEXT_MUTED} font-medium mb-2`}>{t("clock_select_job")}</div>
-                  <div className="space-y-2">
-                    {todayJobs.map((j) => (
-                      <button
-                        key={j.id}
-                        onClick={() => setSelectedJobId(j.booking.id)}
-                        className={`w-full text-left px-3 py-2.5 rounded-xl border transition-colors ${selectedJobId === j.booking.id ? "border-green bg-green/5" : `${INNER_BORDER} hover:border-gray-200 dark:hover:border-[#4a3f35]`}`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className={`text-[0.82rem] font-medium ${TEXT_PRIMARY} flex items-center gap-1.5`}>
-                            <ServiceIcon emoji={j.booking.service.icon} className="w-3.5 h-3.5 text-green" /> {j.booking.service.name}
-                          </span>
-                          <span className={`${TEXT_MUTED} text-[0.72rem] capitalize`}>{j.booking.scheduledTime}</span>
-                        </div>
-                        {j.booking.address && (
-                          <div className={`${TEXT_MUTED} text-[0.72rem] mt-0.5 ml-5`}>{j.booking.address.street}, {j.booking.address.city}</div>
-                        )}
-                      </button>
-                    ))}
+              {(() => {
+                const clockableJobs = todayJobs.filter((j) => j.booking.status !== "COMPLETED");
+                return clockableJobs.length === 0 ? (
+                  <div className="text-center py-4">
+                    <p className={`${TEXT_MUTED} text-sm`}>{t("clock_no_jobs")}</p>
+                    <p className={`${TEXT_FAINT} text-[0.72rem] mt-1`}>{t("clock_no_jobs_sub")}</p>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="mb-3">
+                    <div className={`text-[0.7rem] uppercase tracking-wider ${TEXT_MUTED} font-medium mb-2`}>{t("clock_select_job")}</div>
+                    <div className="space-y-2">
+                      {clockableJobs.map((j) => (
+                        <button
+                          key={j.id}
+                          onClick={() => setSelectedJobId(j.booking.id)}
+                          className={`w-full text-left px-3 py-2.5 rounded-xl border transition-colors ${selectedJobId === j.booking.id ? "border-green bg-green/5" : `${INNER_BORDER} hover:border-gray-200 dark:hover:border-[#4a3f35]`}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className={`text-[0.82rem] font-medium ${TEXT_PRIMARY} flex items-center gap-1.5`}>
+                              <ServiceIcon emoji={j.booking.service.icon} className="w-3.5 h-3.5 text-green" /> {j.booking.service.name}
+                            </span>
+                            <span className={`${TEXT_MUTED} text-[0.72rem] capitalize`}>{j.booking.scheduledTime}</span>
+                          </div>
+                          {j.booking.address && (
+                            <div className={`${TEXT_MUTED} text-[0.72rem] mt-0.5 ml-5`}>{j.booking.address.street}, {j.booking.address.city}</div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               <button
                 onClick={handleClockIn}

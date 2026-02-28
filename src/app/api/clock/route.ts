@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 // POST — Clock in/out (job-based)
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "EMPLOYEE") {
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
