@@ -33,14 +33,14 @@ export function Footer() {
           <h4 className="text-green-light text-[0.72rem] tracking-[0.2em] uppercase mb-5 font-semibold">{t("servicesTitle")}</h4>
           <ul className="space-y-2.5">
             {[
-              { name: "Residential", slug: "residential-cleaning" },
-              { name: "Deep Clean", slug: "deep-cleaning" },
-              { name: "Move-In/Out", slug: "move-in-move-out" },
-              { name: "Commercial", slug: "commercial-cleaning" },
-              { name: "Post-Construction", slug: "post-construction" },
-              { name: "Airbnb Turnover", slug: "airbnb-turnover" },
+              { key: "residential", slug: "residential-cleaning" },
+              { key: "deepClean", slug: "deep-cleaning" },
+              { key: "moveInOut", slug: "move-in-move-out" },
+              { key: "commercial", slug: "commercial-cleaning" },
+              { key: "postConstruction", slug: "post-construction" },
+              { key: "airbnbTurnover", slug: "airbnb-turnover" },
             ].map((s) => (
-              <li key={s.slug}><Link href={`/services/${s.slug}`} className="text-sand text-[0.88rem] hover:text-cream transition-colors">{s.name}</Link></li>
+              <li key={s.slug}><Link href={`/services/${s.slug}`} className="text-sand text-[0.88rem] hover:text-cream transition-colors">{t(s.key)}</Link></li>
             ))}
           </ul>
         </div>
@@ -49,12 +49,12 @@ export function Footer() {
         <div>
           <h4 className="text-green-light text-[0.72rem] tracking-[0.2em] uppercase mb-5 font-semibold">{t("companyTitle")}</h4>
           <ul className="space-y-2.5">
-            <li><Link href="/#about" className="text-sand text-[0.88rem] hover:text-cream transition-colors">About Us</Link></li>
-            <li><Link href="/#about" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Our Team</Link></li>
-            <li><Link href="/#testimonials" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Reviews</Link></li>
-            <li><Link href="/blog" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Blog</Link></li>
-            <li><Link href="/areas" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Service Areas</Link></li>
-            <li><Link href="/careers" className="text-green-light text-[0.88rem] hover:text-white transition-colors font-medium">Careers</Link></li>
+            <li><Link href="/#about" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{t("aboutUs")}</Link></li>
+            <li><Link href="/#about" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{t("ourTeam")}</Link></li>
+            <li><Link href="/#testimonials" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{t("reviews")}</Link></li>
+            <li><Link href="/blog" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{t("blog")}</Link></li>
+            <li><Link href="/areas" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{t("serviceAreas")}</Link></li>
+            <li><Link href="/careers" className="text-green-light text-[0.88rem] hover:text-white transition-colors font-medium">{t("careers")}</Link></li>
           </ul>
         </div>
 
@@ -62,9 +62,9 @@ export function Footer() {
         <div>
           <h4 className="text-green-light text-[0.72rem] tracking-[0.2em] uppercase mb-5 font-semibold">{t("contactTitle")}</h4>
           <ul className="space-y-2.5">
-            <li><span className="text-sand text-[0.88rem]">Miami, FL (HQ)</span></li>
-            <li><Link href="/book" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Book Online</Link></li>
-            <li><Link href="/faq" className="text-sand text-[0.88rem] hover:text-cream transition-colors">FAQ</Link></li>
+            <li><span className="text-sand text-[0.88rem]">{t("location")}</span></li>
+            <li><Link href="/book" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{t("bookOnline")}</Link></li>
+            <li><Link href="/faq" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{t("faq")}</Link></li>
           </ul>
         </div>
       </div>

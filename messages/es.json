@@ -195,7 +195,22 @@
     "careersTitle": "Carreras",
     "contactTitle": "Contacto",
     "copyright": "© {year} Havana Cleaning. Todos los derechos reservados.",
-    "madeWith": "Hecho con amor por la familia, para tu familia."
+    "madeWith": "Hecho con amor por la familia, para tu familia.",
+    "residential": "Residencial",
+    "deepClean": "Limpieza Profunda",
+    "moveInOut": "Entrada/Salida",
+    "commercial": "Comercial",
+    "postConstruction": "Post-Construcción",
+    "airbnbTurnover": "Rotación Airbnb",
+    "aboutUs": "Sobre Nosotros",
+    "ourTeam": "Nuestro Equipo",
+    "reviews": "Reseñas",
+    "blog": "Blog",
+    "serviceAreas": "Áreas de Servicio",
+    "careers": "Carreras",
+    "location": "Miami, FL (Sede)",
+    "bookOnline": "Reservar en Línea",
+    "faq": "Preguntas Frecuentes"
   },
   "login": {
     "title": "Bienvenido",
