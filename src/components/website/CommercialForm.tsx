@@ -2,58 +2,60 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
-const INDUSTRIES = [
-  "Office",
-  "Retail",
-  "Medical",
-  "Restaurant",
-  "Warehouse",
-  "Construction",
-  "Other",
-];
+const INDUSTRY_KEYS = [
+  "industryOffice",
+  "industryRetail",
+  "industryMedical",
+  "industryRestaurant",
+  "industryWarehouse",
+  "industryConstruction",
+  "industryOther",
+] as const;
 
-const SERVICE_TYPES = [
-  "Daily cleaning",
-  "Weekly cleaning",
-  "Bi-weekly",
-  "Monthly",
-  "One-time deep clean",
-  "Post-construction",
-  "Special event",
-];
+const SERVICE_TYPE_KEYS = [
+  "serviceDaily",
+  "serviceWeekly",
+  "serviceBiWeekly",
+  "serviceMonthly",
+  "serviceOneTime",
+  "servicePostConstruction",
+  "serviceSpecialEvent",
+] as const;
 
-const AREAS = [
-  "Offices",
-  "Restrooms",
-  "Break rooms",
-  "Lobby/Reception",
-  "Conference rooms",
-  "Warehouse",
-  "Exterior",
-];
+const AREA_KEYS = [
+  "areaOffices",
+  "areaRestrooms",
+  "areaBreakRooms",
+  "areaLobby",
+  "areaConference",
+  "areaWarehouse",
+  "areaExterior",
+] as const;
 
-const SQFT_RANGES = [
-  "Under 1,000 sq ft",
-  "1,000 - 2,500 sq ft",
-  "2,500 - 5,000 sq ft",
-  "5,000 - 10,000 sq ft",
-  "10,000+ sq ft",
-];
+const SQFT_KEYS = [
+  "sqftUnder1000",
+  "sqft1000to2500",
+  "sqft2500to5000",
+  "sqft5000to10000",
+  "sqft10000plus",
+] as const;
 
-const BUDGETS = [
-  "Under $500/mo",
-  "$500 - $1,000/mo",
-  "$1,000 - $2,500/mo",
-  "$2,500 - $5,000/mo",
-  "$5,000+/mo",
-  "Need a quote first",
-];
+const BUDGET_KEYS = [
+  "budgetUnder500",
+  "budget500to1000",
+  "budget1000to2500",
+  "budget2500to5000",
+  "budget5000plus",
+  "budgetNeedQuote",
+] as const;
 
 const FREE_EMAIL_DOMAINS = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "aol.com", "icloud.com", "mail.com"];
 
 export function CommercialForm() {
   const router = useRouter();
+  const t = useTranslations("commercialForm");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const formLoadTime = useRef(Date.now());
@@ -100,16 +102,14 @@ export function CommercialForm() {
 
     // Time-based validation (must be open > 30 seconds)
     if (Date.now() - formLoadTime.current < 30000) {
-      setError("Please take your time filling out the form.");
+      setError(t("errorTooFast"));
       return;
     }
 
     // Business email validation
     const emailDomain = contactEmail.split("@")[1]?.toLowerCase();
     if (FREE_EMAIL_DOMAINS.includes(emailDomain)) {
-      setError(
-        "Please use a business email address. Free email providers (Gmail, Yahoo, etc.) are not accepted for commercial inquiries."
-      );
+      setError(t("errorBusinessEmail"));
       return;
     }
 
@@ -141,14 +141,14 @@ export function CommercialForm() {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Submission failed");
+        setError(data.error || t("errorGeneric"));
         setLoading(false);
         return;
       }
 
       router.push("/commercial/success");
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t("errorGeneric"));
       setLoading(false);
     }
   }
@@ -171,22 +171,22 @@ export function CommercialForm() {
 
       {/* COMPANY INFO */}
       <div>
-        <h3 className="font-display text-lg mb-4">Company Information</h3>
+        <h3 className="font-display text-lg mb-4">{t("companyInfo")}</h3>
         <div className="space-y-3">
           <div>
-            <label className={labelClass}>Company Name *</label>
+            <label className={labelClass}>{t("companyName")}</label>
             <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required className={inputClass} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelClass}>Industry</label>
+              <label className={labelClass}>{t("industry")}</label>
               <select value={industry} onChange={(e) => setIndustry(e.target.value)} className={inputClass}>
-                <option value="">Select...</option>
-                {INDUSTRIES.map((i) => <option key={i}>{i}</option>)}
+                <option value="">{t("select")}</option>
+                {INDUSTRY_KEYS.map((key) => <option key={key} value={key}>{t(key)}</option>)}
               </select>
             </div>
             <div>
-              <label className={labelClass}>Company Website</label>
+              <label className={labelClass}>{t("companyWebsite")}</label>
               <input type="url" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://" className={inputClass} />
             </div>
           </div>
@@ -195,25 +195,25 @@ export function CommercialForm() {
 
       {/* CONTACT */}
       <div>
-        <h3 className="font-display text-lg mb-4">Contact Person</h3>
+        <h3 className="font-display text-lg mb-4">{t("contactPerson")}</h3>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelClass}>Full Name *</label>
+              <label className={labelClass}>{t("fullName")}</label>
               <input type="text" value={contactName} onChange={(e) => setContactName(e.target.value)} required className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>Job Title</label>
+              <label className={labelClass}>{t("jobTitle")}</label>
               <input type="text" value={contactTitle} onChange={(e) => setContactTitle(e.target.value)} className={inputClass} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelClass}>Business Email *</label>
+              <label className={labelClass}>{t("businessEmail")}</label>
               <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} required className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>Phone *</label>
+              <label className={labelClass}>{t("phone")}</label>
               <input type="tel" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} required className={inputClass} />
             </div>
           </div>
@@ -222,22 +222,22 @@ export function CommercialForm() {
 
       {/* PROPERTY */}
       <div>
-        <h3 className="font-display text-lg mb-4">Service Details</h3>
+        <h3 className="font-display text-lg mb-4">{t("serviceDetails")}</h3>
         <div className="space-y-4">
           <div>
-            <label className={labelClass}>Property Address *</label>
+            <label className={labelClass}>{t("propertyAddress")}</label>
             <input type="text" value={propertyAddress} onChange={(e) => setPropertyAddress(e.target.value)} required className={inputClass} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelClass}>Square Footage</label>
+              <label className={labelClass}>{t("squareFootage")}</label>
               <select value={squareFootage} onChange={(e) => setSquareFootage(e.target.value)} className={inputClass}>
-                <option value="">Select...</option>
-                {SQFT_RANGES.map((r) => <option key={r}>{r}</option>)}
+                <option value="">{t("select")}</option>
+                {SQFT_KEYS.map((key) => <option key={key} value={key}>{t(key)}</option>)}
               </select>
             </div>
             <div>
-              <label className={labelClass}>Number of Floors</label>
+              <label className={labelClass}>{t("numberOfFloors")}</label>
               <select value={floors} onChange={(e) => setFloors(Number(e.target.value))} className={inputClass}>
                 {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
               </select>
@@ -245,56 +245,56 @@ export function CommercialForm() {
           </div>
 
           <div>
-            <label className={labelClass}>Service Types Needed</label>
+            <label className={labelClass}>{t("serviceTypesNeeded")}</label>
             <div className="grid grid-cols-2 gap-2">
-              {SERVICE_TYPES.map((t) => (
+              {SERVICE_TYPE_KEYS.map((key) => (
                 <button
-                  key={t}
+                  key={key}
                   type="button"
-                  onClick={() => toggleArray(serviceTypes, t, setServiceTypes)}
+                  onClick={() => toggleArray(serviceTypes, key, setServiceTypes)}
                   className={`border rounded-md px-3 py-2 text-[0.82rem] text-left transition-colors ${
-                    serviceTypes.includes(t) ? "border-green bg-green/5" : "border-tobacco/10"
+                    serviceTypes.includes(key) ? "border-green bg-green/5" : "border-tobacco/10"
                   }`}
                 >
-                  {t}
+                  {t(key)}
                 </button>
               ))}
             </div>
           </div>
 
           <div>
-            <label className={labelClass}>Areas to Clean</label>
+            <label className={labelClass}>{t("areasToClean")}</label>
             <div className="grid grid-cols-2 gap-2">
-              {AREAS.map((a) => (
+              {AREA_KEYS.map((key) => (
                 <button
-                  key={a}
+                  key={key}
                   type="button"
-                  onClick={() => toggleArray(areas, a, setAreas)}
+                  onClick={() => toggleArray(areas, key, setAreas)}
                   className={`border rounded-md px-3 py-2 text-[0.82rem] text-left transition-colors ${
-                    areas.includes(a) ? "border-green bg-green/5" : "border-tobacco/10"
+                    areas.includes(key) ? "border-green bg-green/5" : "border-tobacco/10"
                   }`}
                 >
-                  {a}
+                  {t(key)}
                 </button>
               ))}
             </div>
           </div>
 
           <div>
-            <label className={labelClass}>Budget Range</label>
+            <label className={labelClass}>{t("budgetRange")}</label>
             <select value={budgetRange} onChange={(e) => setBudgetRange(e.target.value)} className={inputClass}>
-              <option value="">Select...</option>
-              {BUDGETS.map((b) => <option key={b}>{b}</option>)}
+              <option value="">{t("select")}</option>
+              {BUDGET_KEYS.map((key) => <option key={key} value={key}>{t(key)}</option>)}
             </select>
           </div>
 
           <div>
-            <label className={labelClass}>Special Requirements</label>
+            <label className={labelClass}>{t("specialRequirements")}</label>
             <textarea
               value={specialRequirements}
               onChange={(e) => setSpecialRequirements(e.target.value)}
               rows={3}
-              placeholder="After-hours only, HIPAA compliance, green products, etc."
+              placeholder={t("specialPlaceholder")}
               className={inputClass + " resize-none"}
             />
           </div>
@@ -312,7 +312,7 @@ export function CommercialForm() {
         disabled={loading}
         className="w-full bg-green text-white py-4 text-[0.9rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-green/90 disabled:opacity-50 transition-colors"
       >
-        {loading ? "Submitting..." : "Request Quote"}
+        {loading ? t("submitting") : t("requestQuote")}
       </button>
     </form>
   );

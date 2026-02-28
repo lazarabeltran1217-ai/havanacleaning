@@ -5,6 +5,8 @@ import type { Metadata } from "next";
 import { JsonLd } from "@/components/website/JsonLd";
 import { breadcrumbSchema } from "@/lib/schema";
 import { BlogContent } from "@/components/website/BlogContent";
+import { getTranslations, getLocale } from "next-intl/server";
+import { localized } from "@/lib/i18n-content";
 
 export async function generateMetadata({
   params,
@@ -34,6 +36,9 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const locale = await getLocale();
+  const t = await getTranslations("blog");
+  const tCommon = await getTranslations("common");
 
   let post = null;
   try {
@@ -44,10 +49,14 @@ export default async function BlogPostPage({
 
   if (!post || !post.isPublished) notFound();
 
+  const postTitle = localized(post.title, post.titleEs, locale);
+  const postContent = localized(post.content, post.contentEs, locale);
+  const dateLocale = locale === "es" ? "es-ES" : "en-US";
+
   const breadcrumbs = [
-    { name: "Home", url: "/" },
-    { name: "Blog", url: "/blog" },
-    { name: post.title, url: `/blog/${post.slug}` },
+    { name: tCommon("home"), url: "/" },
+    { name: t("breadcrumbBlog"), url: "/blog" },
+    { name: postTitle, url: `/blog/${post.slug}` },
   ];
 
   return (
@@ -56,20 +65,20 @@ export default async function BlogPostPage({
 
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-400 mb-8">
-        <Link href="/" className="hover:text-teal">Home</Link>
+        <Link href="/" className="hover:text-teal">{tCommon("home")}</Link>
         {" / "}
-        <Link href="/blog" className="hover:text-teal">Blog</Link>
+        <Link href="/blog" className="hover:text-teal">{t("breadcrumbBlog")}</Link>
         {" / "}
-        <span className="text-tobacco">{post.title}</span>
+        <span className="text-tobacco">{postTitle}</span>
       </nav>
 
       {/* Header */}
-      <h1 className="font-display text-4xl text-tobacco mb-4">{post.title}</h1>
+      <h1 className="font-display text-4xl text-tobacco mb-4">{postTitle}</h1>
       <div className="flex items-center gap-3 text-gray-400 text-sm mb-8">
-        {post.author && <span>By {post.author}</span>}
+        {post.author && <span>{t("by", { author: post.author })}</span>}
         {post.publishedAt && (
           <span>
-            {new Date(post.publishedAt).toLocaleDateString("en-US", {
+            {new Date(post.publishedAt).toLocaleDateString(dateLocale, {
               month: "long",
               day: "numeric",
               year: "numeric",
@@ -79,25 +88,25 @@ export default async function BlogPostPage({
       </div>
 
       {/* Content */}
-      {post.content ? (
-        <BlogContent content={post.content} />
+      {postContent ? (
+        <BlogContent content={postContent} />
       ) : (
-        <p className="text-gray-400">Content coming soon.</p>
+        <p className="text-gray-400">{t("contentComingSoon")}</p>
       )}
 
       {/* CTA */}
       <div className="mt-12 bg-green/5 rounded-2xl p-8 text-center">
         <h2 className="font-display text-xl text-tobacco mb-3">
-          Need Professional Cleaning?
+          {t("needCleaning")}
         </h2>
         <p className="text-gray-600 mb-4">
-          Let Havana Cleaning handle it. Book online in under 2 minutes.
+          {t("needCleaningDesc")}
         </p>
         <Link
           href="/book"
           className="inline-block bg-green text-white px-8 py-3 rounded-xl font-semibold hover:bg-green/90 transition-colors"
         >
-          Book Your Cleaning
+          {t("bookYourCleaning")}
         </Link>
       </div>
     </article>
