@@ -180,41 +180,37 @@ export default function EmployeeDashboard() {
     return () => clearInterval(interval);
   }, [isClockedIn, clockInTime]);
 
-  /* ─── Fetch All Data ─── */
+  /* ─── Fetch All Data (single request to avoid connection exhaustion) ─── */
   useEffect(() => {
-    Promise.all([
-      fetch("/api/clock/status").then((r) => r.json()).catch(() => ({ isClockedIn: false })),
-      fetch("/api/portal/jobs/today").then((r) => r.json()).catch(() => ({ jobs: [] })),
-      fetch("/api/portal/jobs").then((r) => r.json()).catch(() => ({ jobs: [] })),
-      fetch("/api/portal/hours?period=week").then((r) => r.json()).catch(() => ({ entries: [], summary: null })),
-      fetch("/api/portal/pay-stubs").then((r) => r.json()).catch(() => ({ payStubs: [] })),
-      fetch("/api/portal/supplies").then((r) => r.json()).catch(() => ({ checkouts: [] })),
-      fetch("/api/account/profile").then((r) => r.json()).catch(() => ({ user: null })),
-    ]).then(([clock, today, all, hours, stubs, sups, profile]) => {
-      // Clock
-      setIsClockedIn(clock.isClockedIn);
-      if (clock.currentEntry) {
-        setClockInTime(new Date(clock.currentEntry.clockIn));
-        setCurrentEntry(clock.currentEntry);
-      }
-      // Jobs
-      setTodayJobs(today.jobs || []);
-      setAllJobs(all.jobs || []);
-      // Hours
-      setHoursEntries(hours.entries || []);
-      setHoursSummary(hours.summary || null);
-      // Pay stubs
-      setPayStubs(stubs.payStubs || []);
-      // Supplies
-      setSupplies(sups.checkouts || []);
-      // Profile
-      if (profile.user) {
-        setProfileName(profile.user.name || "");
-        setProfilePhone(profile.user.phone || "");
-        setProfileLocale(profile.user.locale || "en");
-      }
-      setLoading(false);
-    });
+    fetch("/api/portal/dashboard")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.error) { console.error("Dashboard load error:", d.detail); setLoading(false); return; }
+        // Clock
+        setIsClockedIn(d.clock?.isClockedIn ?? false);
+        if (d.clock?.currentEntry) {
+          setClockInTime(new Date(d.clock.currentEntry.clockIn));
+          setCurrentEntry(d.clock.currentEntry);
+        }
+        // Jobs
+        setTodayJobs(d.todayJobs || []);
+        setAllJobs(d.allJobs || []);
+        // Hours
+        setHoursEntries(d.hours?.entries || []);
+        setHoursSummary(d.hours?.summary || null);
+        // Pay stubs
+        setPayStubs(d.payStubs || []);
+        // Supplies
+        setSupplies(d.supplies || []);
+        // Profile
+        if (d.profile) {
+          setProfileName(d.profile.name || "");
+          setProfilePhone(d.profile.phone || "");
+          setProfileLocale(d.profile.locale || "en");
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
   /* ─── Refetch hours when period changes ─── */
