@@ -74,7 +74,7 @@ async function main() {
   for (const s of services) {
     await prisma.service.upsert({
       where: { slug: s.slug },
-      update: {},
+      update: { nameEs: s.nameEs, descriptionEs: s.descriptionEs },
       create: { ...s, isActive: true, isFeatured: s.isFeatured ?? false },
     });
   }
@@ -98,7 +98,9 @@ async function main() {
 
   for (const a of addOns) {
     const exists = await prisma.serviceAddOn.findFirst({ where: { name: a.name } });
-    if (!exists) {
+    if (exists) {
+      await prisma.serviceAddOn.update({ where: { id: exists.id }, data: { nameEs: a.nameEs } });
+    } else {
       await prisma.serviceAddOn.create({ data: { ...a, isActive: true } });
     }
   }
@@ -106,14 +108,16 @@ async function main() {
 
   // ── TESTIMONIALS ──
   const testimonials = [
-    { customerName: "Sofia Reyes", content: "These ladies are absolutely incredible. My apartment has never been this clean. They went above and beyond on everything — even organized my pantry without being asked!", rating: 5, location: "Brickell, Miami", isApproved: true, isFeatured: true },
-    { customerName: "Marco & Lucia Torres", content: "We used Havana Cleaning for our move-out clean and got our full deposit back — $2,800! The team was professional, on time, and thorough. Worth every penny.", rating: 5, location: "Coral Gables, Miami", isApproved: true, isFeatured: true },
-    { customerName: "Dr. Amanda Chen", content: "I've had many cleaning services over the years. Havana Cleaning is by far the most detail-oriented and trustworthy. The bi-weekly plan is the best decision I've made for my home.", rating: 5, location: "Kendall, Miami", isApproved: true, isFeatured: true },
+    { customerName: "Sofia Reyes", content: "These ladies are absolutely incredible. My apartment has never been this clean. They went above and beyond on everything — even organized my pantry without being asked!", contentEs: "Estas señoras son absolutamente increíbles. Mi apartamento nunca había estado tan limpio. Fueron más allá en todo — ¡incluso organizaron mi despensa sin que se lo pidiera!", rating: 5, location: "Brickell, Miami", isApproved: true, isFeatured: true },
+    { customerName: "Marco & Lucia Torres", content: "We used Havana Cleaning for our move-out clean and got our full deposit back — $2,800! The team was professional, on time, and thorough. Worth every penny.", contentEs: "Usamos Havana Cleaning para la limpieza de mudanza y recuperamos nuestro depósito completo — ¡$2,800! El equipo fue profesional, puntual y minucioso. Valió cada centavo.", rating: 5, location: "Coral Gables, Miami", isApproved: true, isFeatured: true },
+    { customerName: "Dr. Amanda Chen", content: "I've had many cleaning services over the years. Havana Cleaning is by far the most detail-oriented and trustworthy. The bi-weekly plan is the best decision I've made for my home.", contentEs: "He tenido muchos servicios de limpieza a lo largo de los años. Havana Cleaning es, con diferencia, el más detallista y confiable. El plan quincenal es la mejor decisión que he tomado para mi hogar.", rating: 5, location: "Kendall, Miami", isApproved: true, isFeatured: true },
   ];
 
   for (const t of testimonials) {
     const exists = await prisma.testimonial.findFirst({ where: { customerName: t.customerName } });
-    if (!exists) {
+    if (exists) {
+      await prisma.testimonial.update({ where: { id: exists.id }, data: { contentEs: t.contentEs } });
+    } else {
       await prisma.testimonial.create({ data: t });
     }
   }
