@@ -125,6 +125,7 @@ export default async function AdminClockPage() {
                     clockOut: e.clockOut?.toISOString() || null,
                     hoursWorked: e.hoursWorked,
                     notes: e.notes,
+                    bookingId: e.bookingId,
                   }} />
                 </td>
               </tr>
