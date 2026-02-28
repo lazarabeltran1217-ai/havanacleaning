@@ -743,7 +743,7 @@ export default function EmployeeDashboard() {
                       <div>
                         <div className={`text-[0.82rem] font-medium ${TEXT_PRIMARY}`}>{fmtDate(stub.periodStart)} — {fmtDate(stub.periodEnd)}</div>
                         <div className={`${TEXT_MUTED} text-[0.68rem] mt-0.5`}>
-                          {t("pay_paid")} {fmtDate(stub.paidAt)}{stub.paidVia && ` via ${stub.paidVia}`}
+                          {t("pay_paid")} {fmtDate(stub.paidAt)}{stub.paidVia && ` via ${fmtStatus(stub.paidVia)}`}
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5">
