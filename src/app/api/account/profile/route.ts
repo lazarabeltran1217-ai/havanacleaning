@@ -58,6 +58,7 @@ export async function PATCH(req: NextRequest) {
       });
     } catch {
       // locale column might not exist — save without it
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { locale: _locale, ...safeData } = updateData;
       user = await prisma.user.update({
         where: { id: session.user.id },
