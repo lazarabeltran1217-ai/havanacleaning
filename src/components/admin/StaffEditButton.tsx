@@ -24,6 +24,7 @@ export function StaffEditButton({ employee }: { employee: EmployeeData }) {
   const [phone, setPhone] = useState(employee.phone || "");
   const [hourlyRate, setHourlyRate] = useState(String(employee.hourlyRate || ""));
   const [isActive, setIsActive] = useState(employee.isActive);
+  const [password, setPassword] = useState("");
 
   const handleSave = async () => {
     setSaving(true);
@@ -36,6 +37,7 @@ export function StaffEditButton({ employee }: { employee: EmployeeData }) {
         phone: phone || null,
         hourlyRate: hourlyRate ? parseFloat(hourlyRate) : null,
         isActive,
+        ...(password && { password }),
       }),
     });
 
@@ -47,6 +49,7 @@ export function StaffEditButton({ employee }: { employee: EmployeeData }) {
     }
 
     setMessage("Saved!");
+    setPassword("");
     setTimeout(() => {
       setOpen(false);
       setMessage("");
@@ -93,6 +96,16 @@ export function StaffEditButton({ employee }: { employee: EmployeeData }) {
               <div>
                 <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">Email</label>
                 <input value={employee.email} disabled className="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 text-gray-400" />
+              </div>
+              <div>
+                <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">New Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Leave blank to keep current"
+                  className="w-full px-3 py-2 border rounded-lg text-sm"
+                />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { hash } from "bcryptjs";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,8 @@ export async function PATCH(
   const { id } = await params;
   const body = await req.json();
 
+  const hashedPassword = body.password ? await hash(body.password, 12) : undefined;
+
   const employee = await prisma.user.update({
     where: { id },
     data: {
@@ -24,6 +27,7 @@ export async function PATCH(
       ...(body.phone !== undefined && { phone: body.phone || null }),
       ...(body.hourlyRate !== undefined && { hourlyRate: body.hourlyRate }),
       ...(body.isActive !== undefined && { isActive: body.isActive }),
+      ...(hashedPassword && { password: hashedPassword }),
     },
   });
 
