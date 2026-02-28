@@ -45,5 +45,9 @@ export async function PATCH(req: NextRequest) {
     select: { id: true, name: true, email: true, phone: true, locale: true },
   });
 
-  return NextResponse.json({ user });
+  const res = NextResponse.json({ user });
+  if (body.locale) {
+    res.cookies.set("locale", body.locale, { path: "/", maxAge: 365 * 24 * 60 * 60 });
+  }
+  return res;
 }

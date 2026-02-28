@@ -35,6 +35,15 @@ h1, h2, h3, h4, h5, h6 {
   font-family: "Playfair Display", serif;
 }
 
+/* Dark mode */
+.dark {
+  --ivory: #1a1410;
+  --tobacco: #F5EDD8;
+  --cream: #2C1810;
+  --sand: #8a7560;
+}
+.dark body { background: #1a1410; color: #F5EDD8; }
+
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--cream); }
 ::-webkit-scrollbar-thumb { background: var(--sand); border-radius: 4px; }
