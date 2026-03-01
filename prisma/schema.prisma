@@ -155,8 +155,10 @@ model Service {
   description    String?
   descriptionEs  String?
   icon           String?
-  basePrice      Float
-  estimatedHours Float    @default(2)
+  basePrice          Float
+  pricePerBedroom    Float    @default(25)
+  pricePerBathroom   Float    @default(20)
+  estimatedHours     Float    @default(2)
   isActive       Boolean  @default(true)
   isFeatured     Boolean  @default(false)
   sortOrder      Int      @default(0)

@@ -32,12 +32,22 @@ export async function calculatePrice(input: PriceCalcInput): Promise<PriceResult
   if (rule) {
     basePrice = rule.price;
   } else {
-    // Fall back to service base price
+    // Fall back to service base price + per-room scaling
+    // basePrice is calibrated for 2 bed / 2 bath
     const service = await prisma.service.findUnique({
       where: { id: input.serviceId },
-      select: { basePrice: true },
+      select: { basePrice: true, pricePerBedroom: true, pricePerBathroom: true },
     });
-    basePrice = service?.basePrice ?? 0;
+    if (!service) {
+      basePrice = 0;
+    } else {
+      const perBed = service.pricePerBedroom ?? 25;
+      const perBath = service.pricePerBathroom ?? 20;
+      basePrice = service.basePrice
+        + (input.bedrooms - 2) * perBed
+        + (input.bathrooms - 2) * perBath;
+      basePrice = Math.max(basePrice, 0);
+    }
   }
 
   // Calculate add-ons

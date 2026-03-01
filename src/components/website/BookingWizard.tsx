@@ -13,6 +13,8 @@ interface ServiceOption {
   slug: string;
   icon: string | null;
   basePrice: number;
+  pricePerBedroom: number;
+  pricePerBathroom: number;
   estimatedHours: number;
 }
 
@@ -68,13 +70,21 @@ export function BookingWizard({ services, addOns }: Props) {
   const [zipCode, setZipCode] = useState("");
 
   // Price calculation (client-side estimate)
+  // basePrice is for 2 bed / 2 bath; scale up/down per room
   const selectedService = services.find((s) => s.id === serviceId);
-  const basePrice = selectedService?.basePrice ?? 0;
+  const servicePrice = selectedService
+    ? Math.max(
+        0,
+        selectedService.basePrice
+          + (bedrooms - 2) * selectedService.pricePerBedroom
+          + (bathrooms - 2) * selectedService.pricePerBathroom
+      )
+    : 0;
   const addOnsTotal = addOns
     .filter((a) => selectedAddOns.includes(a.id))
     .reduce((sum, a) => sum + a.price, 0);
   const discountRate = RECURRENCE_DISCOUNT[recurrence];
-  const subtotal = basePrice + addOnsTotal;
+  const subtotal = servicePrice + addOnsTotal;
   const discount = Math.round(subtotal * discountRate * 100) / 100;
   const afterDiscount = subtotal - discount;
   const tax = Math.round(afterDiscount * 0.07 * 100) / 100;
@@ -185,7 +195,11 @@ export function BookingWizard({ services, addOns }: Props) {
                 <ServiceIcon emoji={s.icon} className="w-7 h-7 mx-auto mb-1 text-tobacco/60" />
                 <div className="text-[0.8rem] font-medium">{s.name}</div>
                 <div className="text-amber text-[0.75rem] mt-1">
-                  {s.basePrice > 0 ? formatCurrency(s.basePrice) : "Quote"}
+                  {s.basePrice > 0
+                    ? formatCurrency(
+                        Math.max(0, s.basePrice + (bedrooms - 2) * s.pricePerBedroom + (bathrooms - 2) * s.pricePerBathroom)
+                      )
+                    : "Quote"}
                 </div>
               </button>
             ))}
@@ -424,8 +438,8 @@ export function BookingWizard({ services, addOns }: Props) {
             <h3 className="font-display text-lg mb-4">Order Summary</h3>
             <div className="space-y-2 text-[0.9rem]">
               <div className="flex justify-between">
-                <span>{selectedService?.name}</span>
-                <span>{formatCurrency(basePrice)}</span>
+                <span>{selectedService?.name} ({bedrooms} bed / {bathrooms} bath)</span>
+                <span>{formatCurrency(servicePrice)}</span>
               </div>
               {addOns
                 .filter((a) => selectedAddOns.includes(a.id))
