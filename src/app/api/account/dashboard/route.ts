@@ -16,7 +16,7 @@ export async function GET() {
     const uid = session.user.id;
     const today = todayStartET();
 
-    const [profile, upcomingBookings, recentBookings, addresses, totalCount, totalSpent] =
+    const [profile, upcomingBookings, allBookings, addresses, totalCount, totalSpent] =
       await Promise.all([
         // Profile
         prisma.user.findUnique({
@@ -40,15 +40,15 @@ export async function GET() {
           take: 5,
         }),
 
-        // Recent bookings (last 5 completed)
+        // All bookings (ordered by date desc)
         prisma.booking.findMany({
-          where: { customerId: uid, status: "COMPLETED" },
+          where: { customerId: uid },
           include: {
             service: { select: { name: true, icon: true } },
-            address: { select: { street: true, city: true } },
+            address: { select: { street: true, unit: true, city: true, state: true, zipCode: true } },
+            payments: { select: { status: true } },
           },
           orderBy: { scheduledDate: "desc" },
-          take: 5,
         }),
 
         // Addresses
@@ -70,7 +70,7 @@ export async function GET() {
     return NextResponse.json({
       profile,
       upcomingBookings,
-      recentBookings,
+      allBookings,
       addresses,
       stats: {
         totalBookings: totalCount,
