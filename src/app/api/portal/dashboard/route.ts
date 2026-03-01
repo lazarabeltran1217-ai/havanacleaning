@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { todayStartET, tomorrowStartET, weekStartET } from "@/lib/timezone";
 
 export const dynamic = "force-dynamic";
 
@@ -13,19 +14,13 @@ export async function GET() {
     }
 
     const uid = session.user.id;
-    const now = new Date();
 
-    // Today boundaries
-    const today = new Date(now);
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Today boundaries (Eastern Time)
+    const today = todayStartET();
+    const tomorrow = tomorrowStartET();
 
-    // This-week start (Monday)
-    const weekStart = new Date(now);
-    weekStart.setHours(0, 0, 0, 0);
-    const day = weekStart.getDay();
-    weekStart.setDate(weekStart.getDate() + (day === 0 ? -6 : 1 - day));
+    // This-week start (Monday, Eastern Time)
+    const weekStart = weekStartET();
 
     // Run all queries in parallel on the SAME connection pool
     const [

@@ -34,8 +34,12 @@ const TIME_LABELS: Record<string, string> = {
   evening: "Evening (5–8)",
 };
 
+function getNowET(): Date {
+  return new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
+}
+
 function getMondayOfWeek(date: Date): Date {
-  const d = new Date(date);
+  const d = new Date(date.toLocaleString("en-US", { timeZone: "America/New_York" }));
   const day = d.getDay();
   const diff = day === 0 ? -6 : 1 - day;
   return new Date(d.getFullYear(), d.getMonth(), d.getDate() + diff);
@@ -220,7 +224,7 @@ export function ScheduleView() {
     setWeekStart(d);
   };
 
-  const goToday = () => setWeekStart(getMondayOfWeek(new Date()));
+  const goToday = () => setWeekStart(getMondayOfWeek(getNowET()));
 
   const assignEmployee = async (bookingId: string, employeeId: string) => {
     setAssigning(bookingId);
@@ -253,7 +257,7 @@ export function ScheduleView() {
   }
 
   const weekEndDate = days[6];
-  const today = new Date();
+  const today = getNowET();
 
   return (
     <div>

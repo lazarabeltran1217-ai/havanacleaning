@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
 import { ServiceIcon } from "@/lib/service-icons";
+import { todayStartET } from "@/lib/timezone";
 
 export default async function AccountOverview() {
   const session = await getServerSession(authOptions);
@@ -27,7 +28,7 @@ export default async function AccountOverview() {
     where: {
       customerId: session.user.id,
       status: { in: ["PENDING", "CONFIRMED"] },
-      scheduledDate: { gte: new Date() },
+      scheduledDate: { gte: todayStartET() },
     },
   });
 

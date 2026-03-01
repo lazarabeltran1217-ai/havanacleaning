@@ -1,12 +1,9 @@
 import { prisma } from "./prisma";
+import { todayDateStringET } from "./timezone";
 
 /** Generate a booking number like HC-20260225-001 */
 export async function generateBookingNumber(): Promise<string> {
-  const today = new Date();
-  const dateStr =
-    today.getFullYear().toString() +
-    String(today.getMonth() + 1).padStart(2, "0") +
-    String(today.getDate()).padStart(2, "0");
+  const dateStr = todayDateStringET();
 
   const prefix = `HC-${dateStr}`;
 

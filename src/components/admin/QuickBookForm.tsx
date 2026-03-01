@@ -48,9 +48,9 @@ export function QuickBookForm({ onCreated }: Props) {
       setEmployees(eData.employees || []);
     });
 
-    // Default date to today
-    const today = new Date();
-    setScheduledDate(today.toISOString().split("T")[0]);
+    // Default date to today (Eastern Time)
+    const et = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
+    setScheduledDate(`${et.getFullYear()}-${String(et.getMonth() + 1).padStart(2, "0")}-${String(et.getDate()).padStart(2, "0")}`);
   }, [open]);
 
   const resetForm = () => {

@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
 import { RevenueChart } from "@/components/admin/RevenueChart";
+import { monthStartET, monthStartOffsetET } from "@/lib/timezone";
 
 export default async function AdminRevenuePage() {
-  const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const startOfMonth = monthStartET();
+  const startOfLastMonth = monthStartOffsetET(-1);
 
   let monthlyData: { month: string; revenue: number; bookings: number }[] = [];
   let revenue = 0;
@@ -39,9 +39,9 @@ export default async function AdminRevenuePage() {
     // Get monthly data for the last 12 months
     const monthlyDataArr: { month: string; revenue: number; bookings: number }[] = [];
     for (let i = 11; i >= 0; i--) {
-      const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
-      const label = monthStart.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+      const monthStart = monthStartOffsetET(-i);
+      const monthEnd = monthStartOffsetET(-i + 1);
+      const label = monthStart.toLocaleDateString("en-US", { month: "short", year: "2-digit", timeZone: "UTC" });
 
       const agg = await prisma.payment.aggregate({
         where: { status: "SUCCEEDED", paidAt: { gte: monthStart, lt: monthEnd } },

@@ -3,6 +3,7 @@ import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
 import Link from "next/link";
 import { ServiceIcon } from "@/lib/service-icons";
 import { DashboardCharts } from "@/components/admin/DashboardCharts";
+import { todayStartET, tomorrowStartET, monthStartET, monthStartOffsetET } from "@/lib/timezone";
 
 const fetchRecentBookings = () =>
   prisma.booking.findMany({
@@ -16,13 +17,12 @@ const fetchRecentBookings = () =>
 
 /** Build 6-month revenue + booking count data */
 async function fetchMonthlyRevenue() {
-  const now = new Date();
   const months: { month: string; revenue: number; bookings: number }[] = [];
 
   for (let i = 5; i >= 0; i--) {
-    const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
-    const label = start.toLocaleString("en-US", { month: "short" });
+    const start = monthStartOffsetET(-i);
+    const end = monthStartOffsetET(-i + 1);
+    const label = start.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
 
     const [rev, count] = await Promise.all([
       prisma.payment.aggregate({
@@ -75,11 +75,9 @@ async function fetchRevenueByService() {
 }
 
 export default async function AdminDashboard() {
-  const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const todayStart = new Date(now.toISOString().split("T")[0]);
-  const tomorrowStart = new Date(todayStart);
-  tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+  const startOfMonth = monthStartET();
+  const todayStart = todayStartET();
+  const tomorrowStart = tomorrowStartET();
 
   let totalBookings = 0;
   let pendingBookings = 0;

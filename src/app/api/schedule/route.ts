@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { weekStartET } from "@/lib/timezone";
 
 export const dynamic = "force-dynamic";
 
@@ -19,11 +20,8 @@ export async function GET(req: NextRequest) {
   if (weekStart) {
     start = new Date(weekStart);
   } else {
-    // Default to current week's Monday
-    const now = new Date();
-    const day = now.getDay();
-    const diff = day === 0 ? -6 : 1 - day;
-    start = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff);
+    // Default to current week's Monday (Eastern Time)
+    start = weekStartET();
   }
 
   const end = new Date(start);

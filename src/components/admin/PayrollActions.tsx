@@ -12,14 +12,15 @@ export function PayrollActions() {
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
 
-  // Default to current bi-weekly period
+  // Default to current bi-weekly period (Eastern Time)
   const setDefaultPeriod = () => {
-    const now = new Date();
+    const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
     const end = new Date(now);
     const start = new Date(now);
     start.setDate(start.getDate() - 13); // 14-day period
-    setPeriodStart(start.toISOString().split("T")[0]);
-    setPeriodEnd(end.toISOString().split("T")[0]);
+    const fmt = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    setPeriodStart(fmt(start));
+    setPeriodEnd(fmt(end));
   };
 
   const handleGenerate = async () => {

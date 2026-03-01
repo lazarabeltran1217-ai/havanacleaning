@@ -97,10 +97,10 @@ export function BookingWizard({ services, addOns }: Props) {
     );
   }
 
-  // Tomorrow's date as minimum
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDate = tomorrow.toISOString().split("T")[0];
+  // Tomorrow's date as minimum (Eastern Time)
+  const etNow = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
+  const etTomorrow = new Date(etNow.getFullYear(), etNow.getMonth(), etNow.getDate() + 1);
+  const minDate = `${etTomorrow.getFullYear()}-${String(etTomorrow.getMonth() + 1).padStart(2, "0")}-${String(etTomorrow.getDate()).padStart(2, "0")}`;
 
   async function handleSubmit() {
     if (!session) {

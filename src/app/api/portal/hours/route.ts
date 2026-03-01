@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { monthStartET, weekStartET } from "@/lib/timezone";
 
 export const dynamic = "force-dynamic";
 
@@ -14,18 +15,13 @@ export async function GET(req: NextRequest) {
 
     const period = req.nextUrl.searchParams.get("period") || "week";
 
-    const now = new Date();
     let startDate: Date;
 
     if (period === "month") {
-      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      startDate = monthStartET();
     } else {
-      // This week (Monday start)
-      startDate = new Date(now);
-      startDate.setHours(0, 0, 0, 0);
-      const day = startDate.getDay();
-      const diff = day === 0 ? -6 : 1 - day;
-      startDate.setDate(startDate.getDate() + diff);
+      // This week (Monday start, Eastern Time)
+      startDate = weekStartET();
     }
 
     const entries = await prisma.timeEntry.findMany({

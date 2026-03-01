@@ -158,9 +158,9 @@ export default function EmployeeDashboard() {
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMessage, setProfileMessage] = useState("");
 
-  /* ─── Live Clock ─── */
+  /* ─── Live Clock (Eastern Time) ─── */
   useEffect(() => {
-    const interval = setInterval(() => setTime(new Date()), 1000);
+    const interval = setInterval(() => setTime(new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }))), 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -327,7 +327,7 @@ export default function EmployeeDashboard() {
 
   /* ─── Schedule Helpers ─── */
   const weekStart = useMemo(() => {
-    const d = new Date();
+    const d = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
     d.setHours(0, 0, 0, 0);
     const day = d.getDay();
     const diff = day === 0 ? -6 : 1 - day;
@@ -341,11 +341,16 @@ export default function EmployeeDashboard() {
     return d;
   }), [weekStart]);
 
-  const isToday = (d: Date) => d.toDateString() === new Date().toDateString();
+  const isToday = (d: Date) => d.toDateString() === new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).toDateString();
 
   const getJobsForDay = (d: Date) => {
-    const dateStr = d.toISOString().split("T")[0];
-    return allJobs.filter((j) => new Date(j.booking.scheduledDate).toISOString().split("T")[0] === dateStr);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const dateStr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    return allJobs.filter((j) => {
+      const jd = new Date(j.booking.scheduledDate);
+      const jStr = `${jd.getUTCFullYear()}-${pad(jd.getUTCMonth() + 1)}-${pad(jd.getUTCDate())}`;
+      return jStr === dateStr;
+    });
   };
 
   const formatWeekRange = () => {

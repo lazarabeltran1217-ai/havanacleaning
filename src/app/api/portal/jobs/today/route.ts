@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { todayStartET, tomorrowStartET } from "@/lib/timezone";
 
 export const dynamic = "force-dynamic";
 
@@ -12,10 +13,8 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const today = todayStartET();
+    const tomorrow = tomorrowStartET();
 
     const jobs = await prisma.jobAssignment.findMany({
       where: {

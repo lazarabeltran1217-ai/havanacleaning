@@ -9,7 +9,7 @@ export default function NewEmployeePage() {
   const [error, setError] = useState("");
   const [form, setForm] = useState({
     name: "", email: "", password: "", phone: "",
-    hourlyRate: "20", hireDate: new Date().toISOString().split("T")[0],
+    hourlyRate: "20", hireDate: (() => { const d = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })(),
   });
 
   function update(field: string, value: string) {
