@@ -104,10 +104,13 @@ export async function GET() {
       services,
       addOns,
     });
-  } catch (err) {
-    console.error("Customer dashboard GET error:", err);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    const stack = err instanceof Error ? err.stack : undefined;
+    console.error("Customer dashboard GET error:", message);
+    if (stack) console.error(stack);
     return NextResponse.json(
-      { error: "Failed to load dashboard data", detail: String(err) },
+      { error: "Failed to load dashboard data", detail: message },
       { status: 500 }
     );
   }
