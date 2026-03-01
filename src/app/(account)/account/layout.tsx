@@ -20,9 +20,9 @@ export default function AccountLayout({
   }
 
   return (
-    <div className="min-h-screen bg-ivory dark:bg-[#1a1410]">
+    <div className="min-h-screen bg-tobacco">
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-40 bg-tobacco/[0.97] dark:bg-[#1a1410]/[0.97] backdrop-blur-sm border-b-2 border-gold px-5 py-3 flex items-center justify-between md:hidden">
+      <header className="sticky top-0 z-40 bg-tobacco/[0.97] backdrop-blur-sm border-b-2 border-gold px-5 py-3 flex items-center justify-between md:hidden">
         <div>
           <div className="font-display text-2xl font-black text-amber tracking-tight">
             Havana <span className="text-green-light italic">Cleaning</span>
@@ -34,7 +34,7 @@ export default function AccountLayout({
 
       {/* Desktop top bar */}
       <div className="hidden md:block">
-        <div className="sticky top-0 z-40 bg-tobacco/[0.97] dark:bg-[#1a1410]/[0.97] backdrop-blur-sm border-b-2 border-gold px-8 h-14 flex items-center justify-between">
+        <div className="sticky top-0 z-40 bg-tobacco/[0.97] backdrop-blur-sm border-b-2 border-gold px-8 h-14 flex items-center justify-between">
           <div className="flex items-center">
             <span className="font-display text-2xl font-black text-amber tracking-tight">
               Havana <span className="text-green-light italic">Cleaning</span>

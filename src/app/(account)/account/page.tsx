@@ -20,13 +20,13 @@ import { ServiceIcon } from "@/lib/service-icons";
 import { BookingPayment } from "@/components/website/BookingPayment";
 import { PortalBookingWizard } from "@/components/website/PortalBookingWizard";
 
-/* ─── Dark mode card class helpers (same as employee portal) ─── */
-const CARD = "bg-white dark:bg-[#231c16] rounded-2xl border border-gray-100 dark:border-[#3a2f25] shadow-sm p-5";
-const INNER_BORDER = "border-gray-100 dark:border-[#3a2f25]";
-const INNER_BG = "bg-ivory/50 dark:bg-[#1a1410]";
-const TEXT_PRIMARY = "text-tobacco dark:text-cream";
-const TEXT_MUTED = "text-gray-400 dark:text-sand/70";
-const INPUT_CLS = "w-full px-3 py-2 border border-gray-200 dark:border-[#3a2f25] rounded-lg text-sm bg-white dark:bg-[#1a1410] dark:text-cream focus:outline-none focus:ring-2 focus:ring-green/30";
+/* ─── Card class helpers (always-dark portal on tobacco bg) ─── */
+const CARD = "bg-[#231c16] rounded-2xl border border-[#3a2f25] shadow-sm p-5";
+const INNER_BORDER = "border-[#3a2f25]";
+const INNER_BG = "bg-[#1a1410]";
+const TEXT_PRIMARY = "text-cream";
+const TEXT_MUTED = "text-sand/70";
+const INPUT_CLS = "w-full px-3 py-2 border border-[#3a2f25] rounded-lg text-sm bg-[#1a1410] text-cream focus:outline-none focus:ring-2 focus:ring-green/30";
 
 /* ─── Helpers ─── */
 const statusColors: Record<string, string> = {
@@ -35,7 +35,7 @@ const statusColors: Record<string, string> = {
   IN_PROGRESS: "bg-teal/10 text-teal",
   COMPLETED: "bg-green/20 text-green",
   CANCELLED: "bg-red/10 text-red-500",
-  NO_SHOW: "bg-gray-100 text-gray-500 dark:bg-[#1a1410] dark:text-sand/50",
+  NO_SHOW: "bg-[#1a1410] text-sand/50",
 };
 
 function fmtDate(dateStr: string) {
@@ -252,7 +252,7 @@ export default function CustomerDashboard() {
   return (
     <div className="space-y-5">
       {/* ═══ WELCOME BANNER ═══ */}
-      <div className="bg-gradient-to-r from-green-light to-green dark:from-green dark:to-[#1a3a2a] rounded-2xl p-6 text-white text-center">
+      <div className="bg-gradient-to-r from-green to-[#1a3a2a] rounded-2xl p-6 text-white text-center">
         <h1 className="font-display text-2xl">
           {greeting}, {firstName}
         </h1>
@@ -307,17 +307,17 @@ export default function CustomerDashboard() {
                         {fmtStatus(b.status)}
                       </span>
                     </div>
-                    <div className="text-gray-500 dark:text-sand/60 text-[0.78rem] space-y-0.5">
+                    <div className="text-sand/60 text-[0.78rem] space-y-0.5">
                       <div>{fmtDate(b.scheduledDate)} &middot; <span className="capitalize">{b.scheduledTime}</span></div>
                       {b.address && (
                         <div className="flex items-start gap-1">
-                          <MapPin className="w-3 h-3 mt-0.5 shrink-0 text-gray-400 dark:text-sand/50" />
+                          <MapPin className="w-3 h-3 mt-0.5 shrink-0 text-sand/50" />
                           {b.address.street}{b.address.unit && ` ${b.address.unit}`}, {b.address.city}
                         </div>
                       )}
                       {b.assignments.length > 0 && (
                         <div className="flex items-center gap-1">
-                          <User className="w-3 h-3 shrink-0 text-gray-400 dark:text-sand/50" />
+                          <User className="w-3 h-3 shrink-0 text-sand/50" />
                           {b.assignments.map((a) => a.employee.name).join(", ")}
                         </div>
                       )}
@@ -386,7 +386,7 @@ export default function CustomerDashboard() {
               <button
                 key={f}
                 onClick={() => { setBookingsFilter(f); setShowAllBookings(false); }}
-                className={`px-3 py-1.5 rounded-lg text-[0.78rem] font-medium transition-colors capitalize ${bookingsFilter === f ? "bg-green text-white" : "bg-gray-100 dark:bg-[#1a1410] text-gray-500 dark:text-sand/70"}`}
+                className={`px-3 py-1.5 rounded-lg text-[0.78rem] font-medium transition-colors capitalize ${bookingsFilter === f ? "bg-green text-white" : "bg-[#1a1410] text-sand/70"}`}
               >
                 {f}
               </button>
@@ -410,7 +410,7 @@ export default function CustomerDashboard() {
                             {fmtStatus(b.status)}
                           </span>
                         </div>
-                        <div className="text-gray-500 dark:text-sand/60 text-[0.72rem] space-y-0.5">
+                        <div className="text-sand/60 text-[0.72rem] space-y-0.5">
                           <div>{fmtDate(b.scheduledDate)} &middot; <span className="capitalize">{b.scheduledTime}</span></div>
                           <div className={TEXT_MUTED}>#{b.bookingNumber}</div>
                           {b.address && (
@@ -529,7 +529,7 @@ export default function CustomerDashboard() {
                         <span className="text-[0.6rem] bg-green/10 text-green px-1.5 py-0.5 rounded-full uppercase tracking-wider">Default</span>
                       )}
                     </div>
-                    <div className="text-gray-500 dark:text-sand/60 text-[0.72rem] truncate">
+                    <div className="text-sand/60 text-[0.72rem] truncate">
                       {addr.street}{addr.unit && ` ${addr.unit}`}, {addr.city}, {addr.state} {addr.zipCode}
                     </div>
                   </div>
@@ -562,15 +562,15 @@ export default function CustomerDashboard() {
           <div className="flex-1 space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="text-[0.72rem] font-medium text-gray-500 dark:text-sand/60 block mb-1">Name</label>
+                <label className="text-[0.72rem] font-medium text-sand/60 block mb-1">Name</label>
                 <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} className={INPUT_CLS} />
               </div>
               <div>
-                <label className="text-[0.72rem] font-medium text-gray-500 dark:text-sand/60 block mb-1">Phone</label>
+                <label className="text-[0.72rem] font-medium text-sand/60 block mb-1">Phone</label>
                 <input type="tel" value={profilePhone} onChange={(e) => setProfilePhone(e.target.value)} className={INPUT_CLS} />
               </div>
               <div>
-                <label className="text-[0.72rem] font-medium text-gray-500 dark:text-sand/60 block mb-1">Language</label>
+                <label className="text-[0.72rem] font-medium text-sand/60 block mb-1">Language</label>
                 <select value={profileLocale} onChange={(e) => setProfileLocale(e.target.value)} className={INPUT_CLS}>
                   <option value="en">English</option>
                   <option value="es">Espa&ntilde;ol</option>
@@ -600,10 +600,10 @@ export default function CustomerDashboard() {
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setPayingBooking(null)} />
           {/* Modal */}
-          <div className="relative bg-white dark:bg-[#231c16] rounded-2xl border border-gray-100 dark:border-[#3a2f25] shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-[#3a2f25]">
+          <div className="relative bg-[#231c16] rounded-2xl border border-[#3a2f25] shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-5 border-b border-[#3a2f25]">
               <h3 className={`font-display text-lg ${TEXT_PRIMARY}`}>Complete Payment</h3>
-              <button onClick={() => setPayingBooking(null)} className={`${TEXT_MUTED} hover:text-tobacco dark:hover:text-cream`}>
+              <button onClick={() => setPayingBooking(null)} className={`${TEXT_MUTED} hover:text-cream`}>
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -614,7 +614,7 @@ export default function CustomerDashboard() {
                   <ServiceIcon emoji={payingBooking.service.icon} className="w-5 h-5 text-green" />
                   <span className={`font-display text-[1rem] ${TEXT_PRIMARY}`}>{payingBooking.service.name}</span>
                 </div>
-                <div className="text-gray-500 dark:text-sand/60 text-[0.82rem] space-y-1">
+                <div className="text-sand/60 text-[0.82rem] space-y-1">
                   <div>{fmtDate(payingBooking.scheduledDate)} &middot; <span className="capitalize">{payingBooking.scheduledTime}</span></div>
                   {payingBooking.address && (
                     <div className="flex items-start gap-1">

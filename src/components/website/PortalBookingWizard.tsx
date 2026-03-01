@@ -5,13 +5,13 @@ import { X, ChevronLeft } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
 import { TIME_SLOTS } from "@/lib/constants";
 
-/* ─── Dark mode constants (matching account portal) ─── */
-const INNER_BORDER = "border-gray-100 dark:border-[#3a2f25]";
-const INNER_BG = "bg-ivory/50 dark:bg-[#1a1410]";
-const TEXT_PRIMARY = "text-tobacco dark:text-cream";
-const TEXT_MUTED = "text-gray-400 dark:text-sand/70";
+/* ─── Card constants (always-dark portal on tobacco bg) ─── */
+const INNER_BORDER = "border-[#3a2f25]";
+const INNER_BG = "bg-[#1a1410]";
+const TEXT_PRIMARY = "text-cream";
+const TEXT_MUTED = "text-sand/70";
 const INPUT_CLS =
-  "w-full px-3 py-2.5 border border-gray-200 dark:border-[#3a2f25] rounded-lg text-sm bg-white dark:bg-[#1a1410] dark:text-cream focus:outline-none focus:ring-2 focus:ring-green/30";
+  "w-full px-3 py-2.5 border border-[#3a2f25] rounded-lg text-sm bg-[#1a1410] text-cream focus:outline-none focus:ring-2 focus:ring-green/30";
 const LABEL_CLS = "block text-[0.72rem] font-medium uppercase tracking-wider mb-1.5";
 
 interface ServiceOption {
@@ -159,7 +159,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-white dark:bg-[#231c16] rounded-2xl border border-gray-100 dark:border-[#3a2f25] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-[#231c16] rounded-2xl border border-[#3a2f25] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className={`flex items-center justify-between p-5 border-b ${INNER_BORDER}`}>
           <div className="flex items-center gap-3">
@@ -172,7 +172,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
               {step === 1 ? "Choose Service" : step === 2 ? "Schedule & Add-Ons" : "Address & Review"}
             </h3>
           </div>
-          <button onClick={onClose} className={`${TEXT_MUTED} hover:text-tobacco dark:hover:text-cream`}>
+          <button onClick={onClose} className={`${TEXT_MUTED} hover:text-cream`}>
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -184,7 +184,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[0.8rem] font-semibold transition-colors ${s <= step ? "bg-green text-white" : `${INNER_BG} ${TEXT_MUTED}`}`}>
                 {s}
               </div>
-              {s < 3 && <div className={`w-12 h-0.5 ${s < step ? "bg-green" : "bg-gray-200 dark:bg-[#3a2f25]"}`} />}
+              {s < 3 && <div className={`w-12 h-0.5 ${s < step ? "bg-green" : "bg-[#3a2f25]"}`} />}
             </div>
           ))}
         </div>
@@ -199,7 +199,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                     key={s.id}
                     type="button"
                     onClick={() => setServiceId(s.id)}
-                    className={`border rounded-xl p-3 text-center transition-all ${serviceId === s.id ? "border-green bg-green/5 dark:bg-green/10 ring-2 ring-green/30" : `${INNER_BORDER} hover:border-green/30`}`}
+                    className={`border rounded-xl p-3 text-center transition-all ${serviceId === s.id ? "border-green bg-green/10 ring-2 ring-green/30" : `${INNER_BORDER} hover:border-green/30`}`}
                   >
                     <ServiceIcon emoji={s.icon} className={`w-7 h-7 mx-auto mb-1 ${TEXT_MUTED}`} />
                     <div className={`text-[0.78rem] font-medium ${TEXT_PRIMARY}`}>{s.name}</div>
@@ -242,7 +242,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                       key={r.value}
                       type="button"
                       onClick={() => setRecurrence(r.value)}
-                      className={`border rounded-xl py-2.5 px-2 text-center transition-all text-[0.78rem] ${recurrence === r.value ? "border-green bg-green/5 dark:bg-green/10 ring-2 ring-green/30" : `${INNER_BORDER} hover:border-green/30`}`}
+                      className={`border rounded-xl py-2.5 px-2 text-center transition-all text-[0.78rem] ${recurrence === r.value ? "border-green bg-green/10 ring-2 ring-green/30" : `${INNER_BORDER} hover:border-green/30`}`}
                     >
                       <div className={`font-medium ${TEXT_PRIMARY}`}>{r.label}</div>
                       {"discount" in r && <div className="text-green text-[0.68rem] mt-0.5">{r.discount}</div>}
@@ -289,7 +289,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                         key={addon.id}
                         type="button"
                         onClick={() => toggleAddOn(addon.id)}
-                        className={`border rounded-xl px-3 py-2.5 text-left transition-all text-[0.82rem] flex items-center justify-between ${selectedAddOns.includes(addon.id) ? "border-green bg-green/5 dark:bg-green/10" : `${INNER_BORDER} hover:border-green/30`}`}
+                        className={`border rounded-xl px-3 py-2.5 text-left transition-all text-[0.82rem] flex items-center justify-between ${selectedAddOns.includes(addon.id) ? "border-green bg-green/10" : `${INNER_BORDER} hover:border-green/30`}`}
                       >
                         <span className={TEXT_PRIMARY}>{addon.name}</span>
                         <span className="text-amber font-medium text-[0.78rem]">+{fmtCurrency(addon.price)}</span>
@@ -334,10 +334,10 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                         key={addr.id}
                         type="button"
                         onClick={() => { setAddressId(addr.id); setUseNewAddress(false); }}
-                        className={`w-full border rounded-xl px-3 py-2.5 text-left transition-all ${!useNewAddress && addressId === addr.id ? "border-green bg-green/5 dark:bg-green/10 ring-2 ring-green/30" : `${INNER_BORDER} hover:border-green/30`}`}
+                        className={`w-full border rounded-xl px-3 py-2.5 text-left transition-all ${!useNewAddress && addressId === addr.id ? "border-green bg-green/10 ring-2 ring-green/30" : `${INNER_BORDER} hover:border-green/30`}`}
                       >
                         <div className={`font-medium text-[0.82rem] ${TEXT_PRIMARY}`}>{addr.label}</div>
-                        <div className="text-gray-500 dark:text-sand/60 text-[0.72rem]">
+                        <div className="text-sand/60 text-[0.72rem]">
                           {addr.street}{addr.unit && ` ${addr.unit}`}, {addr.city}, {addr.state} {addr.zipCode}
                         </div>
                       </button>
@@ -408,7 +408,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                   </div>
                 </div>
 
-                <div className="mt-3 text-gray-500 dark:text-sand/60 text-[0.72rem] space-y-0.5">
+                <div className="mt-3 text-sand/60 text-[0.72rem] space-y-0.5">
                   <div>{scheduledDate && new Date(scheduledDate + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })} &middot; <span className="capitalize">{scheduledTime}</span></div>
                   {!useNewAddress && addresses.find((a) => a.id === addressId) && (
                     <div>{addresses.find((a) => a.id === addressId)!.street}, {addresses.find((a) => a.id === addressId)!.city}</div>

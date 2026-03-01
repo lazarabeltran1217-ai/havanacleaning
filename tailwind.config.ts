@@ -11,7 +11,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        tobacco: "#1a1410",
+        tobacco: "#2C1810",
         rum: "#5C2E00",
         gold: "#C9941A",
         amber: "#E8A820",
