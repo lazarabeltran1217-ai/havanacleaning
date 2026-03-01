@@ -1,7 +1,8 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Calendar,
@@ -13,8 +14,11 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
+  X,
+  CheckCircle,
 } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
+import { BookingPayment } from "@/components/website/BookingPayment";
 
 /* ─── Dark mode card class helpers (same as employee portal) ─── */
 const CARD = "bg-white dark:bg-[#231c16] rounded-2xl border border-gray-100 dark:border-[#3a2f25] shadow-sm p-5";
@@ -84,17 +88,23 @@ interface DashboardData {
   allBookings: BookingData[];
   addresses: AddressData[];
   stats: { totalBookings: number; totalSpent: number };
+  stripeKey: string;
 }
 
 /* ─── Main Dashboard ─── */
 export default function CustomerDashboard() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
 
   // Bookings filter
   const [bookingsFilter, setBookingsFilter] = useState<"all" | "upcoming" | "completed" | "cancelled">("all");
   const [showAllBookings, setShowAllBookings] = useState(false);
+
+  // Payment modal
+  const [payingBooking, setPayingBooking] = useState<BookingData | null>(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   // Address form
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -113,8 +123,8 @@ export default function CustomerDashboard() {
   const [profileMessage, setProfileMessage] = useState("");
 
   /* ─── Fetch All Data ─── */
-  useEffect(() => {
-    fetch("/api/account/dashboard")
+  const fetchDashboard = useCallback(() => {
+    return fetch("/api/account/dashboard")
       .then((r) => r.json())
       .then((d) => {
         if (!d.error) {
@@ -129,6 +139,28 @@ export default function CustomerDashboard() {
       })
       .catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => { fetchDashboard(); }, [fetchDashboard]);
+
+  /* ─── Handle 3DS redirect back ─── */
+  useEffect(() => {
+    const redirectStatus = searchParams.get("redirect_status");
+    const paymentIntent = searchParams.get("payment_intent");
+    if (redirectStatus === "succeeded" && paymentIntent) {
+      fetch("/api/payments/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentIntentId: paymentIntent }),
+      })
+        .then(() => {
+          setPaymentSuccess(true);
+          fetchDashboard();
+          // Clean URL
+          window.history.replaceState({}, "", "/account");
+        })
+        .catch(() => {});
+    }
+  }, [searchParams, fetchDashboard]);
 
   /* ─── Profile Save ─── */
   const handleProfileSave = async () => {
@@ -263,12 +295,12 @@ export default function CustomerDashboard() {
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-green font-semibold text-[0.88rem]">{fmtCurrency(b.total)}</span>
                       {b.status === "CONFIRMED" && !isPaid && (
-                        <Link
-                          href={`/account/bookings/${b.id}/pay`}
+                        <button
+                          onClick={() => setPayingBooking(b)}
                           className="flex items-center gap-1 px-3 py-1.5 bg-green text-white rounded-lg text-[0.75rem] font-semibold hover:bg-green/90 transition-colors"
                         >
                           <CreditCard className="w-3 h-3" /> Pay Now
-                        </Link>
+                        </button>
                       )}
                     </div>
                   </div>
@@ -362,12 +394,12 @@ export default function CustomerDashboard() {
                       <div className="text-right space-y-1">
                         <div className="text-green font-semibold text-[0.85rem]">{fmtCurrency(b.total)}</div>
                         {b.status === "CONFIRMED" && !isPaid && (
-                          <Link
-                            href={`/account/bookings/${b.id}/pay`}
+                          <button
+                            onClick={() => setPayingBooking(b)}
                             className="inline-flex items-center gap-1 bg-green text-white px-3 py-1.5 text-[0.7rem] font-semibold rounded-lg hover:bg-green/90 transition-colors"
                           >
                             <CreditCard className="w-3 h-3" /> Pay
-                          </Link>
+                          </button>
                         )}
                       </div>
                     </div>
@@ -525,6 +557,67 @@ export default function CustomerDashboard() {
           </div>
         </div>
       </div>
+
+      {/* ═══ PAYMENT MODAL ═══ */}
+      {payingBooking && data.stripeKey && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setPayingBooking(null)} />
+          {/* Modal */}
+          <div className="relative bg-white dark:bg-[#231c16] rounded-2xl border border-gray-100 dark:border-[#3a2f25] shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-[#3a2f25]">
+              <h3 className={`font-display text-lg ${TEXT_PRIMARY}`}>Complete Payment</h3>
+              <button onClick={() => setPayingBooking(null)} className={`${TEXT_MUTED} hover:text-tobacco dark:hover:text-cream`}>
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-5">
+              {/* Booking summary */}
+              <div className={`${INNER_BG} rounded-xl p-4 mb-4`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <ServiceIcon emoji={payingBooking.service.icon} className="w-5 h-5 text-green" />
+                  <span className={`font-display text-[1rem] ${TEXT_PRIMARY}`}>{payingBooking.service.name}</span>
+                </div>
+                <div className="text-gray-500 dark:text-sand/60 text-[0.82rem] space-y-1">
+                  <div>{fmtDate(payingBooking.scheduledDate)} &middot; <span className="capitalize">{payingBooking.scheduledTime}</span></div>
+                  {payingBooking.address && (
+                    <div className="flex items-start gap-1">
+                      <MapPin className="w-3 h-3 mt-0.5 shrink-0" />
+                      {payingBooking.address.street}{payingBooking.address.unit && ` ${payingBooking.address.unit}`}, {payingBooking.address.city}, {payingBooking.address.state} {payingBooking.address.zipCode}
+                    </div>
+                  )}
+                </div>
+                <div className={`mt-3 pt-3 border-t ${INNER_BORDER} flex justify-between font-semibold`}>
+                  <span className={TEXT_PRIMARY}>Total</span>
+                  <span className="text-green text-lg">{fmtCurrency(payingBooking.total)}</span>
+                </div>
+              </div>
+              {/* Stripe payment form */}
+              <BookingPayment
+                bookingId={payingBooking.id}
+                amount={payingBooking.total}
+                stripeKey={data.stripeKey}
+                returnUrl="/account"
+                onSuccess={() => {
+                  setPayingBooking(null);
+                  setPaymentSuccess(true);
+                  fetchDashboard();
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ PAYMENT SUCCESS TOAST ═══ */}
+      {paymentSuccess && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
+          <CheckCircle className="w-5 h-5" /> Payment successful!
+          <button onClick={() => setPaymentSuccess(false)} className="ml-2 text-white/70 hover:text-white">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

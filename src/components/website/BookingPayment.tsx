@@ -15,9 +15,10 @@ interface Props {
   amount: number;
   returnUrl?: string;
   stripeKey: string;
+  onSuccess?: () => void;
 }
 
-function PaymentForm({ returnUrl }: { returnUrl: string }) {
+function PaymentForm({ returnUrl, onSuccess }: { returnUrl: string; onSuccess?: () => void }) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -30,16 +31,23 @@ function PaymentForm({ returnUrl }: { returnUrl: string }) {
     setLoading(true);
     setError("");
 
-    const { error: submitError } = await stripe.confirmPayment({
+    const result = await stripe.confirmPayment({
       elements,
       confirmParams: {
         return_url: `${window.location.origin}${returnUrl}`,
       },
+      redirect: "if_required",
     });
 
-    if (submitError) {
-      setError(submitError.message || "Payment failed");
+    if (result.error) {
+      setError(result.error.message || "Payment failed");
       setLoading(false);
+    } else if (result.paymentIntent?.status === "succeeded") {
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        window.location.href = `${returnUrl}?redirect_status=succeeded&payment_intent=${result.paymentIntent.id}`;
+      }
     }
   }
 
@@ -62,7 +70,7 @@ function PaymentForm({ returnUrl }: { returnUrl: string }) {
   );
 }
 
-export function BookingPayment({ bookingId, amount, returnUrl = "/account/bookings", stripeKey }: Props) {
+export function BookingPayment({ bookingId, amount, returnUrl = "/account", stripeKey, onSuccess }: Props) {
   const [clientSecret, setClientSecret] = useState("");
   const [error, setError] = useState("");
   const [paid, setPaid] = useState(false);
@@ -127,7 +135,7 @@ export function BookingPayment({ bookingId, amount, returnUrl = "/account/bookin
         stripe={stripePromise}
         options={{ clientSecret, appearance: { theme: "stripe" } }}
       >
-        <PaymentForm returnUrl={returnUrl} />
+        <PaymentForm returnUrl={returnUrl} onSuccess={onSuccess} />
       </Elements>
     </div>
   );
