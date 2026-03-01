@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export default function RegisterPage() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/account";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -43,7 +46,7 @@ export default function RegisterPage() {
       await signIn("credentials", {
         email,
         password,
-        callbackUrl: "/account",
+        callbackUrl,
       });
     } catch {
       setError("Something went wrong. Please try again.");
@@ -147,7 +150,7 @@ export default function RegisterPage() {
 
           <p className="text-center text-[0.85rem] text-sand">
             Already have an account?{" "}
-            <Link href="/login" className="text-green hover:underline">
+            <Link href={`/login${callbackUrl !== "/account" ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`} className="text-green hover:underline">
               Sign In
             </Link>
           </p>

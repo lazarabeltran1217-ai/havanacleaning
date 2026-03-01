@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import { TIME_SLOTS } from "@/lib/constants";
 import { ServiceIcon } from "@/lib/service-icons";
@@ -276,14 +277,39 @@ export function BookingWizard({ services, addOns }: Props) {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => serviceId && setStep(2)}
-            disabled={!serviceId}
-            className="w-full bg-gold text-tobacco py-4 text-[0.9rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            Continue
-          </button>
+          {/* Auth prompt */}
+          {!session && serviceId && (
+            <div className="bg-tobacco/5 border border-tobacco/15 rounded-lg px-5 py-4 text-center">
+              <p className="text-[0.88rem] mb-3">
+                To book a cleaning, please sign in or create an account.
+              </p>
+              <div className="flex gap-3 justify-center">
+                <Link
+                  href={`/login?callbackUrl=/book${selectedService ? `?service=${selectedService.slug}` : ""}`}
+                  className="px-6 py-2.5 border border-tobacco/20 rounded-[3px] text-[0.85rem] font-medium hover:bg-tobacco/5 transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href={`/register?callbackUrl=/book${selectedService ? `?service=${selectedService.slug}` : ""}`}
+                  className="px-6 py-2.5 bg-green text-white rounded-[3px] text-[0.85rem] font-medium hover:bg-green/90 transition-colors"
+                >
+                  Create Account
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {session && (
+            <button
+              type="button"
+              onClick={() => serviceId && setStep(2)}
+              disabled={!serviceId}
+              className="w-full bg-gold text-tobacco py-4 text-[0.9rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Continue
+            </button>
+          )}
         </div>
       )}
 
@@ -436,6 +462,17 @@ export function BookingWizard({ services, addOns }: Props) {
           {/* ORDER SUMMARY */}
           <div className="bg-white border border-tobacco/10 rounded-lg p-6 mt-6">
             <h3 className="font-display text-lg mb-4">Order Summary</h3>
+            {session && (
+              <div className="flex items-center gap-3 mb-4 pb-3 border-b border-tobacco/10">
+                <div className="w-8 h-8 bg-green/10 rounded-full flex items-center justify-center text-green text-[0.8rem] font-semibold">
+                  {session.user?.name?.charAt(0)?.toUpperCase() || "?"}
+                </div>
+                <div>
+                  <div className="text-[0.88rem] font-medium">{session.user?.name}</div>
+                  <div className="text-[0.78rem] text-sand">{session.user?.email}</div>
+                </div>
+              </div>
+            )}
             <div className="space-y-2 text-[0.9rem]">
               <div className="flex justify-between">
                 <span>{selectedService?.name} ({bedrooms} bed / {bathrooms} bath)</span>
