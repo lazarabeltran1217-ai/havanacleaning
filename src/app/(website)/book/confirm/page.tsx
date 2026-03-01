@@ -1,6 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { ServiceIcon } from "@/lib/service-icons";
@@ -17,9 +15,6 @@ interface Props {
 }
 
 export default async function ConfirmPage({ searchParams }: Props) {
-  const session = await getServerSession(authOptions);
-  if (!session) redirect("/login?callbackUrl=/book");
-
   const { bookingId } = await searchParams;
   if (!bookingId) redirect("/book");
 
@@ -30,7 +25,7 @@ export default async function ConfirmPage({ searchParams }: Props) {
     },
   });
 
-  if (!booking || booking.customerId !== session.user.id) notFound();
+  if (!booking) notFound();
 
   return (
     <section className="bg-ivory min-h-screen pt-36 pb-20 px-6 md:px-20">
@@ -53,15 +48,16 @@ export default async function ConfirmPage({ searchParams }: Props) {
 
         <p className="text-[#5a4535] text-[0.95rem] leading-relaxed mb-8">
           Thank you for your booking request. Our team will review your details
-          and reach out to confirm your appointment.
+          and reach out to confirm your appointment. You can log in with your
+          email and password to track your booking.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="/account/bookings"
+            href="/login?callbackUrl=/account/bookings"
             className="inline-block bg-green text-white px-8 py-3 rounded-[3px] font-semibold text-[0.9rem] hover:bg-green/90 transition-colors"
           >
-            View My Bookings
+            Log In to My Account
           </Link>
           <Link
             href="/book"
