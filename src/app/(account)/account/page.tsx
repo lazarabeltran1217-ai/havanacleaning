@@ -50,6 +50,13 @@ function fmtCurrency(amount: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amount);
 }
 
+function fmtPhone(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 10);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
 /* ─── Types ─── */
 interface BookingData {
   id: string;
@@ -567,7 +574,7 @@ export default function CustomerDashboard() {
               </div>
               <div>
                 <label className="text-[0.72rem] font-medium text-gray-500 dark:text-sand/60 block mb-1">Phone</label>
-                <input type="tel" value={profilePhone} onChange={(e) => setProfilePhone(e.target.value)} className={INPUT_CLS} />
+                <input type="tel" value={fmtPhone(profilePhone)} onChange={(e) => setProfilePhone(e.target.value.replace(/\D/g, "").slice(0, 10))} className={INPUT_CLS} />
               </div>
               <div>
                 <label className="text-[0.72rem] font-medium text-gray-500 dark:text-sand/60 block mb-1">Language</label>
