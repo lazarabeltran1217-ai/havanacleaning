@@ -4,7 +4,9 @@ import { PayrollActions, PayrollStatusButtonClient } from "@/components/admin/Pa
 
 const fetchPayrolls = () =>
   prisma.payroll.findMany({
-    include: { employee: { select: { name: true } } },
+    include: {
+      employee: { select: { name: true, stripeConnectOnboarded: true } },
+    },
     orderBy: { periodStart: "desc" },
     take: 50,
   });
@@ -71,11 +73,15 @@ export default async function AdminPayrollPage() {
                   <span className="text-sand font-medium">Net Pay</span>
                   <span className="font-medium text-green">{formatCurrency(p.netPay)}</span>
                 </div>
-                {p.status !== "PAID" && (
-                  <div className="pt-2 flex justify-end">
-                    <PayrollStatusButtonClient id={p.id} status={p.status} />
-                  </div>
-                )}
+                <div className="pt-2 flex justify-end">
+                  <PayrollStatusButtonClient
+                    id={p.id}
+                    status={p.status}
+                    netPay={p.netPay}
+                    stripeConnectOnboarded={p.employee.stripeConnectOnboarded}
+                    paidVia={p.paidVia}
+                  />
+                </div>
               </div>
             </div>
           );
@@ -133,9 +139,13 @@ export default async function AdminPayrollPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    {p.status !== "PAID" && (
-                      <PayrollStatusButtonClient id={p.id} status={p.status} />
-                    )}
+                    <PayrollStatusButtonClient
+                      id={p.id}
+                      status={p.status}
+                      netPay={p.netPay}
+                      stripeConnectOnboarded={p.employee.stripeConnectOnboarded}
+                      paidVia={p.paidVia}
+                    />
                   </td>
                 </tr>
               );

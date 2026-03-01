@@ -101,32 +101,101 @@ export function PayrollActions() {
   );
 }
 
-export function PayrollStatusButtonClient({ id, status }: { id: string; status: string }) {
+interface PayrollButtonProps {
+  id: string;
+  status: string;
+  netPay: number;
+  stripeConnectOnboarded?: boolean;
+  paidVia?: string | null;
+}
+
+export function PayrollStatusButtonClient({ id, status, netPay, stripeConnectOnboarded, paidVia }: PayrollButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const nextStatus = status === "DRAFT" ? "APPROVED" : "PAID";
-  const label = status === "DRAFT" ? "Approve" : "Mark Paid";
-  const color = status === "DRAFT" ? "text-teal" : "text-green";
+  // PAID — show payment method badge
+  if (status === "PAID") {
+    if (paidVia === "STRIPE_CONNECT") {
+      return <span className="text-[0.7rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium bg-teal/10 text-teal">Stripe</span>;
+    }
+    return null;
+  }
 
-  const handleUpdate = async () => {
+  // DRAFT → Approve
+  if (status === "DRAFT") {
+    const handleApprove = async () => {
+      setLoading(true);
+      await fetch(`/api/payroll/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "APPROVED" }),
+      });
+      setLoading(false);
+      router.refresh();
+    };
+
+    return (
+      <button
+        onClick={handleApprove}
+        disabled={loading}
+        className="text-teal text-[0.78rem] font-medium hover:underline disabled:opacity-50"
+      >
+        {loading ? "..." : "Approve"}
+      </button>
+    );
+  }
+
+  // APPROVED — Pay via Stripe or Mark Paid manually
+  const handleStripePay = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/payroll/${id}/pay`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Transfer failed");
+        return;
+      }
+    } catch {
+      setError("Transfer failed");
+    } finally {
+      setLoading(false);
+      router.refresh();
+    }
+  };
+
+  const handleMarkPaid = async () => {
     setLoading(true);
     await fetch(`/api/payroll/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: nextStatus }),
+      body: JSON.stringify({ status: "PAID", paidVia: "MANUAL" }),
     });
     setLoading(false);
     router.refresh();
   };
 
   return (
-    <button
-      onClick={handleUpdate}
-      disabled={loading}
-      className={`${color} text-[0.78rem] font-medium hover:underline disabled:opacity-50`}
-    >
-      {loading ? "..." : label}
-    </button>
+    <div className="flex items-center gap-2">
+      {stripeConnectOnboarded ? (
+        <button
+          onClick={handleStripePay}
+          disabled={loading}
+          className="px-3 py-1 bg-green text-white text-[0.78rem] font-medium rounded-lg hover:bg-green/90 disabled:opacity-50"
+        >
+          {loading ? "Paying..." : `Pay $${netPay.toFixed(2)}`}
+        </button>
+      ) : (
+        <button
+          onClick={handleMarkPaid}
+          disabled={loading}
+          className="text-green text-[0.78rem] font-medium hover:underline disabled:opacity-50"
+        >
+          {loading ? "..." : "Mark Paid"}
+        </button>
+      )}
+      {error && <span className="text-[0.72rem] text-red">{error}</span>}
+    </div>
   );
 }

@@ -10,6 +10,8 @@ interface EmployeeData {
   phone: string | null;
   hourlyRate: number | null;
   isActive: boolean;
+  stripeConnectAccountId: string | null;
+  stripeConnectOnboarded: boolean;
 }
 
 export function StaffEditButton({ employee }: { employee: EmployeeData }) {
@@ -25,6 +27,72 @@ export function StaffEditButton({ employee }: { employee: EmployeeData }) {
   const [hourlyRate, setHourlyRate] = useState(String(employee.hourlyRate || ""));
   const [isActive, setIsActive] = useState(employee.isActive);
   const [password, setPassword] = useState("");
+  const [stripeLoading, setStripeLoading] = useState(false);
+  const [stripeOnboarded, setStripeOnboarded] = useState(employee.stripeConnectOnboarded);
+  const [stripeAccountId, setStripeAccountId] = useState(employee.stripeConnectAccountId);
+
+  const handleStripeSetup = async () => {
+    setStripeLoading(true);
+    setMessage("");
+    try {
+      const res = await fetch("/api/stripe/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employeeId: employee.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setMessage(data.error || "Failed to create Stripe account");
+        return;
+      }
+      setStripeAccountId(data.accountId);
+      window.open(data.url, "_blank");
+    } catch {
+      setMessage("Failed to setup Stripe");
+    } finally {
+      setStripeLoading(false);
+    }
+  };
+
+  const handleStripeRefresh = async () => {
+    if (!stripeAccountId) return;
+    setStripeLoading(true);
+    setMessage("");
+    try {
+      const res = await fetch("/api/stripe/connect/onboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accountId: stripeAccountId }),
+      });
+      const data = await res.json();
+      if (res.ok) window.open(data.url, "_blank");
+      else setMessage(data.error || "Failed to generate link");
+    } catch {
+      setMessage("Failed to refresh link");
+    } finally {
+      setStripeLoading(false);
+    }
+  };
+
+  const handleStripeCheckStatus = async () => {
+    if (!stripeAccountId) return;
+    setStripeLoading(true);
+    try {
+      const res = await fetch(`/api/stripe/connect/status?accountId=${stripeAccountId}`);
+      const data = await res.json();
+      if (data.onboarded) {
+        setStripeOnboarded(true);
+        setMessage("Stripe payout ready!");
+        router.refresh();
+      } else {
+        setMessage("Onboarding not yet complete");
+      }
+    } catch {
+      setMessage("Failed to check status");
+    } finally {
+      setStripeLoading(false);
+    }
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -130,9 +198,50 @@ export function StaffEditButton({ employee }: { employee: EmployeeData }) {
               </div>
             </div>
 
+            {/* Stripe Connect Payout Section */}
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <label className="text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-2">Stripe Payout</label>
+              {stripeOnboarded ? (
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[0.78rem] font-medium bg-green/10 text-green">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                    Payout Ready
+                  </span>
+                </div>
+              ) : stripeAccountId ? (
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-[0.78rem] font-medium bg-amber/10 text-amber">
+                    Pending
+                  </span>
+                  <button
+                    onClick={handleStripeRefresh}
+                    disabled={stripeLoading}
+                    className="text-[0.78rem] text-teal hover:underline disabled:opacity-50"
+                  >
+                    {stripeLoading ? "..." : "Resend Link"}
+                  </button>
+                  <button
+                    onClick={handleStripeCheckStatus}
+                    disabled={stripeLoading}
+                    className="text-[0.78rem] text-gray-400 hover:underline disabled:opacity-50"
+                  >
+                    Check Status
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleStripeSetup}
+                  disabled={stripeLoading}
+                  className="px-4 py-2 bg-teal/10 text-teal rounded-lg text-sm font-medium hover:bg-teal/20 disabled:opacity-50"
+                >
+                  {stripeLoading ? "Setting up..." : "Setup Stripe Payout"}
+                </button>
+              )}
+            </div>
+
             {message && (
               <div className={`mt-3 text-[0.82rem] px-3 py-2 rounded-lg ${
-                message.includes("Failed") ? "bg-red/10 text-red" : "bg-green/10 text-green"
+                message.includes("Failed") || message.includes("not yet") ? "bg-red/10 text-red" : "bg-green/10 text-green"
               }`}>
                 {message}
               </div>

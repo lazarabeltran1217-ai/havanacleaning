@@ -65,6 +65,8 @@ export default async function AdminStaffPage() {
                   phone: emp.phone,
                   hourlyRate: emp.hourlyRate,
                   isActive: emp.isActive,
+                  stripeConnectAccountId: emp.stripeConnectAccountId,
+                  stripeConnectOnboarded: emp.stripeConnectOnboarded,
                 }} />
               </div>
             </div>
@@ -86,6 +88,7 @@ export default async function AdminStaffPage() {
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Rate</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Hire Date</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Jobs</th>
+              <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Payout</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Status</th>
               <th className="px-4 py-3"></th>
             </tr>
@@ -100,6 +103,15 @@ export default async function AdminStaffPage() {
                 <td className="px-4 py-3 text-gray-500">{emp.hireDate ? formatDate(emp.hireDate) : "—"}</td>
                 <td className="px-4 py-3">{emp._count.jobAssignments}</td>
                 <td className="px-4 py-3">
+                  {emp.stripeConnectOnboarded ? (
+                    <span className="text-[0.7rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium bg-green/10 text-green">Ready</span>
+                  ) : emp.stripeConnectAccountId ? (
+                    <span className="text-[0.7rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium bg-amber/10 text-amber">Pending</span>
+                  ) : (
+                    <span className="text-gray-300">—</span>
+                  )}
+                </td>
+                <td className="px-4 py-3">
                   <span className={`text-[0.7rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${emp.isActive ? "bg-green/10 text-green" : "bg-red/10 text-red"}`}>
                     {emp.isActive ? "Active" : "Inactive"}
                   </span>
@@ -112,13 +124,15 @@ export default async function AdminStaffPage() {
                     phone: emp.phone,
                     hourlyRate: emp.hourlyRate,
                     isActive: emp.isActive,
+                    stripeConnectAccountId: emp.stripeConnectAccountId,
+                    stripeConnectOnboarded: emp.stripeConnectOnboarded,
                   }} />
                 </td>
               </tr>
             ))}
             {employees.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-gray-400">No employees yet.</td>
+                <td colSpan={9} className="px-4 py-12 text-center text-gray-400">No employees yet.</td>
               </tr>
             )}
           </tbody>

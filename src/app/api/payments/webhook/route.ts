@@ -24,8 +24,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  if (event.type === "payment_intent.succeeded") {
-    const paymentIntent = event.data.object;
+  const eventType = event.type as string;
+
+  if (eventType === "payment_intent.succeeded") {
+    const paymentIntent = event.data.object as { id: string; metadata?: Record<string, string> };
     const bookingId = paymentIntent.metadata?.bookingId;
 
     if (bookingId) {
@@ -46,13 +48,42 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  if (event.type === "payment_intent.payment_failed") {
-    const paymentIntent = event.data.object;
+  if (eventType === "payment_intent.payment_failed") {
+    const paymentIntent = event.data.object as { id: string };
 
     await prisma.payment.updateMany({
       where: { stripePaymentIntentId: paymentIntent.id },
       data: { status: "FAILED" },
     });
+  }
+
+  // Stripe Connect: contractor finished onboarding
+  if (eventType === "account.updated") {
+    const account = event.data.object as { id: string; details_submitted?: boolean; payouts_enabled?: boolean };
+    if (account.details_submitted && account.payouts_enabled) {
+      await prisma.user.updateMany({
+        where: { stripeConnectAccountId: account.id },
+        data: { stripeConnectOnboarded: true },
+      });
+    }
+  }
+
+  // Stripe Connect: transfer to contractor failed
+  if (eventType === "transfer.failed") {
+    const transfer = event.data.object as { id: string; metadata?: Record<string, string> };
+    const payrollId = transfer.metadata?.payrollId;
+    if (payrollId) {
+      console.error("Transfer failed for payroll:", payrollId, transfer.id);
+      await prisma.payroll.update({
+        where: { id: payrollId },
+        data: {
+          status: "APPROVED",
+          paidAt: null,
+          paidVia: null,
+          stripeTransferId: null,
+        },
+      });
+    }
   }
 
   return NextResponse.json({ received: true });

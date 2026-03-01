@@ -100,9 +100,11 @@ model User {
   avatar            String?
   hourlyRate        Float?
   hireDate          DateTime?
-  stripeCustomerId  String?
-  locale            String    @default("en")
-  isActive          Boolean   @default(true)
+  stripeCustomerId        String?
+  stripeConnectAccountId  String?
+  stripeConnectOnboarded  Boolean   @default(false)
+  locale                  String    @default("en")
+  isActive                Boolean   @default(true)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -394,6 +396,7 @@ model Payroll {
   status               PayrollStatus @default(DRAFT)
   paidAt               DateTime?
   paidVia              String?
+  stripeTransferId     String?
   createdAt            DateTime      @default(now())
 
   employee User @relation(fields: [employeeId], references: [id])
