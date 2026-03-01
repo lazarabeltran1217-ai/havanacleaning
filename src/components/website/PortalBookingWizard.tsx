@@ -5,13 +5,13 @@ import { X, ChevronLeft } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
 import { TIME_SLOTS } from "@/lib/constants";
 
-/* ─── Card constants (homepage-matching gold/tobacco scheme) ─── */
-const INNER_BORDER = "border-gold/15";
-const INNER_BG = "bg-white/[0.03]";
-const TEXT_PRIMARY = "text-cream";
-const TEXT_MUTED = "text-sand/70";
+/* ─── Card constants (light / dark) ─── */
+const INNER_BORDER = "border-gray-200 dark:border-gold/15";
+const INNER_BG = "bg-gray-50 dark:bg-[#2f1f14]";
+const TEXT_PRIMARY = "text-tobacco dark:text-cream";
+const TEXT_MUTED = "text-gray-500 dark:text-sand/70";
 const INPUT_CLS =
-  "w-full px-3 py-2.5 border border-gold/20 rounded-lg text-sm bg-white/[0.05] text-cream placeholder:text-sand/40 focus:outline-none focus:ring-2 focus:ring-gold/30";
+  "w-full px-3 py-2.5 border border-gray-300 dark:border-gold/20 rounded-lg text-sm bg-white dark:bg-[#2f1f14] text-tobacco dark:text-cream placeholder:text-gray-400 dark:placeholder:text-sand/40 focus:outline-none focus:ring-2 focus:ring-gold/30";
 const LABEL_CLS = "block text-[0.72rem] font-medium uppercase tracking-wider mb-1.5";
 
 interface ServiceOption {
@@ -159,7 +159,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-tobacco rounded-2xl border border-gold/15 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-white dark:bg-[#382618] rounded-2xl border border-gray-200 dark:border-gold/15 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className={`flex items-center justify-between p-5 border-b ${INNER_BORDER}`}>
           <div className="flex items-center gap-3">
@@ -172,7 +172,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
               {step === 1 ? "Choose Service" : step === 2 ? "Schedule & Add-Ons" : "Address & Review"}
             </h3>
           </div>
-          <button onClick={onClose} className={`${TEXT_MUTED} hover:text-cream`}>
+          <button onClick={onClose} className={`${TEXT_MUTED} hover:text-tobacco dark:hover:text-cream`}>
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -184,7 +184,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[0.8rem] font-semibold transition-colors ${s <= step ? "bg-gold text-tobacco" : `${INNER_BG} ${TEXT_MUTED}`}`}>
                 {s}
               </div>
-              {s < 3 && <div className={`w-12 h-0.5 ${s < step ? "bg-gold" : "bg-gold/20"}`} />}
+              {s < 3 && <div className={`w-12 h-0.5 ${s < step ? "bg-gold" : "bg-gray-200 dark:bg-gold/20"}`} />}
             </div>
           ))}
         </div>
@@ -337,7 +337,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                         className={`w-full border rounded-xl px-3 py-2.5 text-left transition-all ${!useNewAddress && addressId === addr.id ? "border-gold bg-gold/10 ring-2 ring-gold/30" : `${INNER_BORDER} hover:border-gold/30`}`}
                       >
                         <div className={`font-medium text-[0.82rem] ${TEXT_PRIMARY}`}>{addr.label}</div>
-                        <div className="text-sand/60 text-[0.72rem]">
+                        <div className="text-gray-500 dark:text-sand/60 text-[0.72rem]">
                           {addr.street}{addr.unit && ` ${addr.unit}`}, {addr.city}, {addr.state} {addr.zipCode}
                         </div>
                       </button>
@@ -408,7 +408,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                   </div>
                 </div>
 
-                <div className="mt-3 text-sand/60 text-[0.72rem] space-y-0.5">
+                <div className="mt-3 text-gray-500 dark:text-sand/60 text-[0.72rem] space-y-0.5">
                   <div>{scheduledDate && new Date(scheduledDate + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })} &middot; <span className="capitalize">{scheduledTime}</span></div>
                   {!useNewAddress && addresses.find((a) => a.id === addressId) && (
                     <div>{addresses.find((a) => a.id === addressId)!.street}, {addresses.find((a) => a.id === addressId)!.city}</div>

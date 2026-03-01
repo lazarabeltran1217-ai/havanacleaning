@@ -5,12 +5,16 @@ import { Sun, Moon, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 export function AccountToolbar() {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
   const [locale, setLocale] = useState("en");
 
   useEffect(() => {
     const saved = localStorage.getItem("account-theme");
-    if (saved === "dark") {
+    // Default to dark if no preference saved
+    if (saved === "light") {
+      setIsDark(false);
+      document.documentElement.classList.remove("dark");
+    } else {
       setIsDark(true);
       document.documentElement.classList.add("dark");
     }
@@ -43,11 +47,11 @@ export function AccountToolbar() {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex items-center rounded-lg border border-gold/30 overflow-hidden">
+      <div className="flex items-center rounded-lg border border-gray-300 dark:border-gold/30 overflow-hidden">
         <button
           onClick={() => locale !== "en" && switchLocale("en")}
           className={`px-2.5 py-1.5 text-[0.7rem] font-semibold transition-colors ${
-            locale === "en" ? "bg-gold/20 text-amber" : "text-sand/70 hover:text-sand"
+            locale === "en" ? "bg-gold/20 text-amber" : "text-gray-500 dark:text-sand/70 hover:text-gray-700 dark:hover:text-sand"
           }`}
         >
           EN
@@ -55,7 +59,7 @@ export function AccountToolbar() {
         <button
           onClick={() => locale !== "es" && switchLocale("es")}
           className={`px-2.5 py-1.5 text-[0.7rem] font-semibold transition-colors ${
-            locale === "es" ? "bg-gold/20 text-amber" : "text-sand/70 hover:text-sand"
+            locale === "es" ? "bg-gold/20 text-amber" : "text-gray-500 dark:text-sand/70 hover:text-gray-700 dark:hover:text-sand"
           }`}
         >
           ES
@@ -64,14 +68,14 @@ export function AccountToolbar() {
 
       <button
         onClick={toggleDarkMode}
-        className="p-1.5 rounded-lg border border-gold/30 text-sand/70 hover:text-amber transition-colors"
+        className="p-1.5 rounded-lg border border-gray-300 dark:border-gold/30 text-gray-500 dark:text-sand/70 hover:text-amber transition-colors"
       >
         {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
       </button>
 
       <button
         onClick={() => signOut({ callbackUrl: "/login" })}
-        className="p-1.5 rounded-lg border border-gold/30 text-sand/70 hover:text-red transition-colors"
+        className="p-1.5 rounded-lg border border-gray-300 dark:border-gold/30 text-gray-500 dark:text-sand/70 hover:text-red-500 transition-colors"
         title="Sign Out"
       >
         <LogOut className="w-4 h-4" />
