@@ -15,7 +15,7 @@ export default async function AddressesPage() {
 
   return (
     <div>
-      <h2 className="font-display text-xl mb-6">My Addresses</h2>
+      <h2 className="font-display text-xl text-tobacco dark:text-cream mb-5">My Addresses</h2>
       <AddressManager
         initialAddresses={addresses.map((a) => ({
           id: a.id,
