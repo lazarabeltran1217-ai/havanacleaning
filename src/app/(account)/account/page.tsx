@@ -62,6 +62,7 @@ interface BookingData {
   service: { name: string; icon: string | null };
   address: { street: string; unit: string | null; city: string; state: string; zipCode: string } | null;
   payments: { status: string }[];
+  assignments: { employee: { name: string } }[];
 }
 
 interface AddressData {
@@ -291,6 +292,12 @@ export default function CustomerDashboard() {
                           {b.address.street}{b.address.unit && ` ${b.address.unit}`}, {b.address.city}
                         </div>
                       )}
+                      {b.assignments.length > 0 && (
+                        <div className="flex items-center gap-1">
+                          <User className="w-3 h-3 shrink-0 text-gray-400 dark:text-sand/50" />
+                          {b.assignments.map((a) => a.employee.name).join(", ")}
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-green font-semibold text-[0.88rem]">{fmtCurrency(b.total)}</span>
@@ -387,6 +394,12 @@ export default function CustomerDashboard() {
                             <div className="flex items-start gap-1">
                               <MapPin className="w-3 h-3 mt-0.5 shrink-0" />
                               {b.address.street}, {b.address.city}
+                            </div>
+                          )}
+                          {b.assignments.length > 0 && (
+                            <div className="flex items-center gap-1">
+                              <User className="w-3 h-3 shrink-0" />
+                              {b.assignments.map((a) => a.employee.name).join(", ")}
                             </div>
                           )}
                         </div>
