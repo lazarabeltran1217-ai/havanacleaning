@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { formatCurrency } from "@/lib/utils";
 import { TIME_SLOTS } from "@/lib/constants";
 import { ServiceIcon } from "@/lib/service-icons";
@@ -41,7 +40,6 @@ const RECURRENCE_DISCOUNT: Record<RecurrenceType, number> = {
 export function BookingWizard({ services, addOns }: Props) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { data: session } = useSession();
 
   const preselectedSlug = searchParams.get("service");
   const preselected = services.find((s) => s.slug === preselectedSlug);
@@ -155,7 +153,7 @@ export function BookingWizard({ services, addOns }: Props) {
     zipCode &&
     customerName.trim() &&
     customerEmail.trim() &&
-    (session || customerPassword.length >= 6);
+    customerPassword.length >= 6;
 
   return (
     <div>
@@ -453,25 +451,23 @@ export function BookingWizard({ services, addOns }: Props) {
                   className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
                 />
               </div>
-              {!session && (
-                <div>
-                  <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                    Create Password <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    type="password"
-                    value={customerPassword}
-                    onChange={(e) => setCustomerPassword(e.target.value)}
-                    placeholder="Min. 6 characters"
-                    minLength={6}
-                    required
-                    className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
-                  />
-                  <p className="text-[0.72rem] text-sand mt-1">
-                    Use this to log in and track your bookings
-                  </p>
-                </div>
-              )}
+              <div>
+                <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
+                  Create Password <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="password"
+                  value={customerPassword}
+                  onChange={(e) => setCustomerPassword(e.target.value)}
+                  placeholder="Min. 6 characters"
+                  minLength={6}
+                  required
+                  className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
+                />
+                <p className="text-[0.72rem] text-sand mt-1">
+                  Use this to log in and track your bookings
+                </p>
+              </div>
             </div>
           </div>
 

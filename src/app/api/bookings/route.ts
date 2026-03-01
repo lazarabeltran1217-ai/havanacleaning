@@ -9,8 +9,6 @@ import { hash } from "bcryptjs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-
   const body = await req.json();
   const {
     serviceId,
@@ -50,13 +48,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid service" }, { status: 400 });
   }
 
-  // Resolve customer: use session user if logged in, otherwise find/create by email
+  // Resolve customer: always use the provided email to find or create
+  if (!customerPassword || customerPassword.length < 6) {
+    return NextResponse.json(
+      { error: "Password must be at least 6 characters" },
+      { status: 400 }
+    );
+  }
+
   let customerId: string;
+  const email = customerEmail.trim().toLowerCase();
+  const existing = await prisma.user.findUnique({ where: { email } });
 
-  if (session) {
-    customerId = session.user.id;
-
-    // Update name/phone if the logged-in user changed them
+  if (existing) {
+    customerId = existing.id;
+    // Update name/phone for returning customer
     await prisma.user.update({
       where: { id: customerId },
       data: {
@@ -65,41 +71,19 @@ export async function POST(req: NextRequest) {
       },
     });
   } else {
-    // Guest booking — find existing customer or create one
-    const email = customerEmail.trim().toLowerCase();
-    const existing = await prisma.user.findUnique({ where: { email } });
+    // Create a new customer account
+    const hashedPassword = await hash(customerPassword, 12);
 
-    if (existing) {
-      customerId = existing.id;
-      // Update name/phone for returning guest
-      await prisma.user.update({
-        where: { id: customerId },
-        data: {
-          name: customerName.trim(),
-          ...(customerPhone ? { phone: customerPhone.trim() } : {}),
-        },
-      });
-    } else {
-      // Create a new customer account with their chosen password
-      if (!customerPassword || customerPassword.length < 6) {
-        return NextResponse.json(
-          { error: "Password must be at least 6 characters" },
-          { status: 400 }
-        );
-      }
-      const hashedPassword = await hash(customerPassword, 12);
-
-      const newUser = await prisma.user.create({
-        data: {
-          name: customerName.trim(),
-          email,
-          password: hashedPassword,
-          phone: customerPhone?.trim() || null,
-          role: "CUSTOMER",
-        },
-      });
-      customerId = newUser.id;
-    }
+    const newUser = await prisma.user.create({
+      data: {
+        name: customerName.trim(),
+        email,
+        password: hashedPassword,
+        phone: customerPhone?.trim() || null,
+        role: "CUSTOMER",
+      },
+    });
+    customerId = newUser.id;
   }
 
   // Calculate price server-side
