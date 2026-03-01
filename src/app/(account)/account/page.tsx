@@ -252,24 +252,24 @@ export default function CustomerDashboard() {
   return (
     <div className="space-y-5">
       {/* ═══ WELCOME BANNER ═══ */}
-      <div className="bg-gradient-to-r from-gold to-amber rounded-2xl p-6 text-tobacco text-center">
+      <div className="bg-gradient-to-r from-green to-green-light rounded-2xl p-6 text-white text-center">
         <h1 className="font-display text-2xl">
           {greeting}, {firstName}
         </h1>
-        <p className="text-tobacco/60 text-sm mt-1">
+        <p className="text-white/70 text-sm mt-1">
           {now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
         </p>
         <div className="flex flex-wrap justify-center gap-2 mt-3">
           {data.upcomingBookings.length > 0 && (
-            <span className="bg-tobacco/15 text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
+            <span className="bg-white/20 text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
               <Calendar className="w-3 h-3" /> {data.upcomingBookings.length} upcoming
             </span>
           )}
-          <span className="bg-tobacco/15 text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
+          <span className="bg-white/20 text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
             <ClipboardList className="w-3 h-3" /> {data.stats.totalBookings} total bookings
           </span>
           {data.addresses.length > 0 && (
-            <span className="bg-tobacco/15 text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
+            <span className="bg-white/20 text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
               <MapPin className="w-3 h-3" /> {data.addresses.length} addresses
             </span>
           )}
