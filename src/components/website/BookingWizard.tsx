@@ -63,25 +63,15 @@ export function BookingWizard({ services, addOns }: Props) {
   const [notes, setNotes] = useState("");
 
   // Step 3 — Contact info + Address
-  const [customerName, setCustomerName] = useState(session?.user?.name || "");
-  const [customerEmail, setCustomerEmail] = useState(
-    session?.user?.email || ""
-  );
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [customerPassword, setCustomerPassword] = useState("");
   const [street, setStreet] = useState("");
   const [unit, setUnit] = useState("");
   const [city, setCity] = useState("Miami");
   const [state] = useState("FL");
   const [zipCode, setZipCode] = useState("");
-
-  // Pre-fill from session when it loads
-  const [prefilled, setPrefilled] = useState(false);
-  if (session && !prefilled) {
-    if (session.user?.name && !customerName) setCustomerName(session.user.name);
-    if (session.user?.email && !customerEmail)
-      setCustomerEmail(session.user.email);
-    setPrefilled(true);
-  }
 
   // Price calculation
   const selectedService = services.find((s) => s.id === serviceId);
@@ -140,6 +130,7 @@ export function BookingWizard({ services, addOns }: Props) {
           customerName: customerName.trim(),
           customerEmail: customerEmail.trim().toLowerCase(),
           customerPhone: customerPhone.trim(),
+          customerPassword: customerPassword || undefined,
           address: { street, unit, city, state, zipCode },
         }),
       });
@@ -160,7 +151,11 @@ export function BookingWizard({ services, addOns }: Props) {
   }
 
   const canSubmit =
-    street && zipCode && customerName.trim() && customerEmail.trim();
+    street &&
+    zipCode &&
+    customerName.trim() &&
+    customerEmail.trim() &&
+    (session || customerPassword.length >= 6);
 
   return (
     <div>
@@ -419,7 +414,7 @@ export function BookingWizard({ services, addOns }: Props) {
             <div className="text-[0.78rem] text-sand uppercase tracking-wider mb-3">
               Your Contact Information
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
                   Full Name <span className="text-red-400">*</span>
@@ -458,6 +453,25 @@ export function BookingWizard({ services, addOns }: Props) {
                   className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
                 />
               </div>
+              {!session && (
+                <div>
+                  <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
+                    Create Password <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    value={customerPassword}
+                    onChange={(e) => setCustomerPassword(e.target.value)}
+                    placeholder="Min. 6 characters"
+                    minLength={6}
+                    required
+                    className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
+                  />
+                  <p className="text-[0.72rem] text-sand mt-1">
+                    Use this to log in and track your bookings
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

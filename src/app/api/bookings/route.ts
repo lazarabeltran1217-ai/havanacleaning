@@ -5,7 +5,6 @@ import { prisma } from "@/lib/prisma";
 import { generateBookingNumber } from "@/lib/booking-number";
 import { calculatePrice } from "@/lib/pricing";
 import { hash } from "bcryptjs";
-import { randomBytes } from "crypto";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +24,7 @@ export async function POST(req: NextRequest) {
     customerName,
     customerEmail,
     customerPhone,
+    customerPassword,
     address,
   } = body;
 
@@ -80,9 +80,14 @@ export async function POST(req: NextRequest) {
         },
       });
     } else {
-      // Create a new customer with a random password (they can reset later)
-      const tempPassword = randomBytes(16).toString("hex");
-      const hashedPassword = await hash(tempPassword, 12);
+      // Create a new customer account with their chosen password
+      if (!customerPassword || customerPassword.length < 6) {
+        return NextResponse.json(
+          { error: "Password must be at least 6 characters" },
+          { status: 400 }
+        );
+      }
+      const hashedPassword = await hash(customerPassword, 12);
 
       const newUser = await prisma.user.create({
         data: {
