@@ -4,14 +4,13 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateBookingNumber } from "@/lib/booking-number";
 import { calculatePrice } from "@/lib/pricing";
+import { hash } from "bcryptjs";
+import { randomBytes } from "crypto";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
 
   const body = await req.json();
   const {
@@ -23,6 +22,9 @@ export async function POST(req: NextRequest) {
     scheduledTime,
     addOnIds = [],
     customerNotes,
+    customerName,
+    customerEmail,
+    customerPhone,
     address,
   } = body;
 
@@ -33,12 +35,66 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  if (!customerName || !customerEmail) {
+    return NextResponse.json(
+      { error: "Name and email are required" },
+      { status: 400 }
+    );
+  }
+
   // Validate service exists
   const service = await prisma.service.findUnique({
     where: { id: serviceId },
   });
   if (!service || !service.isActive) {
     return NextResponse.json({ error: "Invalid service" }, { status: 400 });
+  }
+
+  // Resolve customer: use session user if logged in, otherwise find/create by email
+  let customerId: string;
+
+  if (session) {
+    customerId = session.user.id;
+
+    // Update name/phone if the logged-in user changed them
+    await prisma.user.update({
+      where: { id: customerId },
+      data: {
+        name: customerName.trim(),
+        ...(customerPhone ? { phone: customerPhone.trim() } : {}),
+      },
+    });
+  } else {
+    // Guest booking — find existing customer or create one
+    const email = customerEmail.trim().toLowerCase();
+    const existing = await prisma.user.findUnique({ where: { email } });
+
+    if (existing) {
+      customerId = existing.id;
+      // Update name/phone for returning guest
+      await prisma.user.update({
+        where: { id: customerId },
+        data: {
+          name: customerName.trim(),
+          ...(customerPhone ? { phone: customerPhone.trim() } : {}),
+        },
+      });
+    } else {
+      // Create a new customer with a random password (they can reset later)
+      const tempPassword = randomBytes(16).toString("hex");
+      const hashedPassword = await hash(tempPassword, 12);
+
+      const newUser = await prisma.user.create({
+        data: {
+          name: customerName.trim(),
+          email,
+          password: hashedPassword,
+          phone: customerPhone?.trim() || null,
+          role: "CUSTOMER",
+        },
+      });
+      customerId = newUser.id;
+    }
   }
 
   // Calculate price server-side
@@ -67,7 +123,7 @@ export async function POST(req: NextRequest) {
   if (address?.street) {
     const created = await prisma.address.create({
       data: {
-        userId: session.user.id,
+        userId: customerId,
         street: address.street,
         unit: address.unit || null,
         city: address.city || "Miami",
@@ -92,7 +148,7 @@ export async function POST(req: NextRequest) {
   const booking = await prisma.booking.create({
     data: {
       bookingNumber,
-      customerId: session.user.id,
+      customerId,
       serviceId,
       addressId: addressId || null,
       scheduledDate: new Date(scheduledDate),

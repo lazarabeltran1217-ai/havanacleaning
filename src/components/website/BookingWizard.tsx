@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import { TIME_SLOTS } from "@/lib/constants";
 import { ServiceIcon } from "@/lib/service-icons";
@@ -63,22 +62,35 @@ export function BookingWizard({ services, addOns }: Props) {
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
 
-  // Step 3 — Address
+  // Step 3 — Contact info + Address
+  const [customerName, setCustomerName] = useState(session?.user?.name || "");
+  const [customerEmail, setCustomerEmail] = useState(
+    session?.user?.email || ""
+  );
+  const [customerPhone, setCustomerPhone] = useState("");
   const [street, setStreet] = useState("");
   const [unit, setUnit] = useState("");
   const [city, setCity] = useState("Miami");
   const [state] = useState("FL");
   const [zipCode, setZipCode] = useState("");
 
-  // Price calculation (client-side estimate)
-  // basePrice is for 2 bed / 2 bath; scale up/down per room
+  // Pre-fill from session when it loads
+  const [prefilled, setPrefilled] = useState(false);
+  if (session && !prefilled) {
+    if (session.user?.name && !customerName) setCustomerName(session.user.name);
+    if (session.user?.email && !customerEmail)
+      setCustomerEmail(session.user.email);
+    setPrefilled(true);
+  }
+
+  // Price calculation
   const selectedService = services.find((s) => s.id === serviceId);
   const servicePrice = selectedService
     ? Math.max(
         0,
-        selectedService.basePrice
-          + (bedrooms - 2) * selectedService.pricePerBedroom
-          + (bathrooms - 2) * selectedService.pricePerBathroom
+        selectedService.basePrice +
+          (bedrooms - 2) * selectedService.pricePerBedroom +
+          (bathrooms - 2) * selectedService.pricePerBathroom
       )
     : 0;
   const addOnsTotal = addOns
@@ -98,16 +110,17 @@ export function BookingWizard({ services, addOns }: Props) {
   }
 
   // Tomorrow's date as minimum (Eastern Time)
-  const etNow = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
-  const etTomorrow = new Date(etNow.getFullYear(), etNow.getMonth(), etNow.getDate() + 1);
+  const etNow = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "America/New_York" })
+  );
+  const etTomorrow = new Date(
+    etNow.getFullYear(),
+    etNow.getMonth(),
+    etNow.getDate() + 1
+  );
   const minDate = `${etTomorrow.getFullYear()}-${String(etTomorrow.getMonth() + 1).padStart(2, "0")}-${String(etTomorrow.getDate()).padStart(2, "0")}`;
 
   async function handleSubmit() {
-    if (!session) {
-      router.push(`/login?callbackUrl=/book?service=${selectedService?.slug}`);
-      return;
-    }
-
     setLoading(true);
     setError("");
 
@@ -124,6 +137,9 @@ export function BookingWizard({ services, addOns }: Props) {
           scheduledTime,
           addOnIds: selectedAddOns,
           customerNotes: notes,
+          customerName: customerName.trim(),
+          customerEmail: customerEmail.trim().toLowerCase(),
+          customerPhone: customerPhone.trim(),
           address: { street, unit, city, state, zipCode },
         }),
       });
@@ -136,13 +152,15 @@ export function BookingWizard({ services, addOns }: Props) {
         return;
       }
 
-      // Redirect to payment/confirmation
       router.push(`/book/confirm?bookingId=${data.booking.id}`);
     } catch {
       setError("Something went wrong. Please try again.");
       setLoading(false);
     }
   }
+
+  const canSubmit =
+    street && zipCode && customerName.trim() && customerEmail.trim();
 
   return (
     <div>
@@ -175,7 +193,7 @@ export function BookingWizard({ services, addOns }: Props) {
           ? "Choose Service"
           : step === 2
             ? "Schedule & Add-Ons"
-            : "Your Address"}
+            : "Your Info & Address"}
       </div>
 
       {/* STEP 1 — SERVICE */}
@@ -193,12 +211,20 @@ export function BookingWizard({ services, addOns }: Props) {
                     : "border-tobacco/10 hover:border-green/30"
                 }`}
               >
-                <ServiceIcon emoji={s.icon} className="w-7 h-7 mx-auto mb-1 text-tobacco/60" />
+                <ServiceIcon
+                  emoji={s.icon}
+                  className="w-7 h-7 mx-auto mb-1 text-tobacco/60"
+                />
                 <div className="text-[0.8rem] font-medium">{s.name}</div>
                 <div className="text-amber text-[0.75rem] mt-1">
                   {s.basePrice > 0
                     ? formatCurrency(
-                        Math.max(0, s.basePrice + (bedrooms - 2) * s.pricePerBedroom + (bathrooms - 2) * s.pricePerBathroom)
+                        Math.max(
+                          0,
+                          s.basePrice +
+                            (bedrooms - 2) * s.pricePerBedroom +
+                            (bathrooms - 2) * s.pricePerBathroom
+                        )
                       )
                     : "Quote"}
                 </div>
@@ -252,7 +278,11 @@ export function BookingWizard({ services, addOns }: Props) {
                 [
                   { value: "ONCE", label: "One-Time" },
                   { value: "WEEKLY", label: "Weekly", discount: "20% off" },
-                  { value: "BIWEEKLY", label: "Bi-Weekly", discount: "15% off" },
+                  {
+                    value: "BIWEEKLY",
+                    label: "Bi-Weekly",
+                    discount: "15% off",
+                  },
                   { value: "MONTHLY", label: "Monthly", discount: "10% off" },
                 ] as const
               ).map((r) => (
@@ -277,39 +307,14 @@ export function BookingWizard({ services, addOns }: Props) {
             </div>
           </div>
 
-          {/* Auth prompt */}
-          {!session && serviceId && (
-            <div className="bg-tobacco/5 border border-tobacco/15 rounded-lg px-5 py-4 text-center">
-              <p className="text-[0.88rem] mb-3">
-                To book a cleaning, please sign in or create an account.
-              </p>
-              <div className="flex gap-3 justify-center">
-                <Link
-                  href={`/login?callbackUrl=/book${selectedService ? `?service=${selectedService.slug}` : ""}`}
-                  className="px-6 py-2.5 border border-tobacco/20 rounded-[3px] text-[0.85rem] font-medium hover:bg-tobacco/5 transition-colors"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href={`/register?callbackUrl=/book${selectedService ? `?service=${selectedService.slug}` : ""}`}
-                  className="px-6 py-2.5 bg-green text-white rounded-[3px] text-[0.85rem] font-medium hover:bg-green/90 transition-colors"
-                >
-                  Create Account
-                </Link>
-              </div>
-            </div>
-          )}
-
-          {session && (
-            <button
-              type="button"
-              onClick={() => serviceId && setStep(2)}
-              disabled={!serviceId}
-              className="w-full bg-gold text-tobacco py-4 text-[0.9rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              Continue
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => serviceId && setStep(2)}
+            disabled={!serviceId}
+            className="w-full bg-gold text-tobacco py-4 text-[0.9rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            Continue
+          </button>
         </div>
       )}
 
@@ -406,76 +411,135 @@ export function BookingWizard({ services, addOns }: Props) {
         </div>
       )}
 
-      {/* STEP 3 — ADDRESS + REVIEW */}
+      {/* STEP 3 — CONTACT + ADDRESS + REVIEW */}
       {step === 3 && (
         <div className="space-y-6">
+          {/* CONTACT INFO */}
           <div>
-            <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-              Street Address
-            </label>
-            <input
-              type="text"
-              value={street}
-              onChange={(e) => setStreet(e.target.value)}
-              placeholder="123 Main Street"
-              className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
-            />
+            <div className="text-[0.78rem] text-sand uppercase tracking-wider mb-3">
+              Your Contact Information
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
+                  Full Name <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="John Doe"
+                  required
+                  className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
+                />
+              </div>
+              <div>
+                <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
+                  Email <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  placeholder="john@example.com"
+                  required
+                  className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
+                />
+              </div>
+              <div>
+                <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
+                  Phone
+                </label>
+                <input
+                  type="tel"
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  placeholder="(305) 555-1234"
+                  className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
+                />
+              </div>
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                Unit/Apt
-              </label>
-              <input
-                type="text"
-                value={unit}
-                onChange={(e) => setUnit(e.target.value)}
-                placeholder="#201"
-                className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
-              />
+
+          {/* ADDRESS */}
+          <div>
+            <div className="text-[0.78rem] text-sand uppercase tracking-wider mb-3">
+              Service Address
             </div>
             <div>
               <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                City
+                Street Address
               </label>
               <input
                 type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+                placeholder="123 Main Street"
                 className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
               />
             </div>
-            <div>
-              <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                ZIP
-              </label>
-              <input
-                type="text"
-                value={zipCode}
-                onChange={(e) => setZipCode(e.target.value)}
-                placeholder="33130"
-                className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
-              />
+            <div className="grid grid-cols-3 gap-4 mt-4">
+              <div>
+                <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
+                  Unit/Apt
+                </label>
+                <input
+                  type="text"
+                  value={unit}
+                  onChange={(e) => setUnit(e.target.value)}
+                  placeholder="#201"
+                  className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
+                />
+              </div>
+              <div>
+                <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
+                  City
+                </label>
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
+                />
+              </div>
+              <div>
+                <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
+                  ZIP
+                </label>
+                <input
+                  type="text"
+                  value={zipCode}
+                  onChange={(e) => setZipCode(e.target.value)}
+                  placeholder="33130"
+                  className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
+                />
+              </div>
             </div>
           </div>
 
           {/* ORDER SUMMARY */}
           <div className="bg-white border border-tobacco/10 rounded-lg p-6 mt-6">
             <h3 className="font-display text-lg mb-4">Order Summary</h3>
-            {session && (
+            {customerName && (
               <div className="flex items-center gap-3 mb-4 pb-3 border-b border-tobacco/10">
                 <div className="w-8 h-8 bg-green/10 rounded-full flex items-center justify-center text-green text-[0.8rem] font-semibold">
-                  {session.user?.name?.charAt(0)?.toUpperCase() || "?"}
+                  {customerName.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <div className="text-[0.88rem] font-medium">{session.user?.name}</div>
-                  <div className="text-[0.78rem] text-sand">{session.user?.email}</div>
+                  <div className="text-[0.88rem] font-medium">
+                    {customerName}
+                  </div>
+                  <div className="text-[0.78rem] text-sand">
+                    {customerEmail}
+                  </div>
                 </div>
               </div>
             )}
             <div className="space-y-2 text-[0.9rem]">
               <div className="flex justify-between">
-                <span>{selectedService?.name} ({bedrooms} bed / {bathrooms} bath)</span>
+                <span>
+                  {selectedService?.name} ({bedrooms} bed / {bathrooms} bath)
+                </span>
                 <span>{formatCurrency(servicePrice)}</span>
               </div>
               {addOns
@@ -522,14 +586,10 @@ export function BookingWizard({ services, addOns }: Props) {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!street || !zipCode || loading}
+              disabled={!canSubmit || loading}
               className="flex-1 bg-green text-white py-4 text-[0.9rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-green/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              {loading
-                ? "Processing..."
-                : session
-                  ? "Submit Request"
-                  : "Sign In to Book"}
+              {loading ? "Processing..." : "Submit Request"}
             </button>
           </div>
         </div>
