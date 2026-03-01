@@ -327,7 +327,7 @@ export default function CustomerDashboard() {
                       {b.status === "CONFIRMED" && !isPaid && (
                         <button
                           onClick={() => setPayingBooking(b)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-gold text-tobacco rounded-lg text-[0.75rem] font-semibold hover:bg-amber transition-colors"
+                          className="flex items-center gap-1 px-3 py-1.5 bg-green text-white rounded-lg text-[0.75rem] font-semibold hover:bg-green-light transition-colors"
                         >
                           <CreditCard className="w-3 h-3" /> Pay Now
                         </button>
@@ -348,7 +348,7 @@ export default function CustomerDashboard() {
 
           <button
             onClick={() => setShowBookingWizard(true)}
-            className="flex items-center gap-3 w-full px-4 py-3.5 bg-gold text-tobacco rounded-[3px] font-semibold text-[0.88rem] tracking-[0.06em] uppercase hover:bg-amber transition-colors mb-3"
+            className="flex items-center gap-3 w-full px-4 py-3.5 bg-green text-white rounded-[3px] font-semibold text-[0.88rem] tracking-[0.06em] uppercase hover:bg-green-light transition-colors mb-3"
           >
             <Plus className="w-5 h-5" />
             <span>Book a Cleaning</span>
@@ -386,7 +386,7 @@ export default function CustomerDashboard() {
               <button
                 key={f}
                 onClick={() => { setBookingsFilter(f); setShowAllBookings(false); }}
-                className={`px-3 py-1.5 rounded-lg text-[0.78rem] font-medium transition-colors capitalize ${bookingsFilter === f ? "bg-gold text-tobacco" : "bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-sand/70"}`}
+                className={`px-3 py-1.5 rounded-lg text-[0.78rem] font-medium transition-colors capitalize ${bookingsFilter === f ? "bg-green text-white" : "bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-sand/70"}`}
               >
                 {f}
               </button>
@@ -432,7 +432,7 @@ export default function CustomerDashboard() {
                         {b.status === "CONFIRMED" && !isPaid && (
                           <button
                             onClick={() => setPayingBooking(b)}
-                            className="inline-flex items-center gap-1 bg-gold text-tobacco px-3 py-1.5 text-[0.7rem] font-semibold rounded-lg hover:bg-amber transition-colors"
+                            className="inline-flex items-center gap-1 bg-green text-white px-3 py-1.5 text-[0.7rem] font-semibold rounded-lg hover:bg-green-light transition-colors"
                           >
                             <CreditCard className="w-3 h-3" /> Pay
                           </button>
@@ -504,7 +504,7 @@ export default function CustomerDashboard() {
                   <input type="text" value={addrZip} onChange={(e) => setAddrZip(e.target.value)} required className={INPUT_CLS} />
                 </div>
               </div>
-              <button type="submit" disabled={addrSaving} className="px-4 py-2 bg-gold text-tobacco rounded-[3px] text-[0.78rem] font-semibold hover:bg-amber disabled:opacity-50">
+              <button type="submit" disabled={addrSaving} className="px-4 py-2 bg-green text-white rounded-[3px] text-[0.78rem] font-semibold hover:bg-green-light disabled:opacity-50">
                 {addrSaving ? "Saving..." : "Save Address"}
               </button>
             </form>
@@ -582,7 +582,7 @@ export default function CustomerDashboard() {
               <button
                 onClick={handleProfileSave}
                 disabled={profileSaving}
-                className="px-5 py-2 bg-gold text-tobacco rounded-[3px] text-sm font-semibold hover:bg-amber disabled:opacity-50"
+                className="px-5 py-2 bg-green text-white rounded-[3px] text-sm font-semibold hover:bg-green-light disabled:opacity-50"
               >
                 {profileSaving ? "Saving..." : "Save Changes"}
               </button>
@@ -662,7 +662,7 @@ export default function CustomerDashboard() {
 
       {/* ═══ SUCCESS TOASTS ═══ */}
       {paymentSuccess && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gold text-tobacco px-6 py-3 rounded-[3px] shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green text-white px-6 py-3 rounded-[3px] shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
           <CheckCircle className="w-5 h-5" /> Payment successful!
           <button onClick={() => setPaymentSuccess(false)} className="ml-2 text-tobacco/70 hover:text-tobacco">
             <X className="w-4 h-4" />
@@ -670,7 +670,7 @@ export default function CustomerDashboard() {
         </div>
       )}
       {bookingSuccess && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gold text-tobacco px-6 py-3 rounded-[3px] shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green text-white px-6 py-3 rounded-[3px] shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
           <CheckCircle className="w-5 h-5" /> Booking request submitted!
           <button onClick={() => setBookingSuccess(false)} className="ml-2 text-tobacco/70 hover:text-tobacco">
             <X className="w-4 h-4" />

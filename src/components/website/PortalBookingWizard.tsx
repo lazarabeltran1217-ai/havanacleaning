@@ -181,7 +181,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
         <div className="flex items-center justify-center gap-2 py-4 px-5">
           {[1, 2, 3].map((s) => (
             <div key={s} className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[0.8rem] font-semibold transition-colors ${s <= step ? "bg-gold text-tobacco" : `${INNER_BG} ${TEXT_MUTED}`}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[0.8rem] font-semibold transition-colors ${s <= step ? "bg-green text-white" : `${INNER_BG} ${TEXT_MUTED}`}`}>
                 {s}
               </div>
               {s < 3 && <div className={`w-12 h-0.5 ${s < step ? "bg-gold" : "bg-gray-200 dark:bg-gold/20"}`} />}
@@ -255,7 +255,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                 type="button"
                 onClick={() => serviceId && setStep(2)}
                 disabled={!serviceId}
-                className="w-full bg-gold text-tobacco py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="w-full bg-green text-white py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-green-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Continue
               </button>
@@ -314,7 +314,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                 type="button"
                 onClick={() => scheduledDate && setStep(3)}
                 disabled={!scheduledDate}
-                className="w-full bg-gold text-tobacco py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="w-full bg-green text-white py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-green-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Continue
               </button>
@@ -427,7 +427,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                 type="button"
                 onClick={handleSubmit}
                 disabled={!canSubmit || loading}
-                className="w-full bg-gold text-tobacco py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="w-full bg-green text-white py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-green-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 {loading ? "Processing..." : "Submit Booking Request"}
               </button>
