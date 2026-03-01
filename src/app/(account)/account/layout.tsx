@@ -20,9 +20,15 @@ export default function AccountLayout({
   }
 
   return (
-    <div className="min-h-screen bg-tobacco">
+    <div className="min-h-screen bg-tobacco relative">
+      {/* Diagonal stripe pattern (same as homepage) */}
+      <div className="fixed inset-0 opacity-[0.04] pointer-events-none" style={{
+        backgroundImage: "repeating-linear-gradient(45deg, #C9941A 0, #C9941A 1px, transparent 0, transparent 50%)",
+        backgroundSize: "20px 20px",
+      }} />
+
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-40 bg-tobacco/[0.97] backdrop-blur-sm border-b-2 border-gold px-5 py-3 flex items-center justify-between md:hidden">
+      <header className="sticky top-0 z-40 bg-tobacco/[0.97] backdrop-blur-sm border-b-2 border-gold px-5 py-3 flex items-center justify-between md:hidden relative">
         <div>
           <div className="font-display text-2xl font-black text-amber tracking-tight">
             Havana <span className="text-green-light italic">Cleaning</span>
@@ -46,7 +52,7 @@ export default function AccountLayout({
       </div>
 
       {/* Main content */}
-      <main className="px-4 md:px-8 py-5">
+      <main className="relative z-10 px-4 md:px-8 py-5">
         <div className="max-w-6xl mx-auto">{children}</div>
       </main>
     </div>

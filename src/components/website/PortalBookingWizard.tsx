@@ -5,13 +5,13 @@ import { X, ChevronLeft } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
 import { TIME_SLOTS } from "@/lib/constants";
 
-/* ─── Card constants (always-dark portal on tobacco bg) ─── */
-const INNER_BORDER = "border-[#3a2f25]";
-const INNER_BG = "bg-[#1a1410]";
+/* ─── Card constants (homepage-matching gold/tobacco scheme) ─── */
+const INNER_BORDER = "border-gold/15";
+const INNER_BG = "bg-white/[0.03]";
 const TEXT_PRIMARY = "text-cream";
 const TEXT_MUTED = "text-sand/70";
 const INPUT_CLS =
-  "w-full px-3 py-2.5 border border-[#3a2f25] rounded-lg text-sm bg-[#1a1410] text-cream focus:outline-none focus:ring-2 focus:ring-green/30";
+  "w-full px-3 py-2.5 border border-gold/20 rounded-lg text-sm bg-white/[0.05] text-cream placeholder:text-sand/40 focus:outline-none focus:ring-2 focus:ring-gold/30";
 const LABEL_CLS = "block text-[0.72rem] font-medium uppercase tracking-wider mb-1.5";
 
 interface ServiceOption {
@@ -159,12 +159,12 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-[#231c16] rounded-2xl border border-[#3a2f25] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-tobacco rounded-2xl border border-gold/15 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className={`flex items-center justify-between p-5 border-b ${INNER_BORDER}`}>
           <div className="flex items-center gap-3">
             {step > 1 && (
-              <button onClick={() => setStep(step - 1)} className={`${TEXT_MUTED} hover:text-green transition-colors`}>
+              <button onClick={() => setStep(step - 1)} className={`${TEXT_MUTED} hover:text-gold transition-colors`}>
                 <ChevronLeft className="w-5 h-5" />
               </button>
             )}
@@ -181,10 +181,10 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
         <div className="flex items-center justify-center gap-2 py-4 px-5">
           {[1, 2, 3].map((s) => (
             <div key={s} className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[0.8rem] font-semibold transition-colors ${s <= step ? "bg-green text-white" : `${INNER_BG} ${TEXT_MUTED}`}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[0.8rem] font-semibold transition-colors ${s <= step ? "bg-gold text-tobacco" : `${INNER_BG} ${TEXT_MUTED}`}`}>
                 {s}
               </div>
-              {s < 3 && <div className={`w-12 h-0.5 ${s < step ? "bg-green" : "bg-[#3a2f25]"}`} />}
+              {s < 3 && <div className={`w-12 h-0.5 ${s < step ? "bg-gold" : "bg-gold/20"}`} />}
             </div>
           ))}
         </div>
@@ -199,7 +199,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                     key={s.id}
                     type="button"
                     onClick={() => setServiceId(s.id)}
-                    className={`border rounded-xl p-3 text-center transition-all ${serviceId === s.id ? "border-green bg-green/10 ring-2 ring-green/30" : `${INNER_BORDER} hover:border-green/30`}`}
+                    className={`border rounded-xl p-3 text-center transition-all ${serviceId === s.id ? "border-gold bg-gold/10 ring-2 ring-gold/30" : `${INNER_BORDER} hover:border-gold/30`}`}
                   >
                     <ServiceIcon emoji={s.icon} className={`w-7 h-7 mx-auto mb-1 ${TEXT_MUTED}`} />
                     <div className={`text-[0.78rem] font-medium ${TEXT_PRIMARY}`}>{s.name}</div>
@@ -242,10 +242,10 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                       key={r.value}
                       type="button"
                       onClick={() => setRecurrence(r.value)}
-                      className={`border rounded-xl py-2.5 px-2 text-center transition-all text-[0.78rem] ${recurrence === r.value ? "border-green bg-green/10 ring-2 ring-green/30" : `${INNER_BORDER} hover:border-green/30`}`}
+                      className={`border rounded-xl py-2.5 px-2 text-center transition-all text-[0.78rem] ${recurrence === r.value ? "border-gold bg-gold/10 ring-2 ring-gold/30" : `${INNER_BORDER} hover:border-gold/30`}`}
                     >
                       <div className={`font-medium ${TEXT_PRIMARY}`}>{r.label}</div>
-                      {"discount" in r && <div className="text-green text-[0.68rem] mt-0.5">{r.discount}</div>}
+                      {"discount" in r && <div className="text-gold text-[0.68rem] mt-0.5">{r.discount}</div>}
                     </button>
                   ))}
                 </div>
@@ -255,7 +255,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                 type="button"
                 onClick={() => serviceId && setStep(2)}
                 disabled={!serviceId}
-                className="w-full bg-green text-white py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-green/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="w-full bg-gold text-tobacco py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Continue
               </button>
@@ -289,7 +289,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                         key={addon.id}
                         type="button"
                         onClick={() => toggleAddOn(addon.id)}
-                        className={`border rounded-xl px-3 py-2.5 text-left transition-all text-[0.82rem] flex items-center justify-between ${selectedAddOns.includes(addon.id) ? "border-green bg-green/10" : `${INNER_BORDER} hover:border-green/30`}`}
+                        className={`border rounded-xl px-3 py-2.5 text-left transition-all text-[0.82rem] flex items-center justify-between ${selectedAddOns.includes(addon.id) ? "border-gold bg-gold/10" : `${INNER_BORDER} hover:border-gold/30`}`}
                       >
                         <span className={TEXT_PRIMARY}>{addon.name}</span>
                         <span className="text-amber font-medium text-[0.78rem]">+{fmtCurrency(addon.price)}</span>
@@ -314,7 +314,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                 type="button"
                 onClick={() => scheduledDate && setStep(3)}
                 disabled={!scheduledDate}
-                className="w-full bg-green text-white py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-green/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="w-full bg-gold text-tobacco py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Continue
               </button>
@@ -334,7 +334,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                         key={addr.id}
                         type="button"
                         onClick={() => { setAddressId(addr.id); setUseNewAddress(false); }}
-                        className={`w-full border rounded-xl px-3 py-2.5 text-left transition-all ${!useNewAddress && addressId === addr.id ? "border-green bg-green/10 ring-2 ring-green/30" : `${INNER_BORDER} hover:border-green/30`}`}
+                        className={`w-full border rounded-xl px-3 py-2.5 text-left transition-all ${!useNewAddress && addressId === addr.id ? "border-gold bg-gold/10 ring-2 ring-gold/30" : `${INNER_BORDER} hover:border-gold/30`}`}
                       >
                         <div className={`font-medium text-[0.82rem] ${TEXT_PRIMARY}`}>{addr.label}</div>
                         <div className="text-sand/60 text-[0.72rem]">
@@ -345,7 +345,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                     <button
                       type="button"
                       onClick={() => setUseNewAddress(!useNewAddress)}
-                      className="text-green text-[0.78rem] font-semibold hover:underline"
+                      className="text-gold text-[0.78rem] font-semibold hover:underline"
                     >
                       {useNewAddress ? "Use saved address" : "+ Use a new address"}
                     </button>
@@ -393,7 +393,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                     </div>
                   ))}
                   {discount > 0 && (
-                    <div className="flex justify-between text-green">
+                    <div className="flex justify-between text-gold">
                       <span>Recurring Discount ({Math.round(discountRate * 100)}%)</span>
                       <span>-{fmtCurrency(discount)}</span>
                     </div>
@@ -404,7 +404,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                   </div>
                   <div className={`flex justify-between font-semibold text-lg pt-3 border-t ${INNER_BORDER}`}>
                     <span className={TEXT_PRIMARY}>Total</span>
-                    <span className="text-green">{fmtCurrency(total)}</span>
+                    <span className="text-gold">{fmtCurrency(total)}</span>
                   </div>
                 </div>
 
@@ -427,7 +427,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                 type="button"
                 onClick={handleSubmit}
                 disabled={!canSubmit || loading}
-                className="w-full bg-green text-white py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-green/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="w-full bg-gold text-tobacco py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 {loading ? "Processing..." : "Submit Booking Request"}
               </button>

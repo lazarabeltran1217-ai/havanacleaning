@@ -20,22 +20,22 @@ import { ServiceIcon } from "@/lib/service-icons";
 import { BookingPayment } from "@/components/website/BookingPayment";
 import { PortalBookingWizard } from "@/components/website/PortalBookingWizard";
 
-/* ─── Card class helpers (always-dark portal on tobacco bg) ─── */
-const CARD = "bg-[#231c16] rounded-2xl border border-[#3a2f25] shadow-sm p-5";
-const INNER_BORDER = "border-[#3a2f25]";
-const INNER_BG = "bg-[#1a1410]";
+/* ─── Card class helpers (homepage-matching gold/tobacco scheme) ─── */
+const CARD = "bg-white/[0.04] rounded-2xl border border-gold/15 p-5";
+const INNER_BORDER = "border-gold/15";
+const INNER_BG = "bg-white/[0.03]";
 const TEXT_PRIMARY = "text-cream";
 const TEXT_MUTED = "text-sand/70";
-const INPUT_CLS = "w-full px-3 py-2 border border-[#3a2f25] rounded-lg text-sm bg-[#1a1410] text-cream focus:outline-none focus:ring-2 focus:ring-green/30";
+const INPUT_CLS = "w-full px-3 py-2 border border-gold/20 rounded-lg text-sm bg-white/[0.05] text-cream placeholder:text-sand/40 focus:outline-none focus:ring-2 focus:ring-gold/30";
 
 /* ─── Helpers ─── */
 const statusColors: Record<string, string> = {
-  CONFIRMED: "bg-green/10 text-green",
-  PENDING: "bg-amber-100 text-amber-600",
+  CONFIRMED: "bg-gold/10 text-gold",
+  PENDING: "bg-amber/10 text-amber",
   IN_PROGRESS: "bg-teal/10 text-teal",
-  COMPLETED: "bg-green/20 text-green",
-  CANCELLED: "bg-red/10 text-red-500",
-  NO_SHOW: "bg-[#1a1410] text-sand/50",
+  COMPLETED: "bg-gold/20 text-gold",
+  CANCELLED: "bg-red-500/10 text-red-400",
+  NO_SHOW: "bg-white/[0.04] text-sand/50",
 };
 
 function fmtDate(dateStr: string) {
@@ -252,24 +252,24 @@ export default function CustomerDashboard() {
   return (
     <div className="space-y-5">
       {/* ═══ WELCOME BANNER ═══ */}
-      <div className="bg-gradient-to-r from-green to-[#1a3a2a] rounded-2xl p-6 text-white text-center">
+      <div className="bg-gradient-to-r from-gold to-amber rounded-2xl p-6 text-tobacco text-center">
         <h1 className="font-display text-2xl">
           {greeting}, {firstName}
         </h1>
-        <p className="text-white/70 text-sm mt-1">
+        <p className="text-tobacco/60 text-sm mt-1">
           {now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
         </p>
         <div className="flex flex-wrap justify-center gap-2 mt-3">
           {data.upcomingBookings.length > 0 && (
-            <span className="bg-white/15 backdrop-blur text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
+            <span className="bg-tobacco/15 text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
               <Calendar className="w-3 h-3" /> {data.upcomingBookings.length} upcoming
             </span>
           )}
-          <span className="bg-white/15 backdrop-blur text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
+          <span className="bg-tobacco/15 text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
             <ClipboardList className="w-3 h-3" /> {data.stats.totalBookings} total bookings
           </span>
           {data.addresses.length > 0 && (
-            <span className="bg-white/15 backdrop-blur text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
+            <span className="bg-tobacco/15 text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
               <MapPin className="w-3 h-3" /> {data.addresses.length} addresses
             </span>
           )}
@@ -282,14 +282,14 @@ export default function CustomerDashboard() {
         {/* ─── UPCOMING BOOKINGS CARD ─── */}
         <div className={CARD}>
           <h3 className={`font-display text-lg ${TEXT_PRIMARY} mb-3 flex items-center gap-2`}>
-            <Calendar className="w-4 h-4 text-green" /> Upcoming Bookings
+            <Calendar className="w-4 h-4 text-gold" /> Upcoming Bookings
           </h3>
 
           {data.upcomingBookings.length === 0 ? (
             <div className="text-center py-6">
               <Sparkles className={`w-8 h-8 mx-auto mb-2 ${TEXT_MUTED}`} />
               <p className={`${TEXT_MUTED} text-sm`}>No upcoming bookings</p>
-              <button onClick={() => setShowBookingWizard(true)} className="text-green text-[0.82rem] font-medium hover:underline mt-1 inline-block">
+              <button onClick={() => setShowBookingWizard(true)} className="text-gold text-[0.82rem] font-medium hover:underline mt-1 inline-block">
                 Book a cleaning &rarr;
               </button>
             </div>
@@ -301,7 +301,7 @@ export default function CustomerDashboard() {
                   <div key={b.id} className={`border ${INNER_BORDER} rounded-xl p-3`}>
                     <div className="flex items-center justify-between mb-1">
                       <span className={`font-medium text-[0.85rem] flex items-center gap-1.5 ${TEXT_PRIMARY}`}>
-                        <ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-green" /> {b.service.name}
+                        <ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-gold" /> {b.service.name}
                       </span>
                       <span className={`text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[b.status] || "bg-gray-100 text-gray-500"}`}>
                         {fmtStatus(b.status)}
@@ -323,11 +323,11 @@ export default function CustomerDashboard() {
                       )}
                     </div>
                     <div className="flex items-center justify-between mt-2">
-                      <span className="text-green font-semibold text-[0.88rem]">{fmtCurrency(b.total)}</span>
+                      <span className="text-amber font-semibold text-[0.88rem]">{fmtCurrency(b.total)}</span>
                       {b.status === "CONFIRMED" && !isPaid && (
                         <button
                           onClick={() => setPayingBooking(b)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-green text-white rounded-lg text-[0.75rem] font-semibold hover:bg-green/90 transition-colors"
+                          className="flex items-center gap-1 px-3 py-1.5 bg-gold text-tobacco rounded-lg text-[0.75rem] font-semibold hover:bg-amber transition-colors"
                         >
                           <CreditCard className="w-3 h-3" /> Pay Now
                         </button>
@@ -343,12 +343,12 @@ export default function CustomerDashboard() {
         {/* ─── QUICK ACTIONS + STATS CARD ─── */}
         <div className={CARD}>
           <h3 className={`font-display text-lg ${TEXT_PRIMARY} mb-3 flex items-center gap-2`}>
-            <Sparkles className="w-4 h-4 text-green" /> Quick Actions
+            <Sparkles className="w-4 h-4 text-gold" /> Quick Actions
           </h3>
 
           <button
             onClick={() => setShowBookingWizard(true)}
-            className="flex items-center gap-3 w-full px-4 py-3.5 bg-gradient-to-r from-green to-green-light text-white rounded-xl font-semibold text-[0.88rem] hover:opacity-90 transition-opacity mb-3"
+            className="flex items-center gap-3 w-full px-4 py-3.5 bg-gold text-tobacco rounded-[3px] font-semibold text-[0.88rem] tracking-[0.06em] uppercase hover:bg-amber transition-colors mb-3"
           >
             <Plus className="w-5 h-5" />
             <span>Book a Cleaning</span>
@@ -360,7 +360,7 @@ export default function CustomerDashboard() {
               <div className={`${TEXT_MUTED} text-[0.68rem]`}>Total Bookings</div>
             </div>
             <div className={`${INNER_BG} rounded-lg p-3 text-center`}>
-              <div className="text-xl font-bold text-green">{fmtCurrency(data.stats.totalSpent)}</div>
+              <div className="text-xl font-bold text-amber">{fmtCurrency(data.stats.totalSpent)}</div>
               <div className={`${TEXT_MUTED} text-[0.68rem]`}>Total Spent</div>
             </div>
             <div className={`${INNER_BG} rounded-lg p-3 text-center`}>
@@ -377,7 +377,7 @@ export default function CustomerDashboard() {
         {/* ─── ALL BOOKINGS CARD ─── */}
         <div className={CARD}>
           <h3 className={`font-display text-lg ${TEXT_PRIMARY} mb-3 flex items-center gap-2`}>
-            <ClipboardList className="w-4 h-4 text-green" /> My Bookings
+            <ClipboardList className="w-4 h-4 text-gold" /> My Bookings
           </h3>
 
           {/* Filter tabs */}
@@ -386,7 +386,7 @@ export default function CustomerDashboard() {
               <button
                 key={f}
                 onClick={() => { setBookingsFilter(f); setShowAllBookings(false); }}
-                className={`px-3 py-1.5 rounded-lg text-[0.78rem] font-medium transition-colors capitalize ${bookingsFilter === f ? "bg-green text-white" : "bg-[#1a1410] text-sand/70"}`}
+                className={`px-3 py-1.5 rounded-lg text-[0.78rem] font-medium transition-colors capitalize ${bookingsFilter === f ? "bg-gold text-tobacco" : "bg-white/[0.04] text-sand/70"}`}
               >
                 {f}
               </button>
@@ -404,7 +404,7 @@ export default function CustomerDashboard() {
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-1.5 mb-0.5">
-                          <ServiceIcon emoji={b.service.icon} className="w-3.5 h-3.5 text-green" />
+                          <ServiceIcon emoji={b.service.icon} className="w-3.5 h-3.5 text-gold" />
                           <span className={`font-medium text-[0.82rem] ${TEXT_PRIMARY}`}>{b.service.name}</span>
                           <span className={`text-[0.6rem] uppercase tracking-wider px-1.5 py-0.5 rounded-full font-medium ${statusColors[b.status] || "bg-gray-100 text-gray-500"}`}>
                             {fmtStatus(b.status)}
@@ -428,11 +428,11 @@ export default function CustomerDashboard() {
                         </div>
                       </div>
                       <div className="text-right space-y-1">
-                        <div className="text-green font-semibold text-[0.85rem]">{fmtCurrency(b.total)}</div>
+                        <div className="text-amber font-semibold text-[0.85rem]">{fmtCurrency(b.total)}</div>
                         {b.status === "CONFIRMED" && !isPaid && (
                           <button
                             onClick={() => setPayingBooking(b)}
-                            className="inline-flex items-center gap-1 bg-green text-white px-3 py-1.5 text-[0.7rem] font-semibold rounded-lg hover:bg-green/90 transition-colors"
+                            className="inline-flex items-center gap-1 bg-gold text-tobacco px-3 py-1.5 text-[0.7rem] font-semibold rounded-lg hover:bg-amber transition-colors"
                           >
                             <CreditCard className="w-3 h-3" /> Pay
                           </button>
@@ -448,7 +448,7 @@ export default function CustomerDashboard() {
           {filteredBookings.length > 5 && (
             <button
               onClick={() => setShowAllBookings(!showAllBookings)}
-              className="mt-2 w-full py-2 bg-green/10 text-green rounded-lg text-[0.78rem] font-semibold flex items-center justify-center gap-1"
+              className="mt-2 w-full py-2 bg-gold/10 text-gold rounded-lg text-[0.78rem] font-semibold flex items-center justify-center gap-1"
             >
               {showAllBookings ? (
                 <><ChevronUp className="w-3.5 h-3.5" /> Show Less</>
@@ -463,11 +463,11 @@ export default function CustomerDashboard() {
         <div className={CARD}>
           <div className="flex items-center justify-between mb-3">
             <h3 className={`font-display text-lg ${TEXT_PRIMARY} flex items-center gap-2`}>
-              <MapPin className="w-4 h-4 text-green" /> My Addresses
+              <MapPin className="w-4 h-4 text-gold" /> My Addresses
             </h3>
             <button
               onClick={() => setShowAddressForm(!showAddressForm)}
-              className="text-green text-[0.75rem] font-semibold hover:underline"
+              className="text-gold text-[0.75rem] font-semibold hover:underline"
             >
               {showAddressForm ? "Cancel" : "+ Add"}
             </button>
@@ -504,7 +504,7 @@ export default function CustomerDashboard() {
                   <input type="text" value={addrZip} onChange={(e) => setAddrZip(e.target.value)} required className={INPUT_CLS} />
                 </div>
               </div>
-              <button type="submit" disabled={addrSaving} className="px-4 py-2 bg-green text-white rounded-lg text-[0.78rem] font-semibold hover:bg-green/90 disabled:opacity-50">
+              <button type="submit" disabled={addrSaving} className="px-4 py-2 bg-gold text-tobacco rounded-[3px] text-[0.78rem] font-semibold hover:bg-amber disabled:opacity-50">
                 {addrSaving ? "Saving..." : "Save Address"}
               </button>
             </form>
@@ -513,7 +513,7 @@ export default function CustomerDashboard() {
           {data.addresses.length === 0 && !showAddressForm ? (
             <div className="text-center py-4">
               <p className={`${TEXT_MUTED} text-sm`}>No saved addresses</p>
-              <button onClick={() => setShowAddressForm(true)} className="text-green text-[0.82rem] font-medium hover:underline mt-1">
+              <button onClick={() => setShowAddressForm(true)} className="text-gold text-[0.82rem] font-medium hover:underline mt-1">
                 Add an address &rarr;
               </button>
             </div>
@@ -521,12 +521,12 @@ export default function CustomerDashboard() {
             <div className="space-y-2">
               {data.addresses.map((addr) => (
                 <div key={addr.id} className={`flex items-center gap-3 border ${INNER_BORDER} rounded-xl px-3 py-2.5`}>
-                  <MapPin className="w-4 h-4 text-green shrink-0" />
+                  <MapPin className="w-4 h-4 text-gold shrink-0" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className={`font-medium text-[0.82rem] ${TEXT_PRIMARY}`}>{addr.label}</span>
                       {addr.isDefault && (
-                        <span className="text-[0.6rem] bg-green/10 text-green px-1.5 py-0.5 rounded-full uppercase tracking-wider">Default</span>
+                        <span className="text-[0.6rem] bg-gold/10 text-gold px-1.5 py-0.5 rounded-full uppercase tracking-wider">Default</span>
                       )}
                     </div>
                     <div className="text-sand/60 text-[0.72rem] truncate">
@@ -543,13 +543,13 @@ export default function CustomerDashboard() {
       {/* ═══ PROFILE & SETTINGS ═══ */}
       <div className={CARD}>
         <h3 className={`font-display text-lg ${TEXT_PRIMARY} mb-4 flex items-center gap-2`}>
-          <User className="w-4 h-4 text-green" /> Profile & Settings
+          <User className="w-4 h-4 text-gold" /> Profile & Settings
         </h3>
 
         <div className="md:flex md:gap-6">
           {/* Avatar + info */}
           <div className="flex items-center gap-4 mb-4 md:mb-0 md:w-48 md:shrink-0">
-            <div className="w-14 h-14 rounded-full bg-green/10 text-green flex items-center justify-center text-2xl font-bold">
+            <div className="w-14 h-14 rounded-full bg-gold/10 text-gold flex items-center justify-center text-2xl font-bold">
               {profileName.charAt(0).toUpperCase() || "?"}
             </div>
             <div>
@@ -582,12 +582,12 @@ export default function CustomerDashboard() {
               <button
                 onClick={handleProfileSave}
                 disabled={profileSaving}
-                className="px-5 py-2 bg-green text-white rounded-lg text-sm font-semibold hover:bg-green/90 disabled:opacity-50"
+                className="px-5 py-2 bg-gold text-tobacco rounded-[3px] text-sm font-semibold hover:bg-amber disabled:opacity-50"
               >
                 {profileSaving ? "Saving..." : "Save Changes"}
               </button>
               {profileMessage && (
-                <span className={`text-sm ${profileMessage === "Failed to save." ? "text-red" : "text-green"}`}>{profileMessage}</span>
+                <span className={`text-sm ${profileMessage === "Failed to save." ? "text-red" : "text-gold"}`}>{profileMessage}</span>
               )}
             </div>
           </div>
@@ -600,8 +600,8 @@ export default function CustomerDashboard() {
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setPayingBooking(null)} />
           {/* Modal */}
-          <div className="relative bg-[#231c16] rounded-2xl border border-[#3a2f25] shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-5 border-b border-[#3a2f25]">
+          <div className="relative bg-tobacco rounded-2xl border border-gold/15 shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-5 border-b border-gold/15">
               <h3 className={`font-display text-lg ${TEXT_PRIMARY}`}>Complete Payment</h3>
               <button onClick={() => setPayingBooking(null)} className={`${TEXT_MUTED} hover:text-cream`}>
                 <X className="w-5 h-5" />
@@ -611,7 +611,7 @@ export default function CustomerDashboard() {
               {/* Booking summary */}
               <div className={`${INNER_BG} rounded-xl p-4 mb-4`}>
                 <div className="flex items-center gap-2 mb-2">
-                  <ServiceIcon emoji={payingBooking.service.icon} className="w-5 h-5 text-green" />
+                  <ServiceIcon emoji={payingBooking.service.icon} className="w-5 h-5 text-gold" />
                   <span className={`font-display text-[1rem] ${TEXT_PRIMARY}`}>{payingBooking.service.name}</span>
                 </div>
                 <div className="text-sand/60 text-[0.82rem] space-y-1">
@@ -625,7 +625,7 @@ export default function CustomerDashboard() {
                 </div>
                 <div className={`mt-3 pt-3 border-t ${INNER_BORDER} flex justify-between font-semibold`}>
                   <span className={TEXT_PRIMARY}>Total</span>
-                  <span className="text-green text-lg">{fmtCurrency(payingBooking.total)}</span>
+                  <span className="text-amber text-lg">{fmtCurrency(payingBooking.total)}</span>
                 </div>
               </div>
               {/* Stripe payment form */}
@@ -662,17 +662,17 @@ export default function CustomerDashboard() {
 
       {/* ═══ SUCCESS TOASTS ═══ */}
       {paymentSuccess && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gold text-tobacco px-6 py-3 rounded-[3px] shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
           <CheckCircle className="w-5 h-5" /> Payment successful!
-          <button onClick={() => setPaymentSuccess(false)} className="ml-2 text-white/70 hover:text-white">
+          <button onClick={() => setPaymentSuccess(false)} className="ml-2 text-tobacco/70 hover:text-tobacco">
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
       {bookingSuccess && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gold text-tobacco px-6 py-3 rounded-[3px] shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
           <CheckCircle className="w-5 h-5" /> Booking request submitted!
-          <button onClick={() => setBookingSuccess(false)} className="ml-2 text-white/70 hover:text-white">
+          <button onClick={() => setBookingSuccess(false)} className="ml-2 text-tobacco/70 hover:text-tobacco">
             <X className="w-4 h-4" />
           </button>
         </div>
