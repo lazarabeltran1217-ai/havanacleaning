@@ -16,7 +16,7 @@ export async function GET() {
     const uid = session.user.id;
     const today = todayStartET();
 
-    const [profile, upcomingBookings, allBookings, addresses, totalCount, totalSpent, stripeSetting] =
+    const [profile, upcomingBookings, allBookings, addresses, totalCount, totalSpent, stripeSetting, services, addOns] =
       await Promise.all([
         // Profile
         prisma.user.findUnique({
@@ -70,6 +70,20 @@ export async function GET() {
 
         // Stripe publishable key
         prisma.setting.findUnique({ where: { key: "api_stripe_publishable" } }),
+
+        // Services for booking form
+        prisma.service.findMany({
+          where: { isActive: true },
+          orderBy: { sortOrder: "asc" },
+          select: { id: true, name: true, slug: true, icon: true, basePrice: true, pricePerBedroom: true, pricePerBathroom: true, estimatedHours: true },
+        }),
+
+        // Add-ons for booking form
+        prisma.serviceAddOn.findMany({
+          where: { isActive: true },
+          select: { id: true, name: true, price: true },
+          orderBy: { name: "asc" },
+        }),
       ]);
 
     const stripeKey =
@@ -87,6 +101,8 @@ export async function GET() {
         totalSpent: totalSpent._sum.total || 0,
       },
       stripeKey,
+      services,
+      addOns,
     });
   } catch (err) {
     console.error("Customer dashboard GET error:", err);

@@ -41,7 +41,9 @@ export default function LoginPage() {
     } else if (session?.user?.role === "EMPLOYEE") {
       router.push("/portal");
     } else {
-      router.push(callbackUrl === "/login" ? "/" : callbackUrl);
+      // Customers go to their portal by default
+      const dest = callbackUrl === "/" || callbackUrl === "/login" ? "/account" : callbackUrl;
+      router.push(dest);
     }
   }
 

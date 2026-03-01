@@ -3,7 +3,6 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import {
   Calendar,
   MapPin,
@@ -19,6 +18,7 @@ import {
 } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
 import { BookingPayment } from "@/components/website/BookingPayment";
+import { PortalBookingWizard } from "@/components/website/PortalBookingWizard";
 
 /* ─── Dark mode card class helpers (same as employee portal) ─── */
 const CARD = "bg-white dark:bg-[#231c16] rounded-2xl border border-gray-100 dark:border-[#3a2f25] shadow-sm p-5";
@@ -76,6 +76,23 @@ interface AddressData {
   isDefault: boolean;
 }
 
+interface ServiceData {
+  id: string;
+  name: string;
+  slug: string;
+  icon: string | null;
+  basePrice: number;
+  pricePerBedroom: number;
+  pricePerBathroom: number;
+  estimatedHours: number;
+}
+
+interface AddOnData {
+  id: string;
+  name: string;
+  price: number;
+}
+
 interface DashboardData {
   profile: {
     id: string;
@@ -90,6 +107,8 @@ interface DashboardData {
   addresses: AddressData[];
   stats: { totalBookings: number; totalSpent: number };
   stripeKey: string;
+  services: ServiceData[];
+  addOns: AddOnData[];
 }
 
 /* ─── Main Dashboard ─── */
@@ -106,6 +125,10 @@ export default function CustomerDashboard() {
   // Payment modal
   const [payingBooking, setPayingBooking] = useState<BookingData | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+  // Booking wizard
+  const [showBookingWizard, setShowBookingWizard] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
 
   // Address form
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -266,9 +289,9 @@ export default function CustomerDashboard() {
             <div className="text-center py-6">
               <Sparkles className={`w-8 h-8 mx-auto mb-2 ${TEXT_MUTED}`} />
               <p className={`${TEXT_MUTED} text-sm`}>No upcoming bookings</p>
-              <Link href="/book" className="text-green text-[0.82rem] font-medium hover:underline mt-1 inline-block">
+              <button onClick={() => setShowBookingWizard(true)} className="text-green text-[0.82rem] font-medium hover:underline mt-1 inline-block">
                 Book a cleaning &rarr;
-              </Link>
+              </button>
             </div>
           ) : (
             <div className="space-y-3">
@@ -323,13 +346,13 @@ export default function CustomerDashboard() {
             <Sparkles className="w-4 h-4 text-green" /> Quick Actions
           </h3>
 
-          <Link
-            href="/book"
+          <button
+            onClick={() => setShowBookingWizard(true)}
             className="flex items-center gap-3 w-full px-4 py-3.5 bg-gradient-to-r from-green to-green-light text-white rounded-xl font-semibold text-[0.88rem] hover:opacity-90 transition-opacity mb-3"
           >
             <Plus className="w-5 h-5" />
             <span>Book a Cleaning</span>
-          </Link>
+          </button>
 
           <div className="grid grid-cols-2 gap-2 mt-3">
             <div className={`${INNER_BG} rounded-lg p-3 text-center`}>
@@ -622,11 +645,34 @@ export default function CustomerDashboard() {
         </div>
       )}
 
-      {/* ═══ PAYMENT SUCCESS TOAST ═══ */}
+      {/* ═══ BOOKING WIZARD MODAL ═══ */}
+      {showBookingWizard && data.services.length > 0 && (
+        <PortalBookingWizard
+          services={data.services}
+          addOns={data.addOns}
+          addresses={data.addresses}
+          onClose={() => setShowBookingWizard(false)}
+          onSuccess={() => {
+            setShowBookingWizard(false);
+            setBookingSuccess(true);
+            fetchDashboard();
+          }}
+        />
+      )}
+
+      {/* ═══ SUCCESS TOASTS ═══ */}
       {paymentSuccess && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
           <CheckCircle className="w-5 h-5" /> Payment successful!
           <button onClick={() => setPaymentSuccess(false)} className="ml-2 text-white/70 hover:text-white">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+      {bookingSuccess && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
+          <CheckCircle className="w-5 h-5" /> Booking request submitted!
+          <button onClick={() => setBookingSuccess(false)} className="ml-2 text-white/70 hover:text-white">
             <X className="w-4 h-4" />
           </button>
         </div>
