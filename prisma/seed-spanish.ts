@@ -27,7 +27,7 @@ async function main() {
       descriptionEs: "Oficinas, espacios comerciales, salas de espera — mantenemos tu negocio con apariencia profesional e higiénica.",
     },
     "post-construction": {
-      nameEs: "Post-Construcción",
+      nameEs: "Limpieza Post-Construcción",
       descriptionEs: "La construcción deja un desastre — polvo, escombros, residuos. Nos encargamos de la limpieza pesada para que tu espacio esté listo para habitar.",
     },
     "airbnb-turnover": {
