@@ -72,6 +72,13 @@ enum ApplicationStatus {
   REJECTED
 }
 
+enum SocialPostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  FAILED
+}
+
 enum CommercialInquiryStatus {
   NEW
   CONTACTED
@@ -654,6 +661,33 @@ model BlogPost {
 
   @@index([slug])
   @@index([isPublished])
+}
+
+// ── Social Media Posts ──
+
+model SocialPost {
+  id             String           @id @default(cuid())
+  platforms      Json             // ["facebook", "instagram", "tiktok", "google"]
+  contentType    String           // tip, promo, seasonal, testimonial, before_after, behind_scenes, educational
+  content        String           // English post text
+  contentEs      String?          // Spanish post text
+  hashtags       Json?            // ["#cleaning", "#miami"]
+  imagePrompt    String?          // AI-generated image description
+  imageUrl       String?          // Uploaded image URL
+  callToAction   String?          // CTA text
+  status         SocialPostStatus @default(DRAFT)
+  scheduledFor   DateTime?
+  publishedAt    DateTime?
+  publishResults Json?            // { "facebook": { "postId": "...", "url": "..." } }
+  failureReason  String?
+  aiModel        String?          // "deepseek-chat"
+  aiPromptUsed   String?          // Topic/prompt for regeneration
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([status])
+  @@index([scheduledFor])
+  @@index([createdAt])
 }
 
 model TargetKeyword {

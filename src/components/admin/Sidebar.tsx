@@ -7,7 +7,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard, CalendarCheck, Calendar, Clock, ClipboardList,
   Building2, CreditCard, TrendingUp, Users, Home, Package,
-  DollarSign, Sparkles, PenLine, FileText, Search, Settings,
+  DollarSign, Sparkles, PenLine, Share2, FileText, Search, Settings,
 } from "lucide-react";
 
 const navItems: { label: string; href: string; icon: LucideIcon }[] = [
@@ -25,6 +25,7 @@ const navItems: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Payroll", href: "/admin/payroll", icon: DollarSign },
   { label: "Services", href: "/admin/services", icon: Sparkles },
   { label: "Blog", href: "/admin/blog", icon: PenLine },
+  { label: "Social Media", href: "/admin/social", icon: Share2 },
   { label: "Content", href: "/admin/content", icon: FileText },
   { label: "SEO Manager", href: "/admin/seo", icon: Search },
   { label: "Settings", href: "/admin/settings", icon: Settings },
