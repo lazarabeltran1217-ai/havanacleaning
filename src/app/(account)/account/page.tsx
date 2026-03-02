@@ -246,7 +246,8 @@ export default function CustomerDashboard() {
   // Locale-aware helpers
   const locale = data?.profile?.locale || "en";
   const dateLocale = locale === "es" ? "es-ES" : "en-US";
-  const fmtDate = (dateStr: string) => new Date(dateStr).toLocaleDateString(dateLocale, { month: "short", day: "numeric", year: "numeric" });
+  const capitalize = (s: string) => s.replace(/(^|\s)[a-záéíóúñü]/gi, (c) => c.toUpperCase());
+  const fmtDate = (dateStr: string) => capitalize(new Date(dateStr).toLocaleDateString(dateLocale, { month: "short", day: "numeric", year: "numeric" }));
   const fmtStatus = (status: string) => t(STATUS_KEY[status] || "status_pending");
   const loc = (en: string, es?: string | null) => (locale === "es" && es ? es : en);
   const TIME_KEY: Record<string, string> = { morning: "time_morning", midday: "time_midday", afternoon: "time_afternoon" };
@@ -287,7 +288,7 @@ export default function CustomerDashboard() {
           {greeting}, {firstName}
         </h1>
         <p className="text-white/70 text-sm mt-1">
-          {now.toLocaleDateString(dateLocale, { weekday: "long", month: "long", day: "numeric" })}
+          {capitalize(now.toLocaleDateString(dateLocale, { weekday: "long", month: "long", day: "numeric" }))}
         </p>
         <div className="flex flex-wrap justify-center gap-2 mt-3">
           {data.upcomingBookings.length > 0 && (
