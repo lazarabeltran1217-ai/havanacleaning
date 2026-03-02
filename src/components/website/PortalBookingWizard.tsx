@@ -18,6 +18,7 @@ const LABEL_CLS = "block text-[0.72rem] font-medium uppercase tracking-wider mb-
 interface ServiceOption {
   id: string;
   name: string;
+  nameEs?: string | null;
   slug: string;
   icon: string | null;
   basePrice: number;
@@ -29,6 +30,7 @@ interface ServiceOption {
 interface AddOnOption {
   id: string;
   name: string;
+  nameEs?: string | null;
   price: number;
 }
 
@@ -67,6 +69,7 @@ function fmtCurrency(amount: number) {
 export function PortalBookingWizard({ services, addOns, addresses, locale = "en", onClose, onSuccess }: Props) {
   const t = useTranslations("account");
   const dateLocale = locale === "es" ? "es-ES" : "en-US";
+  const loc = (en: string, es?: string | null) => (locale === "es" && es ? es : en);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -206,7 +209,7 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
                     className={`border rounded-xl p-3 text-center transition-all ${serviceId === s.id ? "border-gold bg-gold/10 ring-2 ring-gold/30" : `${INNER_BORDER} hover:border-gold/30`}`}
                   >
                     <ServiceIcon emoji={s.icon} className={`w-7 h-7 mx-auto mb-1 ${TEXT_MUTED}`} />
-                    <div className={`text-[0.78rem] font-medium ${TEXT_PRIMARY}`}>{s.name}</div>
+                    <div className={`text-[0.78rem] font-medium ${TEXT_PRIMARY}`}>{loc(s.name, s.nameEs)}</div>
                     <div className="text-amber text-[0.72rem] mt-0.5">
                       {s.basePrice > 0 ? fmtCurrency(Math.max(0, s.basePrice + (bedrooms - 2) * s.pricePerBedroom + (bathrooms - 2) * s.pricePerBathroom)) : t("quote")}
                     </div>
@@ -278,7 +281,7 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
                   <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>{t("preferredTime")}</label>
                   <select value={scheduledTime} onChange={(e) => setScheduledTime(e.target.value)} className={INPUT_CLS}>
                     {TIME_SLOTS.map((slot) => (
-                      <option key={slot.value} value={slot.value}>{slot.label}</option>
+                      <option key={slot.value} value={slot.value}>{t(`time_${slot.value}_full` as "time_morning_full")}</option>
                     ))}
                   </select>
                 </div>
@@ -295,7 +298,7 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
                         onClick={() => toggleAddOn(addon.id)}
                         className={`border rounded-xl px-3 py-2.5 text-left transition-all text-[0.82rem] flex items-center justify-between ${selectedAddOns.includes(addon.id) ? "border-gold bg-gold/10" : `${INNER_BORDER} hover:border-gold/30`}`}
                       >
-                        <span className={TEXT_PRIMARY}>{addon.name}</span>
+                        <span className={TEXT_PRIMARY}>{loc(addon.name, addon.nameEs)}</span>
                         <span className="text-amber font-medium text-[0.78rem]">+{fmtCurrency(addon.price)}</span>
                       </button>
                     ))}
@@ -386,13 +389,13 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
                 <div className="space-y-2 text-[0.85rem]">
                   <div className="flex justify-between">
                     <span className={TEXT_PRIMARY}>
-                      {selectedService?.name} ({bedrooms} {t("bed")} / {bathrooms} {t("bath")})
+                      {selectedService ? loc(selectedService.name, selectedService.nameEs) : ""} ({bedrooms} {t("bed")} / {bathrooms} {t("bath")})
                     </span>
                     <span className={TEXT_PRIMARY}>{fmtCurrency(servicePrice)}</span>
                   </div>
                   {addOns.filter((a) => selectedAddOns.includes(a.id)).map((a) => (
                     <div key={a.id} className="flex justify-between">
-                      <span className={TEXT_MUTED}>+ {a.name}</span>
+                      <span className={TEXT_MUTED}>+ {loc(a.name, a.nameEs)}</span>
                       <span className={TEXT_MUTED}>{fmtCurrency(a.price)}</span>
                     </div>
                   ))}
@@ -413,7 +416,7 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
                 </div>
 
                 <div className="mt-3 text-gray-500 dark:text-sand/60 text-[0.72rem] space-y-0.5">
-                  <div>{scheduledDate && new Date(scheduledDate + "T12:00:00").toLocaleDateString(dateLocale, { weekday: "long", month: "long", day: "numeric", year: "numeric" })} &middot; <span className="capitalize">{scheduledTime}</span></div>
+                  <div>{scheduledDate && new Date(scheduledDate + "T12:00:00").toLocaleDateString(dateLocale, { weekday: "long", month: "long", day: "numeric", year: "numeric" })} &middot; <span className="capitalize">{t(`time_${scheduledTime}` as "time_morning")}</span></div>
                   {!useNewAddress && addresses.find((a) => a.id === addressId) && (
                     <div>{addresses.find((a) => a.id === addressId)!.street}, {addresses.find((a) => a.id === addressId)!.city}</div>
                   )}

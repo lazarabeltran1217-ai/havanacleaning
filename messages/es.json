@@ -461,7 +461,16 @@
     "status_in_progress": "En progreso",
     "status_completed": "Completada",
     "status_cancelled": "Cancelada",
-    "status_no_show": "No presentado"
+    "status_no_show": "No presentado",
+    "time_morning": "Mañana",
+    "time_midday": "Mediodía",
+    "time_afternoon": "Tarde",
+    "time_morning_full": "Mañana (8am - 11am)",
+    "time_midday_full": "Mediodía (11am - 2pm)",
+    "time_afternoon_full": "Tarde (2pm - 5pm)",
+    "addr_Home": "Casa",
+    "addr_Work": "Trabajo",
+    "addr_Other": "Otro"
   },
   "common": {
     "loading": "Cargando...",

@@ -461,7 +461,16 @@
     "status_in_progress": "In progress",
     "status_completed": "Completed",
     "status_cancelled": "Cancelled",
-    "status_no_show": "No show"
+    "status_no_show": "No show",
+    "time_morning": "Morning",
+    "time_midday": "Midday",
+    "time_afternoon": "Afternoon",
+    "time_morning_full": "Morning (8am - 11am)",
+    "time_midday_full": "Midday (11am - 2pm)",
+    "time_afternoon_full": "Afternoon (2pm - 5pm)",
+    "addr_Home": "Home",
+    "addr_Work": "Work",
+    "addr_Other": "Other"
   },
   "common": {
     "loading": "Loading...",

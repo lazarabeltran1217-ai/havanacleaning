@@ -32,7 +32,7 @@ export async function GET() {
             scheduledDate: { gte: today },
           },
           include: {
-            service: { select: { name: true, icon: true } },
+            service: { select: { name: true, nameEs: true, icon: true } },
             address: { select: { street: true, unit: true, city: true, state: true, zipCode: true } },
             payments: { select: { status: true } },
             assignments: { include: { employee: { select: { name: true } } } },
@@ -45,7 +45,7 @@ export async function GET() {
         prisma.booking.findMany({
           where: { customerId: uid },
           include: {
-            service: { select: { name: true, icon: true } },
+            service: { select: { name: true, nameEs: true, icon: true } },
             address: { select: { street: true, unit: true, city: true, state: true, zipCode: true } },
             payments: { select: { status: true } },
             assignments: { include: { employee: { select: { name: true } } } },
@@ -75,13 +75,13 @@ export async function GET() {
         prisma.service.findMany({
           where: { isActive: true },
           orderBy: { sortOrder: "asc" },
-          select: { id: true, name: true, slug: true, icon: true, basePrice: true, pricePerBedroom: true, pricePerBathroom: true, estimatedHours: true },
+          select: { id: true, name: true, nameEs: true, slug: true, icon: true, basePrice: true, pricePerBedroom: true, pricePerBathroom: true, estimatedHours: true },
         }),
 
         // Add-ons for booking form
         prisma.serviceAddOn.findMany({
           where: { isActive: true },
-          select: { id: true, name: true, price: true },
+          select: { id: true, name: true, nameEs: true, price: true },
           orderBy: { name: "asc" },
         }),
       ]);

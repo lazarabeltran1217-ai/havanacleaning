@@ -59,7 +59,7 @@ interface BookingData {
   status: string;
   total: number;
   recurrence?: string;
-  service: { name: string; icon: string | null };
+  service: { name: string; nameEs?: string | null; icon: string | null };
   address: { street: string; unit: string | null; city: string; state: string; zipCode: string } | null;
   payments: { status: string }[];
   assignments: { employee: { name: string } }[];
@@ -79,6 +79,7 @@ interface AddressData {
 interface ServiceData {
   id: string;
   name: string;
+  nameEs?: string | null;
   slug: string;
   icon: string | null;
   basePrice: number;
@@ -90,6 +91,7 @@ interface ServiceData {
 interface AddOnData {
   id: string;
   name: string;
+  nameEs?: string | null;
   price: number;
 }
 
@@ -246,6 +248,11 @@ export default function CustomerDashboard() {
   const dateLocale = locale === "es" ? "es-ES" : "en-US";
   const fmtDate = (dateStr: string) => new Date(dateStr).toLocaleDateString(dateLocale, { month: "short", day: "numeric", year: "numeric" });
   const fmtStatus = (status: string) => t(STATUS_KEY[status] || "status_pending");
+  const loc = (en: string, es?: string | null) => (locale === "es" && es ? es : en);
+  const TIME_KEY: Record<string, string> = { morning: "time_morning", midday: "time_midday", afternoon: "time_afternoon" };
+  const fmtTime = (slot: string) => t(TIME_KEY[slot] || TIME_KEY.morning);
+  const ADDR_LABEL_KEY: Record<string, string> = { Home: "addr_Home", Work: "addr_Work", Other: "addr_Other" };
+  const fmtAddrLabel = (label: string) => t(ADDR_LABEL_KEY[label] || label);
 
   // Filtered bookings
   const filteredBookings = data?.allBookings.filter((b) => {
@@ -324,14 +331,14 @@ export default function CustomerDashboard() {
                   <div key={b.id} className={`border ${INNER_BORDER} rounded-xl p-3`}>
                     <div className="flex items-center justify-between mb-1">
                       <span className={`font-medium text-[0.85rem] flex items-center gap-1.5 ${TEXT_PRIMARY}`}>
-                        <ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-gold" /> {b.service.name}
+                        <ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-gold" /> {loc(b.service.name, b.service.nameEs)}
                       </span>
                       <span className={`text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[b.status] || "bg-gray-100 text-gray-500"}`}>
                         {fmtStatus(b.status)}
                       </span>
                     </div>
                     <div className="text-gray-500 dark:text-sand/60 text-[0.78rem] space-y-0.5">
-                      <div>{fmtDate(b.scheduledDate)} &middot; <span className="capitalize">{b.scheduledTime}</span></div>
+                      <div>{fmtDate(b.scheduledDate)} &middot; <span className="capitalize">{fmtTime(b.scheduledTime)}</span></div>
                       {b.address && (
                         <div className="flex items-start gap-1">
                           <MapPin className="w-3 h-3 mt-0.5 shrink-0 text-gray-400 dark:text-sand/50" />
@@ -428,13 +435,13 @@ export default function CustomerDashboard() {
                       <div>
                         <div className="flex items-center gap-1.5 mb-0.5">
                           <ServiceIcon emoji={b.service.icon} className="w-3.5 h-3.5 text-gold" />
-                          <span className={`font-medium text-[0.82rem] ${TEXT_PRIMARY}`}>{b.service.name}</span>
+                          <span className={`font-medium text-[0.82rem] ${TEXT_PRIMARY}`}>{loc(b.service.name, b.service.nameEs)}</span>
                           <span className={`text-[0.6rem] uppercase tracking-wider px-1.5 py-0.5 rounded-full font-medium ${statusColors[b.status] || "bg-gray-100 text-gray-500"}`}>
                             {fmtStatus(b.status)}
                           </span>
                         </div>
                         <div className="text-gray-500 dark:text-sand/60 text-[0.72rem] space-y-0.5">
-                          <div>{fmtDate(b.scheduledDate)} &middot; <span className="capitalize">{b.scheduledTime}</span></div>
+                          <div>{fmtDate(b.scheduledDate)} &middot; <span className="capitalize">{fmtTime(b.scheduledTime)}</span></div>
                           <div className={TEXT_MUTED}>#{b.bookingNumber}</div>
                           {b.address && (
                             <div className="flex items-start gap-1">
@@ -547,7 +554,7 @@ export default function CustomerDashboard() {
                   <MapPin className="w-4 h-4 text-gold shrink-0" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className={`font-medium text-[0.82rem] ${TEXT_PRIMARY}`}>{addr.label}</span>
+                      <span className={`font-medium text-[0.82rem] ${TEXT_PRIMARY}`}>{fmtAddrLabel(addr.label)}</span>
                       {addr.isDefault && (
                         <span className="text-[0.6rem] bg-gold/10 text-gold px-1.5 py-0.5 rounded-full uppercase tracking-wider">{t("default")}</span>
                       )}
@@ -635,10 +642,10 @@ export default function CustomerDashboard() {
               <div className={`${INNER_BG} rounded-xl p-4 mb-4`}>
                 <div className="flex items-center gap-2 mb-2">
                   <ServiceIcon emoji={payingBooking.service.icon} className="w-5 h-5 text-gold" />
-                  <span className={`font-display text-[1rem] ${TEXT_PRIMARY}`}>{payingBooking.service.name}</span>
+                  <span className={`font-display text-[1rem] ${TEXT_PRIMARY}`}>{loc(payingBooking.service.name, payingBooking.service.nameEs)}</span>
                 </div>
                 <div className="text-gray-500 dark:text-sand/60 text-[0.82rem] space-y-1">
-                  <div>{fmtDate(payingBooking.scheduledDate)} &middot; <span className="capitalize">{payingBooking.scheduledTime}</span></div>
+                  <div>{fmtDate(payingBooking.scheduledDate)} &middot; <span className="capitalize">{fmtTime(payingBooking.scheduledTime)}</span></div>
                   {payingBooking.address && (
                     <div className="flex items-start gap-1">
                       <MapPin className="w-3 h-3 mt-0.5 shrink-0" />
