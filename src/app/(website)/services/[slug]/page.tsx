@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         ? baseDesc
         : `Professional ${service.name.toLowerCase()} services. ${baseDesc || "Trusted by local families and businesses."} Book online with Havana Cleaning today.`;
     return {
-      title: service.name,
+      title: `Professional ${service.name} Services`,
       description: description.slice(0, 160),
       alternates: { canonical: `/services/${slug}` },
     };

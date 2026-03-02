@@ -10,7 +10,7 @@ import { localized } from "@/lib/i18n-content";
 export const metadata: Metadata = {
   title: "FAQ — Frequently Asked Questions",
   description:
-    "Get answers to common questions about Havana Cleaning services, pricing, scheduling, and more.",
+    "Get answers to common questions about Havana Cleaning services, pricing, scheduling, cancellations, and more. Book with confidence knowing every detail upfront.",
   alternates: { canonical: "/faq" },
 };
 
