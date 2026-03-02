@@ -18,14 +18,20 @@ export default async function ConfirmPage({ searchParams }: Props) {
   const { bookingId } = await searchParams;
   if (!bookingId) redirect("/book");
 
-  const booking = await prisma.booking.findUnique({
-    where: { id: bookingId },
+  // Support comma-separated IDs for multi-service bookings
+  const ids = bookingId.split(",").filter(Boolean);
+
+  const bookings = await prisma.booking.findMany({
+    where: { id: { in: ids } },
     include: {
       service: { select: { name: true, icon: true } },
     },
+    orderBy: { createdAt: "asc" },
   });
 
-  if (!booking) notFound();
+  if (bookings.length === 0) notFound();
+
+  const primary = bookings[0];
 
   return (
     <section className="bg-ivory min-h-screen pt-36 pb-20 px-6 md:px-20">
@@ -33,16 +39,19 @@ export default async function ConfirmPage({ searchParams }: Props) {
         <CheckCircle className="w-16 h-16 text-green mx-auto mb-6" />
         <h1 className="font-display text-3xl mb-3">Request Received!</h1>
         <p className="text-sand text-[0.85rem] mb-6">
-          Booking #{booking.bookingNumber}
+          Booking #{primary.bookingNumber}
+          {bookings.length > 1 && ` + ${bookings.length - 1} more`}
         </p>
 
-        <div className="bg-white border border-tobacco/10 rounded-lg p-6 mb-8 text-left">
-          <div className="flex items-center gap-3 mb-4">
-            <ServiceIcon emoji={booking.service.icon} className="w-6 h-6 text-green" />
-            <span className="font-display text-lg">{booking.service.name}</span>
-          </div>
-          <div className="text-[0.9rem] text-[#7a6555] space-y-1">
-            <p>{formatDate(booking.scheduledDate)} &middot; <span className="capitalize">{booking.scheduledTime}</span></p>
+        <div className="bg-white border border-tobacco/10 rounded-lg p-6 mb-8 text-left space-y-3">
+          {bookings.map((booking) => (
+            <div key={booking.id} className="flex items-center gap-3">
+              <ServiceIcon emoji={booking.service.icon} className="w-6 h-6 text-green" />
+              <span className="font-display text-lg">{booking.service.name}</span>
+            </div>
+          ))}
+          <div className="text-[0.9rem] text-[#7a6555] space-y-1 pt-2 border-t border-tobacco/10">
+            <p>{formatDate(primary.scheduledDate)} &middot; <span className="capitalize">{primary.scheduledTime}</span></p>
           </div>
         </div>
 

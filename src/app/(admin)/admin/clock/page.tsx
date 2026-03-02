@@ -22,9 +22,42 @@ export default async function AdminClockPage() {
   // Currently clocked in
   const activeClocks = entries.filter((e) => !e.clockOut);
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const weekAgo = new Date(today);
+  weekAgo.setDate(weekAgo.getDate() - 7);
+
+  const todayEntries = entries.filter((e) => new Date(e.clockIn) >= today).length;
+  const weekHours = entries
+    .filter((e) => new Date(e.clockIn) >= weekAgo && e.hoursWorked)
+    .reduce((sum, e) => sum + (e.hoursWorked || 0), 0);
+  const completedEntries = entries.filter((e) => e.hoursWorked);
+  const avgHours = completedEntries.length > 0
+    ? completedEntries.reduce((sum, e) => sum + (e.hoursWorked || 0), 0) / completedEntries.length
+    : 0;
+
   return (
     <div>
       <h2 className="font-display text-xl mb-6">Time Clock</h2>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Active Now</div>
+          <div className="text-2xl font-display text-green">{activeClocks.length}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Today&apos;s Entries</div>
+          <div className="text-2xl font-display text-tobacco">{todayEntries}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Hours This Week</div>
+          <div className="text-2xl font-display text-tobacco">{weekHours.toFixed(1)}h</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Avg per Entry</div>
+          <div className="text-2xl font-display text-tobacco">{avgHours.toFixed(1)}h</div>
+        </div>
+      </div>
 
       {/* ACTIVE CLOCKS */}
       {activeClocks.length > 0 && (

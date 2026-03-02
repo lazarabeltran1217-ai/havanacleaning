@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const {
     serviceId,
+    serviceIds: rawServiceIds,
     bedrooms,
     bathrooms,
     recurrence = "ONCE",
@@ -23,10 +24,19 @@ export async function POST(req: NextRequest) {
     customerEmail,
     customerPhone,
     customerPassword,
+    rush,
     address,
   } = body;
 
-  if (!serviceId || !scheduledDate || !scheduledTime) {
+  // Support both single serviceId and multi serviceIds
+  const serviceIds: string[] =
+    Array.isArray(rawServiceIds) && rawServiceIds.length > 0
+      ? rawServiceIds
+      : serviceId
+        ? [serviceId]
+        : [];
+
+  if (serviceIds.length === 0 || !scheduledDate || !scheduledTime) {
     return NextResponse.json(
       { error: "Missing required fields" },
       { status: 400 }
@@ -40,11 +50,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Validate service exists
-  const service = await prisma.service.findUnique({
-    where: { id: serviceId },
+  // Validate all services exist
+  const validServices = await prisma.service.findMany({
+    where: { id: { in: serviceIds }, isActive: true },
   });
-  if (!service || !service.isActive) {
+  if (validServices.length !== serviceIds.length) {
     return NextResponse.json({ error: "Invalid service" }, { status: 400 });
   }
 
@@ -86,14 +96,6 @@ export async function POST(req: NextRequest) {
     customerId = newUser.id;
   }
 
-  // Calculate price server-side
-  const pricing = await calculatePrice({
-    serviceId,
-    bedrooms: bedrooms || 2,
-    bathrooms: bathrooms || 2,
-    addOnIds,
-  });
-
   // Apply recurring discount
   const discountRates: Record<string, number> = {
     ONCE: 0,
@@ -102,10 +104,6 @@ export async function POST(req: NextRequest) {
     MONTHLY: 0.1,
   };
   const discountRate = discountRates[recurrence] ?? 0;
-  const discount = Math.round(pricing.subtotal * discountRate * 100) / 100;
-  const afterDiscount = pricing.subtotal - discount;
-  const tax = Math.round(afterDiscount * 0.07 * 100) / 100;
-  const total = Math.round((afterDiscount + tax) * 100) / 100;
 
   // Create or find address
   let addressId: string | undefined;
@@ -123,8 +121,6 @@ export async function POST(req: NextRequest) {
     addressId = created.id;
   }
 
-  const bookingNumber = await generateBookingNumber();
-
   // Fetch add-on prices upfront
   let addOnsData: { id: string; price: number }[] = [];
   if (addOnIds.length > 0) {
@@ -134,32 +130,65 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const booking = await prisma.booking.create({
-    data: {
-      bookingNumber,
-      customerId,
-      serviceId,
-      addressId: addressId || null,
-      scheduledDate: new Date(scheduledDate),
-      scheduledTime,
-      bedrooms: bedrooms || null,
-      bathrooms: bathrooms || null,
-      recurrence,
-      subtotal: pricing.subtotal,
-      discount,
-      tax,
-      total,
-      customerNotes: customerNotes || null,
-      addOns: {
-        create: addOnsData.map((addon) => ({
-          addOnId: addon.id,
-          price: addon.price,
-        })),
-      },
-    },
-  });
+  // Create one booking per selected service
+  const bookings: { id: string; bookingNumber: string }[] = [];
+  for (let i = 0; i < serviceIds.length; i++) {
+    const sid = serviceIds[i];
 
-  return NextResponse.json({ booking: { id: booking.id, bookingNumber: booking.bookingNumber } });
+    // Calculate price server-side (add-ons + rush fee only on first booking)
+    const pricing = await calculatePrice({
+      serviceId: sid,
+      bedrooms: bedrooms || 2,
+      bathrooms: bathrooms || 2,
+      addOnIds: i === 0 ? addOnIds : [],
+    });
+
+    const rushFee = (i === 0 && rush) ? 50 : 0;
+    const pricingSubtotal = pricing.subtotal + rushFee;
+    const discount = Math.round(pricingSubtotal * discountRate * 100) / 100;
+    const afterDiscount = pricingSubtotal - discount;
+    const tax = Math.round(afterDiscount * 0.07 * 100) / 100;
+    const total = Math.round((afterDiscount + tax) * 100) / 100;
+
+    const bookingNumber = await generateBookingNumber();
+
+    const booking = await prisma.booking.create({
+      data: {
+        bookingNumber,
+        customerId,
+        serviceId: sid,
+        addressId: addressId || null,
+        scheduledDate: new Date(scheduledDate),
+        scheduledTime,
+        bedrooms: bedrooms || null,
+        bathrooms: bathrooms || null,
+        recurrence,
+        subtotal: pricingSubtotal,
+        discount,
+        tax,
+        total,
+        customerNotes: rush
+          ? `[RUSH] ${customerNotes || "Same-day / ASAP requested"}`
+          : (customerNotes || null),
+        ...(i === 0 && addOnsData.length > 0
+          ? {
+              addOns: {
+                create: addOnsData.map((addon) => ({
+                  addOnId: addon.id,
+                  price: addon.price,
+                })),
+              },
+            }
+          : {}),
+      },
+    });
+    bookings.push({ id: booking.id, bookingNumber: booking.bookingNumber });
+  }
+
+  return NextResponse.json({
+    booking: bookings[0],
+    bookings,
+  });
 }
 
 export async function GET(req: NextRequest) {

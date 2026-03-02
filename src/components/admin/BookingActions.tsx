@@ -37,6 +37,17 @@ export function BookingActions({ bookingId, currentStatus, assignments, employee
     router.refresh();
   }
 
+  async function removeEmployee(employeeId: string) {
+    setLoading(true);
+    await fetch(`/api/bookings/${bookingId}/assign`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ employeeId }),
+    });
+    setLoading(false);
+    router.refresh();
+  }
+
   async function assignEmployee() {
     if (!selectedEmployee) return;
     setLoading(true);
@@ -86,9 +97,18 @@ export function BookingActions({ bookingId, currentStatus, assignments, employee
         {assignments.length > 0 && (
           <div className="mb-3 space-y-1">
             {assignments.map((a) => (
-              <div key={a.employeeId} className="text-[0.85rem] flex items-center gap-2">
-                <span className="w-2 h-2 bg-green rounded-full" />
-                {a.employeeName}
+              <div key={a.employeeId} className="text-[0.85rem] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 bg-green rounded-full" />
+                  {a.employeeName}
+                </div>
+                <button
+                  onClick={() => removeEmployee(a.employeeId)}
+                  disabled={loading}
+                  className="text-red-400 hover:text-red-600 text-[0.75rem] font-medium disabled:opacity-50 transition-colors"
+                >
+                  Remove
+                </button>
               </div>
             ))}
           </div>

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatCurrency } from "@/lib/utils";
 import { AddCustomerButton } from "@/components/admin/AddCustomerButton";
 
 export default async function AdminClientsPage() {
@@ -19,11 +19,40 @@ export default async function AdminClientsPage() {
     console.error("Failed to fetch customers:", error);
   }
 
+  const totalCustomers = customers.length;
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const newThisMonth = customers.filter((c) => new Date(c.createdAt) >= monthStart).length;
+  const totalBookings = customers.reduce((sum, c) => sum + c._count.bookings, 0);
+  const lifetimeRevenue = customers.reduce(
+    (sum, c) => sum + c.bookings.reduce((s, b) => s + b.total, 0),
+    0
+  );
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-display text-xl">Customers</h2>
         <AddCustomerButton />
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Total Customers</div>
+          <div className="text-2xl font-display text-tobacco">{totalCustomers}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">New This Month</div>
+          <div className="text-2xl font-display text-green">{newThisMonth}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Total Bookings</div>
+          <div className="text-2xl font-display text-tobacco">{totalBookings}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Lifetime Revenue</div>
+          <div className="text-2xl font-display text-green">{formatCurrency(lifetimeRevenue)}</div>
+        </div>
       </div>
 
       {/* Mobile card view */}

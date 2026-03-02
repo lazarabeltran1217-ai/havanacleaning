@@ -30,6 +30,9 @@ export default async function AdminInventoryPage() {
   }
 
   const lowStockCount = items.filter((i) => i.currentStock <= i.minStock).length;
+  const totalItems = items.length;
+  const totalValue = items.reduce((sum, i) => sum + i.currentStock * i.costPerUnit, 0);
+  const categories = new Set(items.map((i) => i.category).filter(Boolean)).size;
 
   return (
     <div>
@@ -43,6 +46,25 @@ export default async function AdminInventoryPage() {
           )}
         </div>
         <InventoryActions items={items.map((i) => ({ id: i.id, name: i.name }))} />
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Total Items</div>
+          <div className="text-2xl font-display text-tobacco">{totalItems}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Low Stock</div>
+          <div className={`text-2xl font-display ${lowStockCount > 0 ? "text-red" : "text-green"}`}>{lowStockCount}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Total Value</div>
+          <div className="text-2xl font-display text-green">{formatCurrency(totalValue)}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Categories</div>
+          <div className="text-2xl font-display text-tobacco">{categories}</div>
+        </div>
       </div>
 
       {/* Mobile card view */}

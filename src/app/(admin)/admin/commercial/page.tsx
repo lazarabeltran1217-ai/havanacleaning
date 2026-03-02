@@ -26,11 +26,35 @@ export default async function AdminCommercialPage() {
     LOST: "bg-red/10 text-red",
   };
 
+  const totalInq = inquiries.length;
+  const newInq = inquiries.filter((i) => i.status === "NEW").length;
+  const quoteSent = inquiries.filter((i) => i.status === "QUOTE_SENT").length;
+  const wonCount = inquiries.filter((i) => i.status === "WON").length;
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-display text-xl">Commercial Inquiries</h2>
         <AddCommercialButton />
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Total Inquiries</div>
+          <div className="text-2xl font-display text-tobacco">{totalInq}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">New</div>
+          <div className="text-2xl font-display text-amber">{newInq}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Quote Sent</div>
+          <div className="text-2xl font-display text-teal">{quoteSent}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Won</div>
+          <div className="text-2xl font-display text-green">{wonCount}</div>
+        </div>
       </div>
 
       {/* Mobile card view */}

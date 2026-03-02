@@ -37,6 +37,8 @@ const RECURRENCE_DISCOUNT: Record<RecurrenceType, number> = {
   MONTHLY: 0.1,
 };
 
+const RUSH_FEE = 50;
+
 export function BookingWizard({ services, addOns }: Props) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -48,8 +50,8 @@ export function BookingWizard({ services, addOns }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Step 1 — Service selection
-  const [serviceId, setServiceId] = useState(preselected?.id || "");
+  // Step 1 — Service selection (multi-select)
+  const [serviceIds, setServiceIds] = useState<string[]>(preselected ? [preselected.id] : []);
   const [bedrooms, setBedrooms] = useState(2);
   const [bathrooms, setBathrooms] = useState(2);
   const [recurrence, setRecurrence] = useState<RecurrenceType>("ONCE");
@@ -57,6 +59,7 @@ export function BookingWizard({ services, addOns }: Props) {
   // Step 2 — Date, time, add-ons, notes
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("morning");
+  const [rush, setRush] = useState(false);
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
 
@@ -71,21 +74,17 @@ export function BookingWizard({ services, addOns }: Props) {
   const [state] = useState("FL");
   const [zipCode, setZipCode] = useState("");
 
-  // Price calculation
-  const selectedService = services.find((s) => s.id === serviceId);
-  const servicePrice = selectedService
-    ? Math.max(
-        0,
-        selectedService.basePrice +
-          (bedrooms - 2) * selectedService.pricePerBedroom +
-          (bathrooms - 2) * selectedService.pricePerBathroom
-      )
-    : 0;
+  // Price calculation (supports multiple selected services)
+  const selectedServices = services.filter((s) => serviceIds.includes(s.id));
+  const serviceCalc = (s: ServiceOption) =>
+    Math.max(0, s.basePrice + (bedrooms - 2) * s.pricePerBedroom + (bathrooms - 2) * s.pricePerBathroom);
+  const servicesPrice = selectedServices.reduce((sum, s) => sum + serviceCalc(s), 0);
   const addOnsTotal = addOns
     .filter((a) => selectedAddOns.includes(a.id))
     .reduce((sum, a) => sum + a.price, 0);
   const discountRate = RECURRENCE_DISCOUNT[recurrence];
-  const subtotal = servicePrice + addOnsTotal;
+  const rushCharge = rush ? RUSH_FEE : 0;
+  const subtotal = servicesPrice + addOnsTotal + rushCharge;
   const discount = Math.round(subtotal * discountRate * 100) / 100;
   const afterDiscount = subtotal - discount;
   const tax = Math.round(afterDiscount * 0.07 * 100) / 100;
@@ -97,16 +96,16 @@ export function BookingWizard({ services, addOns }: Props) {
     );
   }
 
-  // Tomorrow's date as minimum (Eastern Time)
+  // Date minimum: today if rush, otherwise tomorrow (Eastern Time)
   const etNow = new Date(
     new Date().toLocaleString("en-US", { timeZone: "America/New_York" })
   );
-  const etTomorrow = new Date(
+  const etMinDay = new Date(
     etNow.getFullYear(),
     etNow.getMonth(),
-    etNow.getDate() + 1
+    etNow.getDate() + (rush ? 0 : 1)
   );
-  const minDate = `${etTomorrow.getFullYear()}-${String(etTomorrow.getMonth() + 1).padStart(2, "0")}-${String(etTomorrow.getDate()).padStart(2, "0")}`;
+  const minDate = `${etMinDay.getFullYear()}-${String(etMinDay.getMonth() + 1).padStart(2, "0")}-${String(etMinDay.getDate()).padStart(2, "0")}`;
 
   async function handleSubmit() {
     setLoading(true);
@@ -117,10 +116,11 @@ export function BookingWizard({ services, addOns }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          serviceId,
+          serviceIds,
           bedrooms,
           bathrooms,
           recurrence,
+          rush,
           scheduledDate,
           scheduledTime,
           addOnIds: selectedAddOns,
@@ -141,7 +141,10 @@ export function BookingWizard({ services, addOns }: Props) {
         return;
       }
 
-      router.push(`/book/confirm?bookingId=${data.booking.id}`);
+      const ids = data.bookings
+        ? data.bookings.map((b: { id: string }) => b.id).join(",")
+        : data.booking.id;
+      router.push(`/book/confirm?bookingId=${ids}`);
     } catch {
       setError("Something went wrong. Please try again.");
       setLoading(false);
@@ -197,9 +200,9 @@ export function BookingWizard({ services, addOns }: Props) {
               <button
                 key={s.id}
                 type="button"
-                onClick={() => setServiceId(s.id)}
+                onClick={() => setServiceIds((prev) => prev.includes(s.id) ? prev.filter((sid) => sid !== s.id) : [...prev, s.id])}
                 className={`border rounded-lg p-4 text-center transition-all ${
-                  serviceId === s.id
+                  serviceIds.includes(s.id)
                     ? "border-green bg-green/5 ring-2 ring-green/30"
                     : "border-tobacco/10 hover:border-green/30"
                 }`}
@@ -302,8 +305,8 @@ export function BookingWizard({ services, addOns }: Props) {
 
           <button
             type="button"
-            onClick={() => serviceId && setStep(2)}
-            disabled={!serviceId}
+            onClick={() => serviceIds.length > 0 && setStep(2)}
+            disabled={serviceIds.length === 0}
             className="w-full bg-gold text-tobacco py-4 text-[0.9rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Continue
@@ -344,6 +347,29 @@ export function BookingWizard({ services, addOns }: Props) {
               </select>
             </div>
           </div>
+
+          {/* RUSH OPTION */}
+          <button
+            type="button"
+            onClick={() => setRush((prev) => !prev)}
+            className={`w-full border rounded-lg px-5 py-4 text-left transition-all flex items-center justify-between ${
+              rush
+                ? "border-amber bg-amber/10 ring-2 ring-amber/30"
+                : "border-tobacco/10 hover:border-amber/30"
+            }`}
+          >
+            <div>
+              <div className="text-[0.9rem] font-semibold">
+                Rush / Same-Day Service
+              </div>
+              <div className="text-[0.78rem] text-sand mt-0.5">
+                Need it done today or ASAP? We&apos;ll prioritize your booking.
+              </div>
+            </div>
+            <span className="text-amber font-bold text-[0.9rem] whitespace-nowrap ml-4">
+              +{formatCurrency(RUSH_FEE)}
+            </span>
+          </button>
 
           {/* ADD-ONS */}
           <div>
@@ -546,12 +572,14 @@ export function BookingWizard({ services, addOns }: Props) {
               </div>
             )}
             <div className="space-y-2 text-[0.9rem]">
-              <div className="flex justify-between">
-                <span>
-                  {selectedService?.name} ({bedrooms} bed / {bathrooms} bath)
-                </span>
-                <span>{formatCurrency(servicePrice)}</span>
-              </div>
+              {selectedServices.map((s) => (
+                <div key={s.id} className="flex justify-between">
+                  <span>
+                    {s.name} ({bedrooms} bed / {bathrooms} bath)
+                  </span>
+                  <span>{formatCurrency(serviceCalc(s))}</span>
+                </div>
+              ))}
               {addOns
                 .filter((a) => selectedAddOns.includes(a.id))
                 .map((a) => (
@@ -560,6 +588,12 @@ export function BookingWizard({ services, addOns }: Props) {
                     <span>{formatCurrency(a.price)}</span>
                   </div>
                 ))}
+              {rush && (
+                <div className="flex justify-between text-amber">
+                  <span>Rush / Same-Day</span>
+                  <span>+{formatCurrency(RUSH_FEE)}</span>
+                </div>
+              )}
               {discount > 0 && (
                 <div className="flex justify-between text-green">
                   <span>

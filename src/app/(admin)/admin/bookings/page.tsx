@@ -33,11 +33,43 @@ export default async function AdminBookingsPage() {
     NO_SHOW: "bg-gray-100 text-gray-500",
   };
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const totalBookings = bookings.length;
+  const pendingCount = bookings.filter((b) => b.status === "PENDING").length;
+  const todayCount = bookings.filter((b) => {
+    const d = new Date(b.scheduledDate);
+    return d >= today && d < tomorrow;
+  }).length;
+  const totalRevenue = bookings.reduce((sum, b) => sum + b.total, 0);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-display text-xl">All Bookings</h2>
         <QuickBookForm />
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Total Bookings</div>
+          <div className="text-2xl font-display text-tobacco">{totalBookings}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Pending</div>
+          <div className="text-2xl font-display text-amber">{pendingCount}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Today</div>
+          <div className="text-2xl font-display text-tobacco">{todayCount}</div>
+        </div>
+        <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Revenue</div>
+          <div className="text-2xl font-display text-green">{formatCurrency(totalRevenue)}</div>
+        </div>
       </div>
 
       {/* Mobile card view */}
