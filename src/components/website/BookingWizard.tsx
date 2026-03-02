@@ -4,11 +4,13 @@ import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
 import { ServiceIcon } from "@/lib/service-icons";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { localized } from "@/lib/i18n-content";
 
 interface ServiceOption {
   id: string;
   name: string;
+  nameEs: string | null;
   slug: string;
   icon: string | null;
   basePrice: number;
@@ -20,6 +22,7 @@ interface ServiceOption {
 interface AddOnOption {
   id: string;
   name: string;
+  nameEs: string | null;
   price: number;
 }
 
@@ -43,6 +46,9 @@ export function BookingWizard({ services, addOns }: Props) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const t = useTranslations("booking");
+  const locale = useLocale();
+  const sName = (s: ServiceOption) => localized(s.name, s.nameEs, locale);
+  const aName = (a: AddOnOption) => localized(a.name, a.nameEs, locale);
 
   const preselectedSlug = searchParams.get("service");
   const preselected = services.find((s) => s.slug === preselectedSlug);
@@ -219,7 +225,7 @@ export function BookingWizard({ services, addOns }: Props) {
                   emoji={s.icon}
                   className="w-7 h-7 mx-auto mb-1 text-tobacco/60"
                 />
-                <div className="text-[0.8rem] font-medium">{s.name}</div>
+                <div className="text-[0.8rem] font-medium">{sName(s)}</div>
                 <div className="text-amber text-[0.75rem] mt-1">
                   {s.basePrice > 0
                     ? formatCurrency(
@@ -396,7 +402,7 @@ export function BookingWizard({ services, addOns }: Props) {
                       : "border-tobacco/10 hover:border-green/30"
                   }`}
                 >
-                  <span>{addon.name}</span>
+                  <span>{aName(addon)}</span>
                   <span className="text-amber font-medium text-[0.8rem]">
                     +{formatCurrency(addon.price)}
                   </span>
@@ -583,7 +589,7 @@ export function BookingWizard({ services, addOns }: Props) {
               {selectedServices.map((s) => (
                 <div key={s.id} className="flex justify-between">
                   <span>
-                    {s.name} ({bedrooms} {t("bed")} / {bathrooms} {t("bath")})
+                    {sName(s)} ({bedrooms} {t("bed")} / {bathrooms} {t("bath")})
                   </span>
                   <span>{formatCurrency(serviceCalc(s))}</span>
                 </div>
@@ -592,7 +598,7 @@ export function BookingWizard({ services, addOns }: Props) {
                 .filter((a) => selectedAddOns.includes(a.id))
                 .map((a) => (
                   <div key={a.id} className="flex justify-between text-sand">
-                    <span>+ {a.name}</span>
+                    <span>+ {aName(a)}</span>
                     <span>{formatCurrency(a.price)}</span>
                   </div>
                 ))}
