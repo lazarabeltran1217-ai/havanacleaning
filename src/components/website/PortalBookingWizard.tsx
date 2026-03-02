@@ -4,6 +4,7 @@ import { useState } from "react";
 import { X, ChevronLeft } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
 import { TIME_SLOTS } from "@/lib/constants";
+import { useTranslations } from "next-intl";
 
 /* ─── Card constants (light / dark) ─── */
 const INNER_BORDER = "border-gray-200 dark:border-gold/15";
@@ -45,6 +46,7 @@ interface Props {
   services: ServiceOption[];
   addOns: AddOnOption[];
   addresses: AddressOption[];
+  locale?: string;
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -62,7 +64,9 @@ function fmtCurrency(amount: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amount);
 }
 
-export function PortalBookingWizard({ services, addOns, addresses, onClose, onSuccess }: Props) {
+export function PortalBookingWizard({ services, addOns, addresses, locale = "en", onClose, onSuccess }: Props) {
+  const t = useTranslations("account");
+  const dateLocale = locale === "es" ? "es-ES" : "en-US";
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -146,7 +150,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
 
       onSuccess();
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t("somethingWrong"));
       setLoading(false);
     }
   }
@@ -169,7 +173,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
               </button>
             )}
             <h3 className={`font-display text-lg ${TEXT_PRIMARY}`}>
-              {step === 1 ? "Choose Service" : step === 2 ? "Schedule & Add-Ons" : "Address & Review"}
+              {step === 1 ? t("wizard_step1") : step === 2 ? t("wizard_step2") : t("wizard_step3")}
             </h3>
           </div>
           <button onClick={onClose} className={`${TEXT_MUTED} hover:text-tobacco dark:hover:text-cream`}>
@@ -204,7 +208,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                     <ServiceIcon emoji={s.icon} className={`w-7 h-7 mx-auto mb-1 ${TEXT_MUTED}`} />
                     <div className={`text-[0.78rem] font-medium ${TEXT_PRIMARY}`}>{s.name}</div>
                     <div className="text-amber text-[0.72rem] mt-0.5">
-                      {s.basePrice > 0 ? fmtCurrency(Math.max(0, s.basePrice + (bedrooms - 2) * s.pricePerBedroom + (bathrooms - 2) * s.pricePerBathroom)) : "Quote"}
+                      {s.basePrice > 0 ? fmtCurrency(Math.max(0, s.basePrice + (bedrooms - 2) * s.pricePerBedroom + (bathrooms - 2) * s.pricePerBathroom)) : t("quote")}
                     </div>
                   </button>
                 ))}
@@ -212,31 +216,31 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>Bedrooms</label>
+                  <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>{t("bedrooms")}</label>
                   <select value={bedrooms} onChange={(e) => setBedrooms(Number(e.target.value))} className={INPUT_CLS}>
                     {[1, 2, 3, 4, 5, 6].map((n) => (
-                      <option key={n} value={n}>{n} {n === 1 ? "Bedroom" : "Bedrooms"}</option>
+                      <option key={n} value={n}>{n} {n === 1 ? t("bedroom_singular") : t("bedrooms_plural")}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>Bathrooms</label>
+                  <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>{t("bathrooms")}</label>
                   <select value={bathrooms} onChange={(e) => setBathrooms(Number(e.target.value))} className={INPUT_CLS}>
                     {[1, 2, 3, 4, 5].map((n) => (
-                      <option key={n} value={n}>{n} {n === 1 ? "Bathroom" : "Bathrooms"}</option>
+                      <option key={n} value={n}>{n} {n === 1 ? t("bathroom_singular") : t("bathrooms_plural")}</option>
                     ))}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>How Often?</label>
+                <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>{t("howOften")}</label>
                 <div className="grid grid-cols-4 gap-2">
                   {([
-                    { value: "ONCE", label: "One-Time" },
-                    { value: "WEEKLY", label: "Weekly", discount: "20% off" },
-                    { value: "BIWEEKLY", label: "Bi-Weekly", discount: "15% off" },
-                    { value: "MONTHLY", label: "Monthly", discount: "10% off" },
+                    { value: "ONCE", labelKey: "oneTime" },
+                    { value: "WEEKLY", labelKey: "weekly", discountKey: "discount_weekly" },
+                    { value: "BIWEEKLY", labelKey: "biWeekly", discountKey: "discount_biweekly" },
+                    { value: "MONTHLY", labelKey: "monthly", discountKey: "discount_monthly" },
                   ] as const).map((r) => (
                     <button
                       key={r.value}
@@ -244,8 +248,8 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                       onClick={() => setRecurrence(r.value)}
                       className={`border rounded-xl py-2.5 px-2 text-center transition-all text-[0.78rem] ${recurrence === r.value ? "border-gold bg-gold/10 ring-2 ring-gold/30" : `${INNER_BORDER} hover:border-gold/30`}`}
                     >
-                      <div className={`font-medium ${TEXT_PRIMARY}`}>{r.label}</div>
-                      {"discount" in r && <div className="text-gold text-[0.68rem] mt-0.5">{r.discount}</div>}
+                      <div className={`font-medium ${TEXT_PRIMARY}`}>{t(r.labelKey)}</div>
+                      {"discountKey" in r && <div className="text-gold text-[0.68rem] mt-0.5">{t(r.discountKey)}</div>}
                     </button>
                   ))}
                 </div>
@@ -257,7 +261,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                 disabled={!serviceId}
                 className="w-full bg-green text-white py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-green-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
-                Continue
+                {t("continue")}
               </button>
             </div>
           )}
@@ -267,11 +271,11 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
             <div className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>Preferred Date</label>
+                  <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>{t("preferredDate")}</label>
                   <input type="date" min={minDate} value={scheduledDate} onChange={(e) => setScheduledDate(e.target.value)} className={INPUT_CLS} />
                 </div>
                 <div>
-                  <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>Preferred Time</label>
+                  <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>{t("preferredTime")}</label>
                   <select value={scheduledTime} onChange={(e) => setScheduledTime(e.target.value)} className={INPUT_CLS}>
                     {TIME_SLOTS.map((slot) => (
                       <option key={slot.value} value={slot.value}>{slot.label}</option>
@@ -282,7 +286,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
 
               {addOns.length > 0 && (
                 <div>
-                  <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>Add-On Services (optional)</label>
+                  <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>{t("addOnServices")}</label>
                   <div className="grid grid-cols-2 gap-2">
                     {addOns.map((addon) => (
                       <button
@@ -300,12 +304,12 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
               )}
 
               <div>
-                <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>Special Instructions (optional)</label>
+                <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>{t("specialInstructions")}</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
-                  placeholder="Gate code, parking info, pet details, areas to focus on..."
+                  placeholder={t("instructionsPlaceholder")}
                   className={`${INPUT_CLS} resize-none`}
                 />
               </div>
@@ -316,7 +320,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                 disabled={!scheduledDate}
                 className="w-full bg-green text-white py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-green-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
-                Continue
+                {t("continue")}
               </button>
             </div>
           )}
@@ -326,7 +330,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
             <div className="space-y-5">
               {/* Address selection */}
               <div>
-                <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>Service Address</label>
+                <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>{t("serviceAddress")}</label>
                 {addresses.length > 0 && (
                   <div className="space-y-2 mb-3">
                     {addresses.map((addr) => (
@@ -347,7 +351,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                       onClick={() => setUseNewAddress(!useNewAddress)}
                       className="text-gold text-[0.78rem] font-semibold hover:underline"
                     >
-                      {useNewAddress ? "Use saved address" : "+ Use a new address"}
+                      {useNewAddress ? t("useSaved") : t("useNew")}
                     </button>
                   </div>
                 )}
@@ -355,20 +359,20 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                 {useNewAddress && (
                   <div className={`border ${INNER_BORDER} rounded-xl p-3 space-y-2`}>
                     <div>
-                      <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>Street</label>
+                      <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>{t("street")}</label>
                       <input type="text" value={newStreet} onChange={(e) => setNewStreet(e.target.value)} placeholder="123 Main Street" className={INPUT_CLS} />
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                       <div>
-                        <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>Unit</label>
+                        <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>{t("unit")}</label>
                         <input type="text" value={newUnit} onChange={(e) => setNewUnit(e.target.value)} placeholder="#201" className={INPUT_CLS} />
                       </div>
                       <div>
-                        <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>City</label>
+                        <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>{t("city")}</label>
                         <input type="text" value={newCity} onChange={(e) => setNewCity(e.target.value)} className={INPUT_CLS} />
                       </div>
                       <div>
-                        <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>ZIP</label>
+                        <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>{t("zip")}</label>
                         <input type="text" value={newZip} onChange={(e) => setNewZip(e.target.value)} placeholder="33130" className={INPUT_CLS} />
                       </div>
                     </div>
@@ -378,11 +382,11 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
 
               {/* Order Summary */}
               <div className={`${INNER_BG} rounded-xl p-4`}>
-                <h4 className={`font-display text-[0.95rem] ${TEXT_PRIMARY} mb-3`}>Order Summary</h4>
+                <h4 className={`font-display text-[0.95rem] ${TEXT_PRIMARY} mb-3`}>{t("orderSummary")}</h4>
                 <div className="space-y-2 text-[0.85rem]">
                   <div className="flex justify-between">
                     <span className={TEXT_PRIMARY}>
-                      {selectedService?.name} ({bedrooms} bed / {bathrooms} bath)
+                      {selectedService?.name} ({bedrooms} {t("bed")} / {bathrooms} {t("bath")})
                     </span>
                     <span className={TEXT_PRIMARY}>{fmtCurrency(servicePrice)}</span>
                   </div>
@@ -394,22 +398,22 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                   ))}
                   {discount > 0 && (
                     <div className="flex justify-between text-gold">
-                      <span>Recurring Discount ({Math.round(discountRate * 100)}%)</span>
+                      <span>{t("recurringDiscount", { percent: Math.round(discountRate * 100) })}</span>
                       <span>-{fmtCurrency(discount)}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
-                    <span className={TEXT_MUTED}>Tax (7%)</span>
+                    <span className={TEXT_MUTED}>{t("tax")}</span>
                     <span className={TEXT_MUTED}>{fmtCurrency(tax)}</span>
                   </div>
                   <div className={`flex justify-between font-semibold text-lg pt-3 border-t ${INNER_BORDER}`}>
-                    <span className={TEXT_PRIMARY}>Total</span>
+                    <span className={TEXT_PRIMARY}>{t("total")}</span>
                     <span className="text-gold">{fmtCurrency(total)}</span>
                   </div>
                 </div>
 
                 <div className="mt-3 text-gray-500 dark:text-sand/60 text-[0.72rem] space-y-0.5">
-                  <div>{scheduledDate && new Date(scheduledDate + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })} &middot; <span className="capitalize">{scheduledTime}</span></div>
+                  <div>{scheduledDate && new Date(scheduledDate + "T12:00:00").toLocaleDateString(dateLocale, { weekday: "long", month: "long", day: "numeric", year: "numeric" })} &middot; <span className="capitalize">{scheduledTime}</span></div>
                   {!useNewAddress && addresses.find((a) => a.id === addressId) && (
                     <div>{addresses.find((a) => a.id === addressId)!.street}, {addresses.find((a) => a.id === addressId)!.city}</div>
                   )}
@@ -429,7 +433,7 @@ export function PortalBookingWizard({ services, addOns, addresses, onClose, onSu
                 disabled={!canSubmit || loading}
                 className="w-full bg-green text-white py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-green-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
-                {loading ? "Processing..." : "Submit Booking Request"}
+                {loading ? t("processing") : t("submitBooking")}
               </button>
             </div>
           )}

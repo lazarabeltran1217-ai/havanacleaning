@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AccountToolbar } from "@/components/website/AccountToolbar";
 
 export default function AccountLayout({
@@ -9,6 +10,7 @@ export default function AccountLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const t = useTranslations("account");
 
   // Payment pages get a minimal wrapper
   if (pathname.includes("/pay")) {
@@ -33,7 +35,7 @@ export default function AccountLayout({
           <div className="font-display text-2xl font-black text-amber tracking-tight">
             Havana <span className="text-green-light italic">Cleaning</span>
           </div>
-          <div className="text-gray-500 dark:text-sand text-[11px] tracking-[1.5px] uppercase">My Account</div>
+          <div className="text-gray-500 dark:text-sand text-[11px] tracking-[1.5px] uppercase">{t("myAccount")}</div>
         </div>
         <AccountToolbar />
       </header>
@@ -45,7 +47,7 @@ export default function AccountLayout({
             <span className="font-display text-2xl font-black text-amber tracking-tight">
               Havana <span className="text-green-light italic">Cleaning</span>
             </span>
-            <span className="ml-3 text-gray-500 dark:text-sand text-[11px] tracking-[1.5px] uppercase">My Account</span>
+            <span className="ml-3 text-gray-500 dark:text-sand text-[11px] tracking-[1.5px] uppercase">{t("myAccount")}</span>
           </div>
           <AccountToolbar />
         </div>

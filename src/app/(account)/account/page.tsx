@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Calendar,
   MapPin,
@@ -37,14 +38,6 @@ const statusColors: Record<string, string> = {
   CANCELLED: "bg-red-500/10 text-red-400",
   NO_SHOW: "bg-gray-100 dark:bg-white/[0.04] text-gray-400 dark:text-sand/50",
 };
-
-function fmtDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
-
-function fmtStatus(status: string) {
-  return status.replace(/_/g, " ").toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
-}
 
 function fmtCurrency(amount: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amount);
@@ -119,9 +112,26 @@ interface DashboardData {
 }
 
 /* ─── Main Dashboard ─── */
+const STATUS_KEY: Record<string, string> = {
+  CONFIRMED: "status_confirmed",
+  PENDING: "status_pending",
+  IN_PROGRESS: "status_in_progress",
+  COMPLETED: "status_completed",
+  CANCELLED: "status_cancelled",
+  NO_SHOW: "status_no_show",
+};
+
+const FILTER_KEY: Record<string, string> = {
+  all: "filter_all",
+  upcoming: "filter_upcoming",
+  completed: "filter_completed",
+  cancelled: "filter_cancelled",
+};
+
 export default function CustomerDashboard() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
+  const t = useTranslations("account");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
 
@@ -203,7 +213,7 @@ export default function CustomerDashboard() {
       body: JSON.stringify({ name: profileName, phone: profilePhone, locale: profileLocale }),
     });
     setProfileSaving(false);
-    setProfileMessage(res.ok ? "Saved!" : "Failed to save.");
+    setProfileMessage(res.ok ? "saved" : "failed");
   };
 
   /* ─── Address Add ─── */
@@ -228,8 +238,14 @@ export default function CustomerDashboard() {
 
   /* ─── Derived ─── */
   const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
-  const greeting = now.getHours() < 12 ? "Good morning" : now.getHours() < 17 ? "Good afternoon" : "Good evening";
+  const greeting = now.getHours() < 12 ? t("greeting_morning") : now.getHours() < 17 ? t("greeting_afternoon") : t("greeting_evening");
   const firstName = data?.profile?.name?.split(" ")[0] || session?.user?.name?.split(" ")[0] || "there";
+
+  // Locale-aware helpers
+  const locale = data?.profile?.locale || "en";
+  const dateLocale = locale === "es" ? "es-ES" : "en-US";
+  const fmtDate = (dateStr: string) => new Date(dateStr).toLocaleDateString(dateLocale, { month: "short", day: "numeric", year: "numeric" });
+  const fmtStatus = (status: string) => t(STATUS_KEY[status] || "status_pending");
 
   // Filtered bookings
   const filteredBookings = data?.allBookings.filter((b) => {
@@ -243,7 +259,7 @@ export default function CustomerDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className={`${TEXT_MUTED} text-sm`}>Loading...</div>
+        <div className={`${TEXT_MUTED} text-sm`}>{t("loading")}</div>
       </div>
     );
   }
@@ -251,7 +267,7 @@ export default function CustomerDashboard() {
   if (!data) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className={`${TEXT_MUTED} text-sm`}>Failed to load dashboard. Please refresh.</div>
+        <div className={`${TEXT_MUTED} text-sm`}>{t("loadFailed")}</div>
       </div>
     );
   }
@@ -264,20 +280,20 @@ export default function CustomerDashboard() {
           {greeting}, {firstName}
         </h1>
         <p className="text-white/70 text-sm mt-1">
-          {now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+          {now.toLocaleDateString(dateLocale, { weekday: "long", month: "long", day: "numeric" })}
         </p>
         <div className="flex flex-wrap justify-center gap-2 mt-3">
           {data.upcomingBookings.length > 0 && (
             <span className="bg-white/20 text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
-              <Calendar className="w-3 h-3" /> {data.upcomingBookings.length} upcoming
+              <Calendar className="w-3 h-3" /> {t("badge_upcoming", { count: data.upcomingBookings.length })}
             </span>
           )}
           <span className="bg-white/20 text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
-            <ClipboardList className="w-3 h-3" /> {data.stats.totalBookings} total bookings
+            <ClipboardList className="w-3 h-3" /> {t("badge_totalBookings", { count: data.stats.totalBookings })}
           </span>
           {data.addresses.length > 0 && (
             <span className="bg-white/20 text-[0.72rem] px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
-              <MapPin className="w-3 h-3" /> {data.addresses.length} addresses
+              <MapPin className="w-3 h-3" /> {t("badge_addresses", { count: data.addresses.length })}
             </span>
           )}
         </div>
@@ -289,15 +305,15 @@ export default function CustomerDashboard() {
         {/* ─── UPCOMING BOOKINGS CARD ─── */}
         <div className={CARD}>
           <h3 className={`font-display text-lg ${TEXT_PRIMARY} mb-3 flex items-center gap-2`}>
-            <Calendar className="w-4 h-4 text-gold" /> Upcoming Bookings
+            <Calendar className="w-4 h-4 text-gold" /> {t("upcomingBookings")}
           </h3>
 
           {data.upcomingBookings.length === 0 ? (
             <div className="text-center py-6">
               <Sparkles className={`w-8 h-8 mx-auto mb-2 ${TEXT_MUTED}`} />
-              <p className={`${TEXT_MUTED} text-sm`}>No upcoming bookings</p>
+              <p className={`${TEXT_MUTED} text-sm`}>{t("noUpcoming")}</p>
               <button onClick={() => setShowBookingWizard(true)} className="text-gold text-[0.82rem] font-medium hover:underline mt-1 inline-block">
-                Book a cleaning &rarr;
+                {t("bookCleaning")} &rarr;
               </button>
             </div>
           ) : (
@@ -336,7 +352,7 @@ export default function CustomerDashboard() {
                           onClick={() => setPayingBooking(b)}
                           className="flex items-center gap-1 px-3 py-1.5 bg-green text-white rounded-lg text-[0.75rem] font-semibold hover:bg-green-light transition-colors"
                         >
-                          <CreditCard className="w-3 h-3" /> Pay Now
+                          <CreditCard className="w-3 h-3" /> {t("payNow")}
                         </button>
                       )}
                     </div>
@@ -350,7 +366,7 @@ export default function CustomerDashboard() {
         {/* ─── QUICK ACTIONS + STATS CARD ─── */}
         <div className={CARD}>
           <h3 className={`font-display text-lg ${TEXT_PRIMARY} mb-3 flex items-center gap-2`}>
-            <Sparkles className="w-4 h-4 text-gold" /> Quick Actions
+            <Sparkles className="w-4 h-4 text-gold" /> {t("quickActions")}
           </h3>
 
           <button
@@ -358,25 +374,25 @@ export default function CustomerDashboard() {
             className="flex items-center gap-3 w-full px-4 py-3.5 bg-green text-white rounded-[3px] font-semibold text-[0.88rem] tracking-[0.06em] uppercase hover:bg-green-light transition-colors mb-3"
           >
             <Plus className="w-5 h-5" />
-            <span>Book a Cleaning</span>
+            <span>{t("bookACleaning")}</span>
           </button>
 
           <div className="grid grid-cols-2 gap-2 mt-3">
             <div className={`${INNER_BG} rounded-lg p-3 text-center`}>
               <div className={`text-xl font-bold ${TEXT_PRIMARY}`}>{data.stats.totalBookings}</div>
-              <div className={`${TEXT_MUTED} text-[0.68rem]`}>Total Bookings</div>
+              <div className={`${TEXT_MUTED} text-[0.68rem]`}>{t("totalBookings")}</div>
             </div>
             <div className={`${INNER_BG} rounded-lg p-3 text-center`}>
               <div className="text-xl font-bold text-amber">{fmtCurrency(data.stats.totalSpent)}</div>
-              <div className={`${TEXT_MUTED} text-[0.68rem]`}>Total Spent</div>
+              <div className={`${TEXT_MUTED} text-[0.68rem]`}>{t("totalSpent")}</div>
             </div>
             <div className={`${INNER_BG} rounded-lg p-3 text-center`}>
               <div className={`text-xl font-bold ${TEXT_PRIMARY}`}>{data.upcomingBookings.length}</div>
-              <div className={`${TEXT_MUTED} text-[0.68rem]`}>Upcoming</div>
+              <div className={`${TEXT_MUTED} text-[0.68rem]`}>{t("upcoming")}</div>
             </div>
             <div className={`${INNER_BG} rounded-lg p-3 text-center`}>
               <div className={`text-xl font-bold ${TEXT_PRIMARY}`}>{data.addresses.length}</div>
-              <div className={`${TEXT_MUTED} text-[0.68rem]`}>Addresses</div>
+              <div className={`${TEXT_MUTED} text-[0.68rem]`}>{t("addresses")}</div>
             </div>
           </div>
         </div>
@@ -384,7 +400,7 @@ export default function CustomerDashboard() {
         {/* ─── ALL BOOKINGS CARD ─── */}
         <div className={CARD}>
           <h3 className={`font-display text-lg ${TEXT_PRIMARY} mb-3 flex items-center gap-2`}>
-            <ClipboardList className="w-4 h-4 text-gold" /> My Bookings
+            <ClipboardList className="w-4 h-4 text-gold" /> {t("myBookings")}
           </h3>
 
           {/* Filter tabs */}
@@ -393,15 +409,15 @@ export default function CustomerDashboard() {
               <button
                 key={f}
                 onClick={() => { setBookingsFilter(f); setShowAllBookings(false); }}
-                className={`px-3 py-1.5 rounded-lg text-[0.78rem] font-medium transition-colors capitalize ${bookingsFilter === f ? "bg-green text-white" : "bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-sand/70"}`}
+                className={`px-3 py-1.5 rounded-lg text-[0.78rem] font-medium transition-colors ${bookingsFilter === f ? "bg-green text-white" : "bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-sand/70"}`}
               >
-                {f}
+                {t(FILTER_KEY[f])}
               </button>
             ))}
           </div>
 
           {filteredBookings.length === 0 ? (
-            <p className={`${TEXT_MUTED} text-sm text-center py-4`}>No bookings found.</p>
+            <p className={`${TEXT_MUTED} text-sm text-center py-4`}>{t("noBookings")}</p>
           ) : (
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {displayedBookings.map((b) => {
@@ -441,7 +457,7 @@ export default function CustomerDashboard() {
                             onClick={() => setPayingBooking(b)}
                             className="inline-flex items-center gap-1 bg-green text-white px-3 py-1.5 text-[0.7rem] font-semibold rounded-lg hover:bg-green-light transition-colors"
                           >
-                            <CreditCard className="w-3 h-3" /> Pay
+                            <CreditCard className="w-3 h-3" /> {t("pay")}
                           </button>
                         )}
                       </div>
@@ -458,9 +474,9 @@ export default function CustomerDashboard() {
               className="mt-2 w-full py-2 bg-gold/10 text-gold rounded-lg text-[0.78rem] font-semibold flex items-center justify-center gap-1"
             >
               {showAllBookings ? (
-                <><ChevronUp className="w-3.5 h-3.5" /> Show Less</>
+                <><ChevronUp className="w-3.5 h-3.5" /> {t("showLess")}</>
               ) : (
-                <><ChevronDown className="w-3.5 h-3.5" /> Show All ({filteredBookings.length})</>
+                <><ChevronDown className="w-3.5 h-3.5" /> {t("showAll", { count: filteredBookings.length })}</>
               )}
             </button>
           )}
@@ -470,13 +486,13 @@ export default function CustomerDashboard() {
         <div className={CARD}>
           <div className="flex items-center justify-between mb-3">
             <h3 className={`font-display text-lg ${TEXT_PRIMARY} flex items-center gap-2`}>
-              <MapPin className="w-4 h-4 text-gold" /> My Addresses
+              <MapPin className="w-4 h-4 text-gold" /> {t("myAddresses")}
             </h3>
             <button
               onClick={() => setShowAddressForm(!showAddressForm)}
               className="text-gold text-[0.75rem] font-semibold hover:underline"
             >
-              {showAddressForm ? "Cancel" : "+ Add"}
+              {showAddressForm ? t("cancel") : t("addNew")}
             </button>
           </div>
 
@@ -485,43 +501,43 @@ export default function CustomerDashboard() {
             <form onSubmit={handleAddAddress} className={`border ${INNER_BORDER} rounded-xl p-3 mb-3 space-y-2`}>
               <div className="grid grid-cols-4 gap-2">
                 <div>
-                  <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>Label</label>
+                  <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>{t("label")}</label>
                   <select value={addrLabel} onChange={(e) => setAddrLabel(e.target.value)} className={INPUT_CLS}>
-                    <option>Home</option>
-                    <option>Work</option>
-                    <option>Other</option>
+                    <option value="Home">{t("labelHome")}</option>
+                    <option value="Work">{t("labelWork")}</option>
+                    <option value="Other">{t("labelOther")}</option>
                   </select>
                 </div>
                 <div className="col-span-3">
-                  <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>Street</label>
+                  <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>{t("street")}</label>
                   <input type="text" value={addrStreet} onChange={(e) => setAddrStreet(e.target.value)} required className={INPUT_CLS} />
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-2">
                 <div>
-                  <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>Unit</label>
+                  <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>{t("unit")}</label>
                   <input type="text" value={addrUnit} onChange={(e) => setAddrUnit(e.target.value)} className={INPUT_CLS} />
                 </div>
                 <div className="col-span-2">
-                  <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>City</label>
+                  <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>{t("city")}</label>
                   <input type="text" value={addrCity} onChange={(e) => setAddrCity(e.target.value)} className={INPUT_CLS} />
                 </div>
                 <div>
-                  <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>ZIP</label>
+                  <label className={`text-[0.65rem] font-medium ${TEXT_MUTED} block mb-0.5`}>{t("zip")}</label>
                   <input type="text" value={addrZip} onChange={(e) => setAddrZip(e.target.value)} required className={INPUT_CLS} />
                 </div>
               </div>
               <button type="submit" disabled={addrSaving} className="px-4 py-2 bg-green text-white rounded-[3px] text-[0.78rem] font-semibold hover:bg-green-light disabled:opacity-50">
-                {addrSaving ? "Saving..." : "Save Address"}
+                {addrSaving ? t("saving") : t("saveAddress")}
               </button>
             </form>
           )}
 
           {data.addresses.length === 0 && !showAddressForm ? (
             <div className="text-center py-4">
-              <p className={`${TEXT_MUTED} text-sm`}>No saved addresses</p>
+              <p className={`${TEXT_MUTED} text-sm`}>{t("noAddresses")}</p>
               <button onClick={() => setShowAddressForm(true)} className="text-gold text-[0.82rem] font-medium hover:underline mt-1">
-                Add an address &rarr;
+                {t("addAddress")} &rarr;
               </button>
             </div>
           ) : (
@@ -533,7 +549,7 @@ export default function CustomerDashboard() {
                     <div className="flex items-center gap-2">
                       <span className={`font-medium text-[0.82rem] ${TEXT_PRIMARY}`}>{addr.label}</span>
                       {addr.isDefault && (
-                        <span className="text-[0.6rem] bg-gold/10 text-gold px-1.5 py-0.5 rounded-full uppercase tracking-wider">Default</span>
+                        <span className="text-[0.6rem] bg-gold/10 text-gold px-1.5 py-0.5 rounded-full uppercase tracking-wider">{t("default")}</span>
                       )}
                     </div>
                     <div className="text-gray-500 dark:text-sand/60 text-[0.72rem] truncate">
@@ -550,7 +566,7 @@ export default function CustomerDashboard() {
       {/* ═══ PROFILE & SETTINGS ═══ */}
       <div className={CARD}>
         <h3 className={`font-display text-lg ${TEXT_PRIMARY} mb-4 flex items-center gap-2`}>
-          <User className="w-4 h-4 text-gold" /> Profile & Settings
+          <User className="w-4 h-4 text-gold" /> {t("profileSettings")}
         </h3>
 
         <div className="md:flex md:gap-6">
@@ -569,18 +585,18 @@ export default function CustomerDashboard() {
           <div className="flex-1 space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="text-[0.72rem] font-medium text-gray-500 dark:text-sand/60 block mb-1">Name</label>
+                <label className="text-[0.72rem] font-medium text-gray-500 dark:text-sand/60 block mb-1">{t("name")}</label>
                 <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} className={INPUT_CLS} />
               </div>
               <div>
-                <label className="text-[0.72rem] font-medium text-gray-500 dark:text-sand/60 block mb-1">Phone</label>
+                <label className="text-[0.72rem] font-medium text-gray-500 dark:text-sand/60 block mb-1">{t("phone")}</label>
                 <input type="tel" value={fmtPhone(profilePhone)} onChange={(e) => setProfilePhone(e.target.value.replace(/\D/g, "").slice(0, 10))} className={INPUT_CLS} />
               </div>
               <div>
-                <label className="text-[0.72rem] font-medium text-gray-500 dark:text-sand/60 block mb-1">Language</label>
+                <label className="text-[0.72rem] font-medium text-gray-500 dark:text-sand/60 block mb-1">{t("language")}</label>
                 <select value={profileLocale} onChange={(e) => setProfileLocale(e.target.value)} className={INPUT_CLS}>
-                  <option value="en">English</option>
-                  <option value="es">Espa&ntilde;ol</option>
+                  <option value="en">{t("english")}</option>
+                  <option value="es">{t("espanol")}</option>
                 </select>
               </div>
             </div>
@@ -591,10 +607,10 @@ export default function CustomerDashboard() {
                 disabled={profileSaving}
                 className="px-5 py-2 bg-green text-white rounded-[3px] text-sm font-semibold hover:bg-green-light disabled:opacity-50"
               >
-                {profileSaving ? "Saving..." : "Save Changes"}
+                {profileSaving ? t("saving") : t("saveChanges")}
               </button>
               {profileMessage && (
-                <span className={`text-sm ${profileMessage === "Failed to save." ? "text-red" : "text-gold"}`}>{profileMessage}</span>
+                <span className={`text-sm ${profileMessage === "failed" ? "text-red" : "text-gold"}`}>{profileMessage === "saved" ? t("saved") : t("failedSave")}</span>
               )}
             </div>
           </div>
@@ -609,7 +625,7 @@ export default function CustomerDashboard() {
           {/* Modal */}
           <div className="relative bg-white dark:bg-[#382618] rounded-2xl border border-gray-200 dark:border-gold/15 shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className={`flex items-center justify-between p-5 border-b ${INNER_BORDER}`}>
-              <h3 className={`font-display text-lg ${TEXT_PRIMARY}`}>Complete Payment</h3>
+              <h3 className={`font-display text-lg ${TEXT_PRIMARY}`}>{t("completePayment")}</h3>
               <button onClick={() => setPayingBooking(null)} className={`${TEXT_MUTED} hover:text-tobacco dark:hover:text-cream`}>
                 <X className="w-5 h-5" />
               </button>
@@ -631,7 +647,7 @@ export default function CustomerDashboard() {
                   )}
                 </div>
                 <div className={`mt-3 pt-3 border-t ${INNER_BORDER} flex justify-between font-semibold`}>
-                  <span className={TEXT_PRIMARY}>Total</span>
+                  <span className={TEXT_PRIMARY}>{t("total")}</span>
                   <span className="text-amber text-lg">{fmtCurrency(payingBooking.total)}</span>
                 </div>
               </div>
@@ -658,6 +674,7 @@ export default function CustomerDashboard() {
           services={data.services}
           addOns={data.addOns}
           addresses={data.addresses}
+          locale={locale}
           onClose={() => setShowBookingWizard(false)}
           onSuccess={() => {
             setShowBookingWizard(false);
@@ -670,7 +687,7 @@ export default function CustomerDashboard() {
       {/* ═══ SUCCESS TOASTS ═══ */}
       {paymentSuccess && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green text-white px-6 py-3 rounded-[3px] shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
-          <CheckCircle className="w-5 h-5" /> Payment successful!
+          <CheckCircle className="w-5 h-5" /> {t("paymentSuccess")}
           <button onClick={() => setPaymentSuccess(false)} className="ml-2 text-tobacco/70 hover:text-tobacco">
             <X className="w-4 h-4" />
           </button>
@@ -678,7 +695,7 @@ export default function CustomerDashboard() {
       )}
       {bookingSuccess && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green text-white px-6 py-3 rounded-[3px] shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
-          <CheckCircle className="w-5 h-5" /> Booking request submitted!
+          <CheckCircle className="w-5 h-5" /> {t("bookingSuccess")}
           <button onClick={() => setBookingSuccess(false)} className="ml-2 text-tobacco/70 hover:text-tobacco">
             <X className="w-4 h-4" />
           </button>
