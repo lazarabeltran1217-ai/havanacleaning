@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
-import { TIME_SLOTS } from "@/lib/constants";
 import { ServiceIcon } from "@/lib/service-icons";
+import { useTranslations } from "next-intl";
 
 interface ServiceOption {
   id: string;
@@ -42,6 +42,7 @@ const RUSH_FEE = 50;
 export function BookingWizard({ services, addOns }: Props) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const t = useTranslations("booking");
 
   const preselectedSlug = searchParams.get("service");
   const preselected = services.find((s) => s.slug === preselectedSlug);
@@ -107,6 +108,13 @@ export function BookingWizard({ services, addOns }: Props) {
   );
   const minDate = `${etMinDay.getFullYear()}-${String(etMinDay.getMonth() + 1).padStart(2, "0")}-${String(etMinDay.getDate()).padStart(2, "0")}`;
 
+  // Translated time slots
+  const timeSlots = [
+    { label: t("time_morning"), value: "morning" },
+    { label: t("time_midday"), value: "midday" },
+    { label: t("time_afternoon"), value: "afternoon" },
+  ];
+
   async function handleSubmit() {
     setLoading(true);
     setError("");
@@ -136,7 +144,7 @@ export function BookingWizard({ services, addOns }: Props) {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Failed to create booking");
+        setError(data.error || t("failedCreate"));
         setLoading(false);
         return;
       }
@@ -146,7 +154,7 @@ export function BookingWizard({ services, addOns }: Props) {
         : data.booking.id;
       router.push(`/book/confirm?bookingId=${ids}`);
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t("somethingWrong"));
       setLoading(false);
     }
   }
@@ -186,10 +194,10 @@ export function BookingWizard({ services, addOns }: Props) {
 
       <div className="text-center text-[0.78rem] text-sand uppercase tracking-wider mb-8">
         {step === 1
-          ? "Choose Service"
+          ? t("wizard_step1")
           : step === 2
-            ? "Schedule & Add-Ons"
-            : "Your Info & Address"}
+            ? t("wizard_step2")
+            : t("wizard_step3")}
       </div>
 
       {/* STEP 1 — SERVICE */}
@@ -222,7 +230,7 @@ export function BookingWizard({ services, addOns }: Props) {
                             (bathrooms - 2) * s.pricePerBathroom
                         )
                       )
-                    : "Quote"}
+                    : t("quote")}
                 </div>
               </button>
             ))}
@@ -232,7 +240,7 @@ export function BookingWizard({ services, addOns }: Props) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                Bedrooms
+                {t("bedrooms")}
               </label>
               <select
                 value={bedrooms}
@@ -241,14 +249,14 @@ export function BookingWizard({ services, addOns }: Props) {
               >
                 {[1, 2, 3, 4, 5, 6].map((n) => (
                   <option key={n} value={n}>
-                    {n} {n === 1 ? "Bedroom" : "Bedrooms"}
+                    {n} {n === 1 ? t("bedroom_singular") : t("bedrooms_plural")}
                   </option>
                 ))}
               </select>
             </div>
             <div>
               <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                Bathrooms
+                {t("bathrooms")}
               </label>
               <select
                 value={bathrooms}
@@ -257,7 +265,7 @@ export function BookingWizard({ services, addOns }: Props) {
               >
                 {[1, 2, 3, 4, 5].map((n) => (
                   <option key={n} value={n}>
-                    {n} {n === 1 ? "Bathroom" : "Bathrooms"}
+                    {n} {n === 1 ? t("bathroom_singular") : t("bathrooms_plural")}
                   </option>
                 ))}
               </select>
@@ -267,19 +275,19 @@ export function BookingWizard({ services, addOns }: Props) {
           {/* Recurrence */}
           <div>
             <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-              How Often?
+              {t("howOften")}
             </label>
             <div className="grid grid-cols-4 gap-3">
               {(
                 [
-                  { value: "ONCE", label: "One-Time" },
-                  { value: "WEEKLY", label: "Weekly", discount: "20% off" },
+                  { value: "ONCE", label: t("oneTime") },
+                  { value: "WEEKLY", label: t("weekly"), discount: t("discount_weekly") },
                   {
                     value: "BIWEEKLY",
-                    label: "Bi-Weekly",
-                    discount: "15% off",
+                    label: t("biWeekly"),
+                    discount: t("discount_biweekly"),
                   },
-                  { value: "MONTHLY", label: "Monthly", discount: "10% off" },
+                  { value: "MONTHLY", label: t("monthly"), discount: t("discount_monthly") },
                 ] as const
               ).map((r) => (
                 <button
@@ -309,7 +317,7 @@ export function BookingWizard({ services, addOns }: Props) {
             disabled={serviceIds.length === 0}
             className="w-full bg-gold text-tobacco py-4 text-[0.9rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            Continue
+            {t("continue")}
           </button>
         </div>
       )}
@@ -320,7 +328,7 @@ export function BookingWizard({ services, addOns }: Props) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                Preferred Date
+                {t("preferredDate")}
               </label>
               <input
                 type="date"
@@ -332,14 +340,14 @@ export function BookingWizard({ services, addOns }: Props) {
             </div>
             <div>
               <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                Preferred Time
+                {t("preferredTime")}
               </label>
               <select
                 value={scheduledTime}
                 onChange={(e) => setScheduledTime(e.target.value)}
                 className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
               >
-                {TIME_SLOTS.map((slot) => (
+                {timeSlots.map((slot) => (
                   <option key={slot.value} value={slot.value}>
                     {slot.label}
                   </option>
@@ -360,10 +368,10 @@ export function BookingWizard({ services, addOns }: Props) {
           >
             <div>
               <div className="text-[0.9rem] font-semibold">
-                Rush / Same-Day Service
+                {t("rushTitle")}
               </div>
               <div className="text-[0.78rem] text-sand mt-0.5">
-                Need it done today or ASAP? We&apos;ll prioritize your booking.
+                {t("rushDescription")}
               </div>
             </div>
             <span className="text-amber font-bold text-[0.9rem] whitespace-nowrap ml-4">
@@ -374,7 +382,7 @@ export function BookingWizard({ services, addOns }: Props) {
           {/* ADD-ONS */}
           <div>
             <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-3">
-              Add-On Services (optional)
+              {t("addOnServices")}
             </label>
             <div className="grid grid-cols-2 gap-2">
               {addOns.map((addon) => (
@@ -399,13 +407,13 @@ export function BookingWizard({ services, addOns }: Props) {
 
           <div>
             <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-              Special Instructions (optional)
+              {t("specialInstructions")}
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              placeholder="Gate code, parking info, pet details, areas to focus on..."
+              placeholder={t("instructionsPlaceholder")}
               className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem] resize-none"
             />
           </div>
@@ -416,7 +424,7 @@ export function BookingWizard({ services, addOns }: Props) {
               onClick={() => setStep(1)}
               className="px-6 py-3 border border-tobacco/20 rounded-[3px] text-[0.85rem] hover:bg-tobacco/5 transition-colors"
             >
-              Back
+              {t("back")}
             </button>
             <button
               type="button"
@@ -424,7 +432,7 @@ export function BookingWizard({ services, addOns }: Props) {
               disabled={!scheduledDate}
               className="flex-1 bg-gold text-tobacco py-3 text-[0.9rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              Continue
+              {t("continue")}
             </button>
           </div>
         </div>
@@ -436,12 +444,12 @@ export function BookingWizard({ services, addOns }: Props) {
           {/* CONTACT INFO */}
           <div>
             <div className="text-[0.78rem] text-sand uppercase tracking-wider mb-3">
-              Your Contact Information
+              {t("contactInfo")}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                  Full Name <span className="text-red-400">*</span>
+                  {t("fullName")} <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
@@ -454,7 +462,7 @@ export function BookingWizard({ services, addOns }: Props) {
               </div>
               <div>
                 <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                  Email <span className="text-red-400">*</span>
+                  {t("email")} <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="email"
@@ -467,7 +475,7 @@ export function BookingWizard({ services, addOns }: Props) {
               </div>
               <div>
                 <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                  Phone
+                  {t("phone")}
                 </label>
                 <input
                   type="tel"
@@ -479,19 +487,19 @@ export function BookingWizard({ services, addOns }: Props) {
               </div>
               <div>
                 <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                  Create Password <span className="text-red-400">*</span>
+                  {t("createPassword")} <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="password"
                   value={customerPassword}
                   onChange={(e) => setCustomerPassword(e.target.value)}
-                  placeholder="Min. 6 characters"
+                  placeholder={t("minChars")}
                   minLength={6}
                   required
                   className="w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]"
                 />
                 <p className="text-[0.72rem] text-sand mt-1">
-                  Use this to log in and track your bookings
+                  {t("passwordHint")}
                 </p>
               </div>
             </div>
@@ -500,11 +508,11 @@ export function BookingWizard({ services, addOns }: Props) {
           {/* ADDRESS */}
           <div>
             <div className="text-[0.78rem] text-sand uppercase tracking-wider mb-3">
-              Service Address
+              {t("serviceAddress")}
             </div>
             <div>
               <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                Street Address
+                {t("streetAddress")}
               </label>
               <input
                 type="text"
@@ -517,7 +525,7 @@ export function BookingWizard({ services, addOns }: Props) {
             <div className="grid grid-cols-3 gap-4 mt-4">
               <div>
                 <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                  Unit/Apt
+                  {t("unitApt")}
                 </label>
                 <input
                   type="text"
@@ -529,7 +537,7 @@ export function BookingWizard({ services, addOns }: Props) {
               </div>
               <div>
                 <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                  City
+                  {t("city")}
                 </label>
                 <input
                   type="text"
@@ -540,7 +548,7 @@ export function BookingWizard({ services, addOns }: Props) {
               </div>
               <div>
                 <label className="block text-[0.78rem] uppercase tracking-wider text-sand mb-2">
-                  ZIP
+                  {t("zip")}
                 </label>
                 <input
                   type="text"
@@ -555,7 +563,7 @@ export function BookingWizard({ services, addOns }: Props) {
 
           {/* ORDER SUMMARY */}
           <div className="bg-white border border-tobacco/10 rounded-lg p-6 mt-6">
-            <h3 className="font-display text-lg mb-4">Order Summary</h3>
+            <h3 className="font-display text-lg mb-4">{t("orderSummary")}</h3>
             {customerName && (
               <div className="flex items-center gap-3 mb-4 pb-3 border-b border-tobacco/10">
                 <div className="w-8 h-8 bg-green/10 rounded-full flex items-center justify-center text-green text-[0.8rem] font-semibold">
@@ -575,7 +583,7 @@ export function BookingWizard({ services, addOns }: Props) {
               {selectedServices.map((s) => (
                 <div key={s.id} className="flex justify-between">
                   <span>
-                    {s.name} ({bedrooms} bed / {bathrooms} bath)
+                    {s.name} ({bedrooms} {t("bed")} / {bathrooms} {t("bath")})
                   </span>
                   <span>{formatCurrency(serviceCalc(s))}</span>
                 </div>
@@ -590,24 +598,24 @@ export function BookingWizard({ services, addOns }: Props) {
                 ))}
               {rush && (
                 <div className="flex justify-between text-amber">
-                  <span>Rush / Same-Day</span>
+                  <span>{t("rushLabel")}</span>
                   <span>+{formatCurrency(RUSH_FEE)}</span>
                 </div>
               )}
               {discount > 0 && (
                 <div className="flex justify-between text-green">
                   <span>
-                    Recurring Discount ({Math.round(discountRate * 100)}%)
+                    {t("recurringDiscount", { percent: Math.round(discountRate * 100) })}
                   </span>
                   <span>-{formatCurrency(discount)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sand">
-                <span>Tax (7%)</span>
+                <span>{t("tax")}</span>
                 <span>{formatCurrency(tax)}</span>
               </div>
               <div className="flex justify-between font-semibold text-lg pt-3 border-t border-tobacco/10">
-                <span>Total</span>
+                <span>{t("total")}</span>
                 <span className="text-green">{formatCurrency(total)}</span>
               </div>
             </div>
@@ -625,7 +633,7 @@ export function BookingWizard({ services, addOns }: Props) {
               onClick={() => setStep(2)}
               className="px-6 py-3 border border-tobacco/20 rounded-[3px] text-[0.85rem] hover:bg-tobacco/5 transition-colors"
             >
-              Back
+              {t("back")}
             </button>
             <button
               type="button"
@@ -633,7 +641,7 @@ export function BookingWizard({ services, addOns }: Props) {
               disabled={!canSubmit || loading}
               className="flex-1 bg-green text-white py-4 text-[0.9rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-green/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              {loading ? "Processing..." : "Submit Request"}
+              {loading ? t("processing") : t("submitRequest")}
             </button>
           </div>
         </div>
