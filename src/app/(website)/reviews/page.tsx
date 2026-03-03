@@ -19,17 +19,19 @@ export default async function ReviewsPage() {
   let contentMap: Record<string, unknown> = {};
 
   try {
-    [testimonials] = await Promise.all([
-      prisma.testimonial.findMany({
-        where: { isApproved: true },
-        orderBy: { createdAt: "desc" },
-      }),
-      prisma.content.findMany({ where: { published: true } }).then((rows) => {
-        contentMap = buildContentMap(rows, locale);
-      }),
-    ]);
+    testimonials = await prisma.testimonial.findMany({
+      where: { isApproved: true },
+      orderBy: { createdAt: "desc" },
+    });
   } catch (error) {
     console.error("Failed to fetch testimonials:", error);
+  }
+
+  try {
+    const rows = await prisma.content.findMany({ where: { published: true } });
+    contentMap = buildContentMap(rows, locale);
+  } catch (error) {
+    console.error("Failed to fetch content:", error);
   }
 
   const pageContent = (contentMap.reviews_page ?? {}) as {
