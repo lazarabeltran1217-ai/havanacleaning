@@ -146,24 +146,24 @@ export default async function AdminDashboard() {
   }
 
   const stats = [
-    { label: "Monthly Revenue", value: formatCurrency(revenue), color: "text-green" },
-    { label: "Total Bookings", value: totalBookings.toString(), color: "text-amber" },
-    { label: "Today's Jobs", value: confirmedToday.toString(), color: "text-teal" },
-    { label: "Pending", value: pendingBookings.toString(), color: "text-gold" },
-    { label: "Employees", value: employeeCount.toString(), color: "text-green" },
-    { label: "Customers", value: customerCount.toString(), color: "text-caribbean" },
-    { label: "New Applicants", value: newApplicants.toString(), color: "text-amber" },
-    { label: "New Inquiries", value: newInquiries.toString(), color: "text-teal" },
+    { label: "Monthly Revenue", value: formatCurrency(revenue), color: "text-green", href: "/admin/revenue" },
+    { label: "Total Bookings", value: totalBookings.toString(), color: "text-amber", href: "/admin/bookings" },
+    { label: "Today's Jobs", value: confirmedToday.toString(), color: "text-teal", href: "/admin/schedule" },
+    { label: "Pending", value: pendingBookings.toString(), color: "text-gold", href: "/admin/bookings" },
+    { label: "Employees", value: employeeCount.toString(), color: "text-green", href: "/admin/staff" },
+    { label: "Customers", value: customerCount.toString(), color: "text-caribbean", href: "/admin/clients" },
+    { label: "New Applicants", value: newApplicants.toString(), color: "text-amber", href: "/admin/applicants" },
+    { label: "New Inquiries", value: newInquiries.toString(), color: "text-teal", href: "/admin/commercial" },
   ];
 
   return (
     <div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         {stats.map((stat) => (
-          <div key={stat.label} className="bg-white rounded-xl p-5 border border-[#ece6d9] shadow-sm">
+          <Link key={stat.label} href={stat.href} className="bg-white rounded-xl p-5 border border-[#ece6d9] shadow-sm hover:border-green/30 hover:shadow-md transition-all">
             <div className="text-[11px] text-gray-400 uppercase tracking-wider">{stat.label}</div>
             <div className={`font-display text-2xl font-bold mt-1 ${stat.color}`}>{stat.value}</div>
-          </div>
+          </Link>
         ))}
       </div>
 
