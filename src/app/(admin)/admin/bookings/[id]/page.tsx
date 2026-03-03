@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
 import { ServiceIcon } from "@/lib/service-icons";
 import { BookingActions } from "@/components/admin/BookingActions";
+import Link from "next/link";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -53,6 +54,9 @@ export default async function AdminBookingDetailPage({ params }: Props) {
 
   return (
     <div>
+      <Link href="/admin/bookings" className="inline-flex items-center gap-1.5 text-[0.82rem] text-gray-400 hover:text-green mb-4 transition-colors">
+        <span>←</span> Back to Bookings
+      </Link>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="font-display text-xl">Booking #{booking.bookingNumber}</h2>
