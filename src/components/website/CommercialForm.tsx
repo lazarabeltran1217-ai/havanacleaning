@@ -32,6 +32,7 @@ const AREA_KEYS = [
   "areaConference",
   "areaWarehouse",
   "areaExterior",
+  "areaRestaurant",
 ] as const;
 
 const SQFT_KEYS = [
