@@ -188,7 +188,7 @@ export function CommercialForm() {
             </div>
             <div>
               <label className={labelClass}>{t("companyWebsite")}</label>
-              <input type="url" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://" className={inputClass} />
+              <input type="text" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="www.example.com" className={inputClass} />
             </div>
           </div>
         </div>
