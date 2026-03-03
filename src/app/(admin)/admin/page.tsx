@@ -160,7 +160,7 @@ export default async function AdminDashboard() {
     <div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         {stats.map((stat) => (
-          <Link key={stat.label} href={stat.href} className="bg-white rounded-xl p-5 border border-[#ece6d9] shadow-sm hover:border-green/30 hover:shadow-md transition-all">
+          <Link key={stat.label} href={stat.href} prefetch={false} className="bg-white rounded-xl p-5 border border-[#ece6d9] shadow-sm hover:border-green/30 hover:shadow-md transition-all">
             <div className="text-[11px] text-gray-400 uppercase tracking-wider">{stat.label}</div>
             <div className={`font-display text-2xl font-bold mt-1 ${stat.color}`}>{stat.value}</div>
           </Link>

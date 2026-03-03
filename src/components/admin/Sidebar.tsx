@@ -63,6 +63,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               key={item.href}
               href={item.href}
               onClick={onClose}
+              prefetch={false}
               className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13.5px] font-medium transition-colors ${
                 isActive
                   ? "bg-gold text-tobacco"
