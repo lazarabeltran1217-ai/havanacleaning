@@ -1,0 +1,154 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+interface Props {
+  inquiryId: string;
+  currentStatus: string;
+  currentNotes: string;
+  currentQuotedPrice: number | null;
+  assignments: { employeeId: string; employeeName: string }[];
+  employees: { id: string; name: string }[];
+}
+
+const STATUSES: { value: string; label: string }[] = [
+  { value: "NEW", label: "New" },
+  { value: "CONTACTED", label: "Contacted" },
+  { value: "QUOTE_SENT", label: "Quote Sent" },
+  { value: "SCHEDULED", label: "Scheduled" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "CANCELLED", label: "Cancelled" },
+];
+
+export function HandymanActions({ inquiryId, currentStatus, currentNotes, currentQuotedPrice, assignments, employees }: Props) {
+  const router = useRouter();
+  const [status, setStatus] = useState(currentStatus);
+  const [notes, setNotes] = useState(currentNotes || "");
+  const [quotedPrice, setQuotedPrice] = useState(currentQuotedPrice?.toString() || "");
+  const [selectedEmployee, setSelectedEmployee] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function updateStatus() {
+    setLoading(true);
+    const price = quotedPrice ? parseFloat(quotedPrice) : null;
+    await fetch(`/api/handyman/${inquiryId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status, notes, quotedPrice: price }),
+    });
+    setLoading(false);
+    router.refresh();
+  }
+
+  async function removeEmployee(employeeId: string) {
+    setLoading(true);
+    await fetch(`/api/handyman/${inquiryId}/assign`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ employeeId }),
+    });
+    setLoading(false);
+    router.refresh();
+  }
+
+  async function assignEmployee() {
+    if (!selectedEmployee) return;
+    setLoading(true);
+    await fetch(`/api/handyman/${inquiryId}/assign`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ employeeId: selectedEmployee }),
+    });
+    setLoading(false);
+    setSelectedEmployee("");
+    router.refresh();
+  }
+
+  return (
+    <div className="space-y-5">
+      {/* STATUS UPDATE */}
+      <div className="bg-white rounded-xl p-5 border border-[#ece6d9]">
+        <h3 className="font-display text-base mb-3">Update Status</h3>
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-[0.85rem] mb-3"
+        >
+          {STATUSES.map((s) => (
+            <option key={s.value} value={s.value}>{s.label}</option>
+          ))}
+        </select>
+        <div className="mb-3">
+          <label className="text-[0.72rem] uppercase tracking-wider text-sand font-medium mb-1 block">Quoted Price ($)</label>
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            value={quotedPrice}
+            onChange={(e) => setQuotedPrice(e.target.value)}
+            placeholder="0.00"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-[0.85rem]"
+          />
+        </div>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Internal notes..."
+          rows={2}
+          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-[0.85rem] resize-none mb-3"
+        />
+        <button
+          onClick={updateStatus}
+          disabled={loading}
+          className="w-full bg-green text-white py-2.5 text-[0.82rem] font-semibold rounded-lg hover:bg-green/90 disabled:opacity-50 transition-colors"
+        >
+          {loading ? "Saving..." : "Save"}
+        </button>
+      </div>
+
+      {/* ASSIGN EMPLOYEE */}
+      <div className="bg-white rounded-xl p-5 border border-[#ece6d9]">
+        <h3 className="font-display text-base mb-3">Assign Employee</h3>
+        {assignments.length > 0 && (
+          <div className="mb-3 space-y-1">
+            {assignments.map((a) => (
+              <div key={a.employeeId} className="text-[0.85rem] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 bg-green rounded-full" />
+                  {a.employeeName}
+                </div>
+                <button
+                  onClick={() => removeEmployee(a.employeeId)}
+                  disabled={loading}
+                  className="text-red-400 hover:text-red-600 text-[0.75rem] font-medium disabled:opacity-50 transition-colors"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <select
+          value={selectedEmployee}
+          onChange={(e) => setSelectedEmployee(e.target.value)}
+          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-[0.85rem] mb-3"
+        >
+          <option value="">Select employee...</option>
+          {employees
+            .filter((e) => !assignments.some((a) => a.employeeId === e.id))
+            .map((e) => (
+              <option key={e.id} value={e.id}>{e.name}</option>
+            ))}
+        </select>
+        <button
+          onClick={assignEmployee}
+          disabled={loading || !selectedEmployee}
+          className="w-full bg-gold text-tobacco py-2.5 text-[0.82rem] font-semibold rounded-lg hover:bg-amber disabled:opacity-50 transition-colors"
+        >
+          Assign
+        </button>
+      </div>
+    </div>
+  );
+}

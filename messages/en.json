@@ -541,7 +541,8 @@
     "handymanStatus_SCHEDULED": "Scheduled",
     "handymanStatus_COMPLETED": "Completed",
     "handymanStatus_CANCELLED": "Cancelled",
-    "handymanBookingSuccess": "Handyman request submitted!"
+    "handymanBookingSuccess": "Handyman request submitted!",
+    "handymanService": "Handyman Service"
   },
   "handyman": {
     "label": "Handyman Services",

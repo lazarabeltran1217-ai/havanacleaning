@@ -541,7 +541,8 @@
     "handymanStatus_SCHEDULED": "Programado",
     "handymanStatus_COMPLETED": "Completado",
     "handymanStatus_CANCELLED": "Cancelado",
-    "handymanBookingSuccess": "Solicitud de mantenimiento enviada!"
+    "handymanBookingSuccess": "Solicitud de mantenimiento enviada!",
+    "handymanService": "Servicio de Mantenimiento"
   },
   "handyman": {
     "label": "Servicios de Mantenimiento",

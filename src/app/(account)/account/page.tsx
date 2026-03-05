@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
 import { BookingPayment } from "@/components/website/BookingPayment";
+import { HandymanPayment } from "@/components/website/HandymanPayment";
 import { PortalBookingWizard } from "@/components/website/PortalBookingWizard";
 import { PortalHandymanWizard } from "@/components/website/PortalHandymanWizard";
 
@@ -107,7 +108,9 @@ interface HandymanInquiryData {
   rush: boolean;
   status: string;
   address: string;
+  quotedPrice: number | null;
   createdAt: string;
+  payments: { status: string }[];
 }
 
 interface DashboardData {
@@ -141,11 +144,20 @@ const STATUS_KEY: Record<string, string> = {
 
 const handymanStatusColors: Record<string, string> = {
   NEW: "bg-amber/10 text-amber",
-  CONTACTED: "bg-teal/10 text-teal",
-  QUOTE_SENT: "bg-gold/10 text-gold",
+  CONTACTED: "bg-amber/10 text-amber",
+  QUOTE_SENT: "bg-amber/10 text-amber",
   SCHEDULED: "bg-green/10 text-green",
   COMPLETED: "bg-gold/20 text-gold",
   CANCELLED: "bg-red-500/10 text-red-400",
+};
+
+const handymanCustomerStatus: Record<string, string> = {
+  NEW: "Pending",
+  CONTACTED: "Pending",
+  QUOTE_SENT: "Pending",
+  SCHEDULED: "Confirmed",
+  COMPLETED: "Completed",
+  CANCELLED: "Cancelled",
 };
 
 const FILTER_KEY: Record<string, string> = {
@@ -178,6 +190,9 @@ export default function CustomerDashboard() {
   // Handyman wizard
   const [showHandymanWizard, setShowHandymanWizard] = useState(false);
   const [handymanSuccess, setHandymanSuccess] = useState(false);
+
+  // Handyman payment
+  const [payingHandyman, setPayingHandyman] = useState<HandymanInquiryData | null>(null);
 
   // Address form
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -346,59 +361,105 @@ export default function CustomerDashboard() {
             <Calendar className="w-4 h-4 text-gold" /> {t("upcomingBookings")}
           </h3>
 
-          {data.upcomingBookings.length === 0 ? (
-            <div className="text-center py-6">
-              <Sparkles className={`w-8 h-8 mx-auto mb-2 ${TEXT_MUTED}`} />
-              <p className={`${TEXT_MUTED} text-sm`}>{t("noUpcoming")}</p>
-              <button onClick={() => setShowBookingWizard(true)} className="text-gold text-[0.82rem] font-medium hover:underline mt-1 inline-block">
-                {t("bookCleaning")} &rarr;
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {data.upcomingBookings.map((b) => {
-                const isPaid = b.payments.some((p) => p.status === "SUCCEEDED");
-                return (
-                  <div key={b.id} className={`border ${INNER_BORDER} rounded-xl p-3`}>
+          {(() => {
+            const scheduledHandyman = (data.handymanInquiries || []).filter(
+              (inq) => inq.status === "SCHEDULED" && inq.quotedPrice && !inq.payments.some((p) => p.status === "SUCCEEDED")
+            );
+            const hasUpcoming = data.upcomingBookings.length > 0 || scheduledHandyman.length > 0;
+
+            if (!hasUpcoming) {
+              return (
+                <div className="text-center py-6">
+                  <Sparkles className={`w-8 h-8 mx-auto mb-2 ${TEXT_MUTED}`} />
+                  <p className={`${TEXT_MUTED} text-sm`}>{t("noUpcoming")}</p>
+                  <button onClick={() => setShowBookingWizard(true)} className="text-gold text-[0.82rem] font-medium hover:underline mt-1 inline-block">
+                    {t("bookCleaning")} &rarr;
+                  </button>
+                </div>
+              );
+            }
+
+            return (
+              <div className="space-y-3">
+                {/* Cleaning bookings */}
+                {data.upcomingBookings.map((b) => {
+                  const isPaid = b.payments.some((p) => p.status === "SUCCEEDED");
+                  return (
+                    <div key={b.id} className={`border ${INNER_BORDER} rounded-xl p-3`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className={`font-medium text-[0.85rem] flex items-center gap-1.5 ${TEXT_PRIMARY}`}>
+                          <ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-gold" /> {loc(b.service.name, b.service.nameEs)}
+                        </span>
+                        <span className={`text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[b.status] || "bg-gray-100 text-gray-500"}`}>
+                          {fmtStatus(b.status)}
+                        </span>
+                      </div>
+                      <div className="text-gray-500 dark:text-sand/60 text-[0.78rem] space-y-0.5">
+                        <div>{fmtDate(b.scheduledDate)} &middot; <span className="capitalize">{fmtTime(b.scheduledTime)}</span></div>
+                        {b.address && (
+                          <div className="flex items-start gap-1">
+                            <MapPin className="w-3 h-3 mt-0.5 shrink-0 text-gray-400 dark:text-sand/50" />
+                            {b.address.street}{b.address.unit && ` ${b.address.unit}`}, {b.address.city}
+                          </div>
+                        )}
+                        {b.assignments.length > 0 && (
+                          <div className="flex items-center gap-1">
+                            <User className="w-3 h-3 shrink-0 text-gray-400 dark:text-sand/50" />
+                            {b.assignments.map((a) => a.employee.name).join(", ")}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-amber font-semibold text-[0.88rem]">{fmtCurrency(b.total)}</span>
+                        {b.status === "CONFIRMED" && !isPaid && (
+                          <button
+                            onClick={() => setPayingBooking(b)}
+                            className="flex items-center gap-1 px-3 py-1.5 bg-green text-white rounded-lg text-[0.75rem] font-semibold hover:bg-green-light transition-colors"
+                          >
+                            <CreditCard className="w-3 h-3" /> {t("payNow")}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Confirmed handyman inquiries */}
+                {scheduledHandyman.map((inq) => (
+                  <div key={inq.id} className={`border ${INNER_BORDER} rounded-xl p-3`}>
                     <div className="flex items-center justify-between mb-1">
                       <span className={`font-medium text-[0.85rem] flex items-center gap-1.5 ${TEXT_PRIMARY}`}>
-                        <ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-gold" /> {loc(b.service.name, b.service.nameEs)}
+                        <Wrench className="w-4 h-4 text-gold" /> {t("handymanService")}
                       </span>
-                      <span className={`text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[b.status] || "bg-gray-100 text-gray-500"}`}>
-                        {fmtStatus(b.status)}
+                      <span className="text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium bg-green/10 text-green">
+                        {t("status_confirmed")}
                       </span>
                     </div>
                     <div className="text-gray-500 dark:text-sand/60 text-[0.78rem] space-y-0.5">
-                      <div>{fmtDate(b.scheduledDate)} &middot; <span className="capitalize">{fmtTime(b.scheduledTime)}</span></div>
-                      {b.address && (
+                      {inq.preferredDate && (
+                        <div>{fmtDate(inq.preferredDate)} {inq.preferredTime && <>&middot; <span className="capitalize">{inq.preferredTime}</span></>}</div>
+                      )}
+                      {inq.address && (
                         <div className="flex items-start gap-1">
                           <MapPin className="w-3 h-3 mt-0.5 shrink-0 text-gray-400 dark:text-sand/50" />
-                          {b.address.street}{b.address.unit && ` ${b.address.unit}`}, {b.address.city}
-                        </div>
-                      )}
-                      {b.assignments.length > 0 && (
-                        <div className="flex items-center gap-1">
-                          <User className="w-3 h-3 shrink-0 text-gray-400 dark:text-sand/50" />
-                          {b.assignments.map((a) => a.employee.name).join(", ")}
+                          {inq.address}
                         </div>
                       )}
                     </div>
                     <div className="flex items-center justify-between mt-2">
-                      <span className="text-amber font-semibold text-[0.88rem]">{fmtCurrency(b.total)}</span>
-                      {b.status === "CONFIRMED" && !isPaid && (
-                        <button
-                          onClick={() => setPayingBooking(b)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-green text-white rounded-lg text-[0.75rem] font-semibold hover:bg-green-light transition-colors"
-                        >
-                          <CreditCard className="w-3 h-3" /> {t("payNow")}
-                        </button>
-                      )}
+                      <span className="text-amber font-semibold text-[0.88rem]">{fmtCurrency(inq.quotedPrice!)}</span>
+                      <button
+                        onClick={() => setPayingHandyman(inq)}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-green text-white rounded-lg text-[0.75rem] font-semibold hover:bg-green-light transition-colors"
+                      >
+                        <CreditCard className="w-3 h-3" /> {t("payNow")}
+                      </button>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
+                ))}
+              </div>
+            );
+          })()}
         </div>
 
         {/* ─── QUICK ACTIONS + STATS CARD ─── */}
@@ -635,7 +696,7 @@ export default function CustomerDashboard() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className={`text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${handymanStatusColors[inq.status] || "bg-gray-100 text-gray-500"}`}>
-                          {t(`handymanStatus_${inq.status}`)}
+                          {handymanCustomerStatus[inq.status] || inq.status}
                         </span>
                         {inq.rush && (
                           <span className="text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium bg-amber/15 text-amber flex items-center gap-0.5">
@@ -775,6 +836,55 @@ export default function CustomerDashboard() {
                 returnUrl="/account"
                 onSuccess={() => {
                   setPayingBooking(null);
+                  setPaymentSuccess(true);
+                  fetchDashboard();
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ HANDYMAN PAYMENT MODAL ═══ */}
+      {payingHandyman && data.stripeKey && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setPayingHandyman(null)} />
+          <div className="relative bg-white dark:bg-[#382618] rounded-2xl border border-gray-200 dark:border-gold/15 shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className={`flex items-center justify-between p-5 border-b ${INNER_BORDER}`}>
+              <h3 className={`font-display text-lg ${TEXT_PRIMARY}`}>{t("completePayment")}</h3>
+              <button onClick={() => setPayingHandyman(null)} className={`${TEXT_MUTED} hover:text-tobacco dark:hover:text-cream`}>
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-5">
+              <div className={`${INNER_BG} rounded-xl p-4 mb-4`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Wrench className="w-5 h-5 text-gold" />
+                  <span className={`font-display text-[1rem] ${TEXT_PRIMARY}`}>{t("handymanService")}</span>
+                </div>
+                <div className="text-gray-500 dark:text-sand/60 text-[0.82rem] space-y-1">
+                  {payingHandyman.preferredDate && (
+                    <div>{fmtDate(payingHandyman.preferredDate)} {payingHandyman.preferredTime && <>&middot; <span className="capitalize">{payingHandyman.preferredTime}</span></>}</div>
+                  )}
+                  {payingHandyman.address && (
+                    <div className="flex items-start gap-1">
+                      <MapPin className="w-3 h-3 mt-0.5 shrink-0" />
+                      {payingHandyman.address}
+                    </div>
+                  )}
+                </div>
+                <div className={`mt-3 pt-3 border-t ${INNER_BORDER} flex justify-between font-semibold`}>
+                  <span className={TEXT_PRIMARY}>{t("total")}</span>
+                  <span className="text-amber text-lg">{fmtCurrency(payingHandyman.quotedPrice!)}</span>
+                </div>
+              </div>
+              <HandymanPayment
+                inquiryId={payingHandyman.id}
+                amount={payingHandyman.quotedPrice!}
+                stripeKey={data.stripeKey}
+                returnUrl="/account"
+                onSuccess={() => {
+                  setPayingHandyman(null);
                   setPaymentSuccess(true);
                   fetchDashboard();
                 }}

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import { Zap } from "lucide-react";
+import Link from "next/link";
 
 const SERVICE_LABELS: Record<string, string> = {
   minorRepairs: "Minor Repairs",
@@ -122,6 +123,9 @@ export default async function AdminHandymanPage() {
                   </div>
                 )}
               </div>
+              <Link href={`/admin/handyman/${inq.id}`} prefetch={false} className="mt-3 block text-center text-[0.82rem] font-medium text-green hover:text-green/80 transition-colors">
+                View Details &rarr;
+              </Link>
             </div>
           );
         })}
@@ -143,6 +147,7 @@ export default async function AdminHandymanPage() {
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Status</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Rush</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Address</th>
+              <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
@@ -191,12 +196,17 @@ export default async function AdminHandymanPage() {
                     )}
                   </td>
                   <td className="px-4 py-3 text-[0.82rem] max-w-[200px] truncate">{inq.address}</td>
+                  <td className="px-4 py-3">
+                    <Link href={`/admin/handyman/${inq.id}`} prefetch={false} className="text-green hover:text-green/80 text-[0.82rem] font-medium transition-colors">
+                      View
+                    </Link>
+                  </td>
                 </tr>
               );
             })}
             {inquiries.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-12 text-center text-gray-400">
+                <td colSpan={7} className="px-4 py-12 text-center text-gray-400">
                   No handyman inquiries yet.
                 </td>
               </tr>

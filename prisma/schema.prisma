@@ -309,6 +309,7 @@ model TimeEntry {
 model Payment {
   id                    String        @id @default(cuid())
   bookingId             String?
+  handymanInquiryId     String?
   customerId            String
   amount                Float
   status                PaymentStatus @default(PENDING)
@@ -320,10 +321,12 @@ model Payment {
   notes                 String?
   createdAt             DateTime      @default(now())
 
-  booking  Booking? @relation(fields: [bookingId], references: [id])
-  customer User     @relation(fields: [customerId], references: [id])
+  booking          Booking?          @relation(fields: [bookingId], references: [id])
+  handymanInquiry  HandymanInquiry?  @relation(fields: [handymanInquiryId], references: [id])
+  customer         User              @relation(fields: [customerId], references: [id])
 
   @@index([bookingId])
+  @@index([handymanInquiryId])
   @@index([customerId])
   @@index([status])
 }
@@ -626,8 +629,11 @@ model HandymanInquiry {
   spamScore          Float                 @default(0)
   status             HandymanInquiryStatus @default(NEW)
   notes              String?
+  assignedEmployees  Json?
+  quotedPrice        Float?
   userId             String?
   user               User?                 @relation(fields: [userId], references: [id])
+  payments           Payment[]
   createdAt          DateTime              @default(now())
   updatedAt          DateTime              @updatedAt
 
