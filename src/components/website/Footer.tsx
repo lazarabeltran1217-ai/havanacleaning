@@ -42,6 +42,7 @@ export function Footer() {
             ].map((s) => (
               <li key={s.slug}><Link href={`/services/${s.slug}`} className="text-sand text-[0.88rem] hover:text-cream transition-colors">{t(s.key)}</Link></li>
             ))}
+            <li><Link href="/handyman" className="text-green-light text-[0.88rem] hover:text-white transition-colors font-medium">{t("handyman")}</Link></li>
           </ul>
         </div>
 
@@ -55,6 +56,9 @@ export function Footer() {
             <li><Link href="/blog" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{t("blog")}</Link></li>
             <li><Link href="/areas" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{t("serviceAreas")}</Link></li>
             <li><Link href="/careers" className="text-green-light text-[0.88rem] hover:text-white transition-colors font-medium">{t("careers")}</Link></li>
+            <li><Link href="/support" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Help & Support</Link></li>
+            <li><Link href="/privacy" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Privacy Policy</Link></li>
+            <li><Link href="/terms" className="text-sand text-[0.88rem] hover:text-cream transition-colors">Terms of Service</Link></li>
           </ul>
         </div>
 
@@ -63,6 +67,7 @@ export function Footer() {
           <h4 className="text-green-light text-[0.72rem] tracking-[0.2em] uppercase mb-5 font-semibold">{t("contactTitle")}</h4>
           <ul className="space-y-2.5">
             <li><span className="text-sand text-[0.88rem]">{t("location")}</span></li>
+            <li><span className="text-sand text-[0.88rem]">{t("locationNYC")}</span></li>
             <li><Link href="/book" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{t("bookOnline")}</Link></li>
             <li><Link href="/faq" className="text-sand text-[0.88rem] hover:text-cream transition-colors">{t("faq")}</Link></li>
           </ul>

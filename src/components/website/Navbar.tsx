@@ -54,6 +54,11 @@ export function Navbar() {
             </Link>
           </li>
           <li>
+            <Link href="/handyman" className="text-cream text-[0.82rem] tracking-[0.1em] uppercase font-medium hover:text-amber transition-colors">
+              {t("handyman")}
+            </Link>
+          </li>
+          <li>
             <Link href="/about" className="text-cream text-[0.82rem] tracking-[0.1em] uppercase font-medium hover:text-amber transition-colors">
               {t("about")}
             </Link>
@@ -98,6 +103,11 @@ export function Navbar() {
             <li>
               <Link href="/commercial" onClick={() => setMobileOpen(false)} className="block py-3 text-cream text-[0.9rem] tracking-[0.08em] uppercase font-medium hover:text-amber transition-colors border-b border-white/[0.06]">
                 {t("commercial")}
+              </Link>
+            </li>
+            <li>
+              <Link href="/handyman" onClick={() => setMobileOpen(false)} className="block py-3 text-cream text-[0.9rem] tracking-[0.08em] uppercase font-medium hover:text-amber transition-colors border-b border-white/[0.06]">
+                {t("handyman")}
               </Link>
             </li>
             <li>

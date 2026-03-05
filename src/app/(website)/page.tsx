@@ -4,8 +4,10 @@ import { SERVICE_AREAS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import { JsonLd } from "@/components/website/JsonLd";
 import { aggregateRatingSchema, reviewSchema, faqPageSchema } from "@/lib/schema";
-import { Check } from "lucide-react";
+import { Check, MapPin, Wrench, Package, Tv, DoorOpen, Lightbulb, Grid3x3, Paintbrush, Droplets, Waves, Wifi, Fence, LayoutGrid } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
+import { HANDYMAN_SERVICES } from "@/lib/handyman-constants";
+import type { LucideIcon } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { buildContentMap, localized } from "@/lib/i18n-content";
 
@@ -55,6 +57,10 @@ export default async function HomePage() {
     title: t("about.title"),
     paragraphs: [t("about.p1"), t("about.p2"), t("about.p3")],
   });
+
+  const HANDYMAN_ICON_MAP: Record<string, LucideIcon> = {
+    Wrench, Package, Tv, DoorOpen, Lightbulb, Grid3x3, Paintbrush, Droplets, Waves, Wifi, Fence, LayoutGrid,
+  };
 
   const avgRating = allTestimonials.length > 0
     ? allTestimonials.reduce((sum, t) => sum + t.rating, 0) / allTestimonials.length
@@ -181,6 +187,48 @@ export default async function HomePage() {
                 {t("about.bookToday")}
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* HANDYMAN SERVICES — NYC */}
+      <section className="bg-tobacco py-24 px-6 md:px-20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center gap-3">
+            <span className="w-8 h-px bg-green-light" />{t("handyman.label")}
+          </div>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
+            <div>
+              <h2 className="font-display text-cream mb-3" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>
+                {t("handyman.homeTitle")}
+              </h2>
+              <p className="text-sand max-w-[500px] leading-relaxed">
+                {t("handyman.homeSubtitle")}
+              </p>
+            </div>
+            <span className="mt-4 md:mt-0 inline-flex items-center gap-2 bg-green/20 text-green-light px-4 py-2 rounded-full text-[0.8rem] font-medium shrink-0">
+              <MapPin className="w-4 h-4" /> {t("handyman.nycBadge")}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0.5">
+            {HANDYMAN_SERVICES.slice(0, 6).map((service) => {
+              const Icon = HANDYMAN_ICON_MAP[service.icon] || Wrench;
+              return (
+                <div key={service.key} className="bg-white/[0.04] border border-gold/15 p-8 hover:bg-green-light/10 hover:border-green-light transition-colors">
+                  <Icon className="w-10 h-10 text-green-light mb-4" />
+                  <div className="font-display text-lg text-cream mb-2">{t(`handyman.${service.key}`)}</div>
+                  <p className="text-sand text-[0.88rem] leading-relaxed">{t(`handyman.${service.key}Desc`)}</p>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-8 flex gap-4 flex-wrap">
+            <Link href="/handyman" className="bg-gold text-tobacco px-8 py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-amber hover:-translate-y-0.5 transition-all">
+              {t("handyman.viewAll")}
+            </Link>
+            <Link href="/handyman#quote" className="border-[1.5px] border-cream/30 text-cream px-8 py-3.5 text-[0.88rem] font-medium tracking-[0.06em] uppercase rounded-[3px] hover:border-cream transition-colors">
+              {t("handyman.getQuote")}
+            </Link>
           </div>
         </div>
       </section>
