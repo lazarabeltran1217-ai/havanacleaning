@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { Check, MapPin, Wrench, Package, Tv, DoorOpen, Lightbulb, Grid3x3, Paintbrush, Droplets, Waves, Wifi, Fence, LayoutGrid, ClipboardList, MessageSquare, Clock } from "lucide-react";
+import { Check, MapPin, Wrench, Package, Tv, DoorOpen, Lightbulb, Grid3x3, Paintbrush, Droplets, Waves, Wifi, Fence, LayoutGrid } from "lucide-react";
 import { HANDYMAN_SERVICES, NYC_BOROUGHS, NYC_NEIGHBORHOODS } from "@/lib/handyman-constants";
 import { HandymanBookingWizard } from "@/components/website/HandymanBookingWizard";
 import type { LucideIcon } from "lucide-react";
@@ -32,12 +32,6 @@ export default async function HandymanPage() {
   const t = await getTranslations("handyman");
 
   const trustItems = [t("trust1"), t("trust2"), t("trust3"), t("trust4"), t("trust5")];
-
-  const steps = [
-    { num: 1, icon: ClipboardList, title: t("step1Title"), desc: t("step1Desc") },
-    { num: 2, icon: MessageSquare, title: t("step2Title"), desc: t("step2Desc") },
-    { num: 3, icon: Clock, title: t("step3Title"), desc: t("step3Desc") },
-  ];
 
   const faqs = [
     { q: t("faq1q"), a: t("faq1a") },
@@ -98,59 +92,19 @@ export default async function HandymanPage() {
         </div>
       </section>
 
-      {/* SERVICES GRID */}
-      <section id="services" className="bg-cream py-24 px-6 md:px-20">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center gap-3">
-            <span className="w-8 h-px bg-green" />{t("servicesTitle")}
-          </div>
-          <h2 className="font-display mb-3" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>
-            {t("servicesTitle")}
+      {/* BOOKING WIZARD */}
+      <section id="book" className="bg-ivory py-24 px-6 md:px-20">
+        <div className="max-w-3xl mx-auto">
+          <h2
+            className="font-display text-tobacco text-center mb-2"
+            style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)" }}
+          >
+            {t("formTitle")}
           </h2>
-          <p className="text-[#7a6555] max-w-[500px] leading-relaxed mb-12">
-            {t("servicesSubtitle")}
+          <p className="text-center text-tobacco/60 text-[0.9rem] mb-10">
+            {t("formSubtitle")}
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {HANDYMAN_SERVICES.map((service) => {
-              const Icon = ICON_MAP[service.icon] || Wrench;
-              return (
-                <div
-                  key={service.key}
-                  className="bg-white border border-tobacco/10 rounded-lg p-7 hover:shadow-lg hover:border-green/30 transition-all"
-                >
-                  <Icon className="w-9 h-9 text-green mb-4" />
-                  <h3 className="font-display text-lg mb-2">{t(service.key)}</h3>
-                  <p className="text-[#7a6555] text-[0.88rem] leading-relaxed">
-                    {t(`${service.key}Desc`)}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section className="bg-ivory py-24 px-6 md:px-20">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center justify-center gap-3">
-            <span className="w-8 h-px bg-green" />{t("howItWorksTitle")}
-            <span className="w-8 h-px bg-green" />
-          </div>
-          <h2 className="font-display mb-16" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>
-            {t("howItWorksTitle")}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {steps.map((step) => (
-              <div key={step.num} className="text-center">
-                <div className="w-16 h-16 bg-green text-white rounded-full flex items-center justify-center mx-auto mb-5 text-xl font-bold">
-                  {step.num}
-                </div>
-                <h3 className="font-display text-xl mb-3">{step.title}</h3>
-                <p className="text-[#7a6555] text-[0.9rem] leading-relaxed">{step.desc}</p>
-              </div>
-            ))}
-          </div>
+          <HandymanBookingWizard />
         </div>
       </section>
 
@@ -160,10 +114,10 @@ export default async function HandymanPage() {
           <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center gap-3">
             <span className="w-8 h-px bg-green" />{t("nycAreasTitle")}
           </div>
-          <h2 className="font-display mb-3" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>
+          <h2 className="font-display text-tobacco mb-3" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>
             {t("nycAreasTitle")}
           </h2>
-          <p className="text-[#7a6555] max-w-[500px] leading-relaxed mb-10">
+          <p className="text-tobacco/60 max-w-[500px] leading-relaxed mb-10">
             {t("nycAreasSubtitle")}
           </p>
           <div className="flex flex-wrap gap-2.5 mb-6">
@@ -189,30 +143,14 @@ export default async function HandymanPage() {
         </div>
       </section>
 
-      {/* BOOKING WIZARD */}
-      <section id="book" className="bg-ivory py-24 px-6 md:px-20">
-        <div className="max-w-3xl mx-auto">
-          <h2
-            className="font-display text-center mb-2"
-            style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)" }}
-          >
-            {t("formTitle")}
-          </h2>
-          <p className="text-center text-[#7a6555] text-[0.9rem] mb-10">
-            {t("formSubtitle")}
-          </p>
-          <HandymanBookingWizard />
-        </div>
-      </section>
-
       {/* FAQ */}
-      <section className="bg-cream py-24 px-6 md:px-20">
+      <section className="bg-ivory py-24 px-6 md:px-20">
         <div className="max-w-3xl mx-auto">
           <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center justify-center gap-3">
             <span className="w-8 h-px bg-green" />{t("faqTitle")}
             <span className="w-8 h-px bg-green" />
           </div>
-          <h2 className="font-display text-center mb-12" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>
+          <h2 className="font-display text-tobacco text-center mb-12" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>
             {t("faqTitle")}
           </h2>
           <div className="space-y-4">
@@ -222,11 +160,43 @@ export default async function HandymanPage() {
                   {faq.q}
                   <span className="text-green ml-4 group-open:rotate-180 transition-transform">&#9660;</span>
                 </summary>
-                <div className="px-6 pb-5 text-[#5a4535] text-[0.9rem] leading-relaxed border-t border-tobacco/5 pt-4">
+                <div className="px-6 pb-5 text-tobacco/70 text-[0.9rem] leading-relaxed border-t border-tobacco/5 pt-4">
                   {faq.a}
                 </div>
               </details>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SERVICES GRID */}
+      <section id="services" className="bg-cream py-24 px-6 md:px-20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center gap-3">
+            <span className="w-8 h-px bg-green" />{t("servicesTitle")}
+          </div>
+          <h2 className="font-display text-tobacco mb-3" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>
+            {t("servicesTitle")}
+          </h2>
+          <p className="text-tobacco/60 max-w-[500px] leading-relaxed mb-12">
+            {t("servicesSubtitle")}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {HANDYMAN_SERVICES.map((service) => {
+              const Icon = ICON_MAP[service.icon] || Wrench;
+              return (
+                <div
+                  key={service.key}
+                  className="bg-white border border-tobacco/10 rounded-lg p-7 hover:shadow-lg hover:border-green/30 transition-all"
+                >
+                  <Icon className="w-9 h-9 text-green mb-4" />
+                  <h3 className="font-display text-tobacco text-lg mb-2">{t(service.key)}</h3>
+                  <p className="text-tobacco/70 text-[0.88rem] leading-relaxed">
+                    {t(`${service.key}Desc`)}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

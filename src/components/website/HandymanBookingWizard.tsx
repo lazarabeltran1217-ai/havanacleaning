@@ -125,7 +125,7 @@ export function HandymanBookingWizard() {
   const inputClass =
     "w-full border border-tobacco/15 rounded-md px-4 py-3 bg-white text-[0.9rem]";
   const labelClass =
-    "block text-[0.78rem] uppercase tracking-wider text-sand mb-2";
+    "block text-[0.78rem] uppercase tracking-wider text-tobacco/50 mb-2";
 
   return (
     <div>
@@ -153,7 +153,7 @@ export function HandymanBookingWizard() {
         ))}
       </div>
 
-      <div className="text-center text-[0.78rem] text-sand uppercase tracking-wider mb-8">
+      <div className="text-center text-[0.78rem] text-tobacco/50 uppercase tracking-wider mb-8">
         {step === 1 ? t("step1") : step === 2 ? t("step2") : t("step3")}
       </div>
 
@@ -175,8 +175,8 @@ export function HandymanBookingWizard() {
                       : "border-tobacco/10 hover:border-green/30"
                   }`}
                 >
-                  <Icon className="w-7 h-7 mx-auto mb-1 text-tobacco/60" />
-                  <div className="text-[0.8rem] font-medium">{th(service.key)}</div>
+                  <Icon className="w-7 h-7 mx-auto mb-1 text-tobacco/70" />
+                  <div className="text-[0.8rem] font-medium text-tobacco">{th(service.key)}</div>
                 </button>
               );
             })}
@@ -235,7 +235,7 @@ export function HandymanBookingWizard() {
           >
             <div>
               <div className="text-[0.9rem] font-semibold">{t("rushTitle")}</div>
-              <div className="text-[0.78rem] text-sand mt-0.5">{t("rushDescription")}</div>
+              <div className="text-[0.78rem] text-tobacco/50 mt-0.5">{t("rushDescription")}</div>
             </div>
             <span className="text-amber font-bold text-[0.9rem] whitespace-nowrap ml-4">
               +${RUSH_FEE}
@@ -280,7 +280,7 @@ export function HandymanBookingWizard() {
         <div className="space-y-6">
           {/* CONTACT INFO */}
           <div>
-            <div className="text-[0.78rem] text-sand uppercase tracking-wider mb-3">
+            <div className="text-[0.78rem] text-tobacco/50 uppercase tracking-wider mb-3">
               {t("contactInfo")}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -333,14 +333,14 @@ export function HandymanBookingWizard() {
                   required
                   className={inputClass}
                 />
-                <p className="text-[0.72rem] text-sand mt-1">{t("passwordHint")}</p>
+                <p className="text-[0.72rem] text-tobacco/50 mt-1">{t("passwordHint")}</p>
               </div>
             </div>
           </div>
 
           {/* ADDRESS */}
           <div>
-            <div className="text-[0.78rem] text-sand uppercase tracking-wider mb-3">
+            <div className="text-[0.78rem] text-tobacco/50 uppercase tracking-wider mb-3">
               {t("serviceAddress")}
             </div>
             <div>
@@ -409,12 +409,12 @@ export function HandymanBookingWizard() {
                 </div>
                 <div>
                   <div className="text-[0.88rem] font-medium">{customerName}</div>
-                  <div className="text-[0.78rem] text-sand">{customerEmail}</div>
+                  <div className="text-[0.78rem] text-tobacco/50">{customerEmail}</div>
                 </div>
               </div>
             )}
             <div className="space-y-2 text-[0.9rem]">
-              <div className="text-[0.78rem] text-sand uppercase tracking-wider mb-1">
+              <div className="text-[0.78rem] text-tobacco/50 uppercase tracking-wider mb-1">
                 {t("selectedServices")}
               </div>
               {serviceCategories.map((key) => (
@@ -430,7 +430,7 @@ export function HandymanBookingWizard() {
                 </div>
               )}
               {scheduledDate && (
-                <div className="text-sand text-[0.85rem] mt-2 pt-2 border-t border-tobacco/10">
+                <div className="text-tobacco/50 text-[0.85rem] mt-2 pt-2 border-t border-tobacco/10">
                   {new Date(scheduledDate + "T12:00:00").toLocaleDateString("en-US", {
                     weekday: "long",
                     month: "long",
