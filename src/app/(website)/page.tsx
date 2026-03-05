@@ -226,8 +226,8 @@ export default async function HomePage() {
             <Link href="/handyman" className="bg-gold text-tobacco px-8 py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-amber hover:-translate-y-0.5 transition-all">
               {t("handyman.viewAll")}
             </Link>
-            <Link href="/handyman#quote" className="border-[1.5px] border-cream/30 text-cream px-8 py-3.5 text-[0.88rem] font-medium tracking-[0.06em] uppercase rounded-[3px] hover:border-cream transition-colors">
-              {t("handyman.getQuote")}
+            <Link href="/handyman#book" className="border-[1.5px] border-cream/30 text-cream px-8 py-3.5 text-[0.88rem] font-medium tracking-[0.06em] uppercase rounded-[3px] hover:border-cream transition-colors">
+              {t("handyman.bookHandyman")}
             </Link>
           </div>
         </div>

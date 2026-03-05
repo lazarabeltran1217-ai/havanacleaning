@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Check, MapPin, Wrench, Package, Tv, DoorOpen, Lightbulb, Grid3x3, Paintbrush, Droplets, Waves, Wifi, Fence, LayoutGrid, ClipboardList, MessageSquare, Clock } from "lucide-react";
 import { HANDYMAN_SERVICES, NYC_BOROUGHS, NYC_NEIGHBORHOODS } from "@/lib/handyman-constants";
-import { HandymanInquiryForm } from "@/components/website/HandymanInquiryForm";
+import { HandymanBookingWizard } from "@/components/website/HandymanBookingWizard";
 import type { LucideIcon } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -73,10 +73,10 @@ export default async function HandymanPage() {
         </div>
         <div className="flex gap-4 flex-wrap justify-center">
           <a
-            href="#quote"
+            href="#book"
             className="bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber hover:-translate-y-0.5 transition-all"
           >
-            {t("ctaQuote")}
+            {t("bookHandyman")}
           </a>
           <a
             href="#services"
@@ -189,8 +189,8 @@ export default async function HandymanPage() {
         </div>
       </section>
 
-      {/* QUOTE FORM */}
-      <section id="quote" className="bg-ivory py-24 px-6 md:px-20">
+      {/* BOOKING WIZARD */}
+      <section id="book" className="bg-ivory py-24 px-6 md:px-20">
         <div className="max-w-3xl mx-auto">
           <h2
             className="font-display text-center mb-2"
@@ -201,7 +201,7 @@ export default async function HandymanPage() {
           <p className="text-center text-[#7a6555] text-[0.9rem] mb-10">
             {t("formSubtitle")}
           </p>
-          <HandymanInquiryForm />
+          <HandymanBookingWizard />
         </div>
       </section>
 
@@ -241,7 +241,7 @@ export default async function HandymanPage() {
         </p>
         <div className="flex gap-4 flex-wrap justify-center">
           <a
-            href="#quote"
+            href="#book"
             className="bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber hover:-translate-y-0.5 transition-all"
           >
             {t("ctaButton")}

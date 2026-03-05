@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Sidebar } from "./Sidebar";
+import { AdminBottomNav } from "./AdminBottomNav";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -33,8 +34,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <h1 className="font-display text-lg md:text-xl text-tobacco">Dashboard</h1>
         </div>
 
-        <div className="p-4 md:p-7">{children}</div>
+        <div className="p-4 md:p-7 pb-24 md:pb-7">{children}</div>
       </main>
+
+      <AdminBottomNav onMenuOpen={() => setSidebarOpen(true)} />
     </div>
   );
 }

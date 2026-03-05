@@ -1,6 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { compare } from "bcryptjs";
+import GoogleProvider from "next-auth/providers/google";
+import { compare, hash } from "bcryptjs";
+import { randomBytes } from "crypto";
 import { prisma } from "./prisma";
 import type { UserRole } from "@/generated/prisma/enums";
 
@@ -31,6 +33,14 @@ declare module "next-auth/jwt" {
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? [
+          GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          }),
+        ]
+      : []),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -60,6 +70,34 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "google" && user.email) {
+        const email = user.email.toLowerCase();
+        let dbUser = await prisma.user.findUnique({ where: { email } });
+
+        if (!dbUser) {
+          // Create new customer from Google sign-in
+          const randomPassword = await hash(randomBytes(32).toString("hex"), 12);
+          dbUser = await prisma.user.create({
+            data: {
+              email,
+              name: user.name || email.split("@")[0],
+              password: randomPassword,
+              role: "CUSTOMER",
+              avatar: user.image || null,
+            },
+          });
+        }
+
+        if (!dbUser.isActive) return false;
+
+        // Attach DB fields to user object for jwt callback
+        user.id = dbUser.id;
+        user.role = dbUser.role;
+        user.locale = dbUser.locale;
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;

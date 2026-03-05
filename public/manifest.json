@@ -1,23 +1,58 @@
 {
-  "name": "Havana Cleaning — Employee Portal",
-  "short_name": "Havana Portal",
-  "description": "Employee portal for Havana Cleaning. Clock in/out, view jobs, and track hours.",
-  "start_url": "/portal",
+  "name": "Havana Cleaning",
+  "short_name": "Havana",
+  "description": "Professional cleaning service for homes and businesses. Book online, manage appointments, and track your cleaning schedule.",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#FAF6ED",
   "theme_color": "#2C1810",
   "orientation": "portrait",
-  "scope": "/portal",
+  "scope": "/",
+  "categories": ["business", "lifestyle"],
   "icons": [
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book a Cleaning",
+      "short_name": "Book",
+      "url": "/book",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Account",
+      "short_name": "Account",
+      "url": "/account",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Employee Portal",
+      "short_name": "Portal",
+      "url": "/portal",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
