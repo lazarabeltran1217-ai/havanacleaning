@@ -13,12 +13,12 @@ interface Props {
 }
 
 const STATUSES: { value: string; label: string }[] = [
-  { value: "NEW", label: "New" },
-  { value: "CONTACTED", label: "Contacted" },
-  { value: "QUOTE_SENT", label: "Quote Sent" },
-  { value: "SCHEDULED", label: "Scheduled" },
+  { value: "PENDING", label: "Pending" },
+  { value: "CONFIRMED", label: "Confirmed" },
+  { value: "IN_PROGRESS", label: "In Progress" },
   { value: "COMPLETED", label: "Completed" },
   { value: "CANCELLED", label: "Cancelled" },
+  { value: "NO_SHOW", label: "No Show" },
 ];
 
 export function HandymanActions({ inquiryId, currentStatus, currentNotes, currentQuotedPrice, assignments, employees }: Props) {

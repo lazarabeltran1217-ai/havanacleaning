@@ -605,14 +605,7 @@ model CommercialQuote {
 
 // ── HANDYMAN INQUIRIES ──
 
-enum HandymanInquiryStatus {
-  NEW
-  CONTACTED
-  QUOTE_SENT
-  SCHEDULED
-  COMPLETED
-  CANCELLED
-}
+// HandymanInquiry now uses BookingStatus (same flow as bookings)
 
 model HandymanInquiry {
   id                 String                @id @default(cuid())
@@ -627,7 +620,7 @@ model HandymanInquiry {
   preferredTime      String?
   rush               Boolean               @default(false)
   spamScore          Float                 @default(0)
-  status             HandymanInquiryStatus @default(NEW)
+  status             BookingStatus         @default(PENDING)
   notes              String?
   assignedEmployees  Json?
   quotedPrice        Float?

@@ -25,7 +25,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
   }
 
   const paymentAmount = inquiry.quotedPrice ?? inquiry.estimatedTotal;
-  if (inquiry.status !== "SCHEDULED" || !paymentAmount) {
+  if (inquiry.status !== "CONFIRMED" || !paymentAmount) {
     return NextResponse.json({ error: "Inquiry not ready for payment" }, { status: 400 });
   }
 

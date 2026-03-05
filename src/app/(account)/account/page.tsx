@@ -145,21 +145,12 @@ const STATUS_KEY: Record<string, string> = {
 };
 
 const handymanStatusColors: Record<string, string> = {
-  NEW: "bg-amber/10 text-amber",
-  CONTACTED: "bg-amber/10 text-amber",
-  QUOTE_SENT: "bg-amber/10 text-amber",
-  SCHEDULED: "bg-green/10 text-green",
+  PENDING: "bg-amber/10 text-amber",
+  CONFIRMED: "bg-gold/10 text-gold",
+  IN_PROGRESS: "bg-teal/10 text-teal",
   COMPLETED: "bg-gold/20 text-gold",
   CANCELLED: "bg-red-500/10 text-red-400",
-};
-
-const handymanCustomerStatus: Record<string, string> = {
-  NEW: "Pending",
-  CONTACTED: "Pending",
-  QUOTE_SENT: "Pending",
-  SCHEDULED: "Confirmed",
-  COMPLETED: "Completed",
-  CANCELLED: "Cancelled",
+  NO_SHOW: "bg-gray-100 dark:bg-white/[0.04] text-gray-400 dark:text-sand/50",
 };
 
 const FILTER_KEY: Record<string, string> = {
@@ -365,7 +356,7 @@ export default function CustomerDashboard() {
 
           {(() => {
             const scheduledHandyman = (data.handymanInquiries || []).filter(
-              (inq) => inq.status === "SCHEDULED" && (inq.quotedPrice || inq.estimatedTotal) && !inq.payments.some((p) => p.status === "SUCCEEDED")
+              (inq) => inq.status === "CONFIRMED" && (inq.quotedPrice || inq.estimatedTotal) && !inq.payments.some((p) => p.status === "SUCCEEDED")
             );
             const hasUpcoming = data.upcomingBookings.length > 0 || scheduledHandyman.length > 0;
 
@@ -697,8 +688,8 @@ export default function CustomerDashboard() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className={`text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${handymanStatusColors[inq.status] || "bg-gray-100 text-gray-500"}`}>
-                          {handymanCustomerStatus[inq.status] || inq.status}
+                        <span className={`text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${handymanStatusColors[inq.status] || statusColors[inq.status] || "bg-gray-100 text-gray-500"}`}>
+                          {fmtStatus(inq.status)}
                         </span>
                         {inq.rush && (
                           <span className="text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium bg-amber/15 text-amber flex items-center gap-0.5">

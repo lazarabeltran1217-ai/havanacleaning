@@ -19,12 +19,12 @@ const SERVICE_LABELS: Record<string, string> = {
 };
 
 const statusColors: Record<string, string> = {
-  NEW: "bg-amber/10 text-amber",
-  CONTACTED: "bg-teal/10 text-teal",
-  QUOTE_SENT: "bg-gold/10 text-gold",
-  SCHEDULED: "bg-green/10 text-green",
+  PENDING: "bg-amber/10 text-amber",
+  CONFIRMED: "bg-gold/10 text-gold",
+  IN_PROGRESS: "bg-teal/10 text-teal",
   COMPLETED: "bg-green/20 text-green",
   CANCELLED: "bg-red/10 text-red",
+  NO_SHOW: "bg-gray-100 text-gray-400",
 };
 
 export default async function AdminHandymanPage() {
@@ -45,8 +45,8 @@ export default async function AdminHandymanPage() {
   }
 
   const total = inquiries.length;
-  const newCount = inquiries.filter((i) => i.status === "NEW").length;
-  const scheduledCount = inquiries.filter((i) => i.status === "SCHEDULED").length;
+  const pendingCount = inquiries.filter((i) => i.status === "PENDING").length;
+  const confirmedCount = inquiries.filter((i) => i.status === "CONFIRMED").length;
   const rushCount = inquiries.filter((i) => i.rush).length;
 
   return (
@@ -60,12 +60,12 @@ export default async function AdminHandymanPage() {
           <div className="text-2xl font-display text-tobacco">{total}</div>
         </div>
         <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
-          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">New</div>
-          <div className="text-2xl font-display text-amber">{newCount}</div>
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Pending</div>
+          <div className="text-2xl font-display text-amber">{pendingCount}</div>
         </div>
         <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
-          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Scheduled</div>
-          <div className="text-2xl font-display text-green">{scheduledCount}</div>
+          <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Confirmed</div>
+          <div className="text-2xl font-display text-green">{confirmedCount}</div>
         </div>
         <div className="bg-white rounded-xl border border-[#ece6d9] p-4">
           <div className="text-[0.72rem] uppercase tracking-wider text-sand mb-1">Rush</div>

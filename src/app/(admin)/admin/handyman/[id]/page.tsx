@@ -21,12 +21,12 @@ const SERVICE_LABELS: Record<string, string> = {
 };
 
 const statusColors: Record<string, string> = {
-  NEW: "bg-amber/10 text-amber",
-  CONTACTED: "bg-teal/10 text-teal",
-  QUOTE_SENT: "bg-gold/10 text-gold",
-  SCHEDULED: "bg-green/10 text-green",
+  PENDING: "bg-amber/10 text-amber",
+  CONFIRMED: "bg-gold/10 text-gold",
+  IN_PROGRESS: "bg-teal/10 text-teal",
   COMPLETED: "bg-green/20 text-green",
   CANCELLED: "bg-red/10 text-red",
+  NO_SHOW: "bg-gray-100 text-gray-400",
 };
 
 interface Props {
