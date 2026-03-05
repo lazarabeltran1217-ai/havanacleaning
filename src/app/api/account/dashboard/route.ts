@@ -16,7 +16,7 @@ export async function GET() {
     const uid = session.user.id;
     const today = todayStartET();
 
-    const [profile, upcomingBookings, allBookings, addresses, totalCount, totalSpent, stripeSetting, services, addOns] =
+    const [profile, upcomingBookings, allBookings, addresses, totalCount, totalSpent, stripeSetting, services, addOns, handymanInquiries] =
       await Promise.all([
         // Profile
         prisma.user.findUnique({
@@ -84,6 +84,23 @@ export async function GET() {
           select: { id: true, name: true, nameEs: true, price: true },
           orderBy: { name: "asc" },
         }),
+
+        // Handyman inquiries for this user
+        prisma.handymanInquiry.findMany({
+          where: { userId: uid },
+          select: {
+            id: true,
+            serviceCategories: true,
+            projectDescription: true,
+            preferredDate: true,
+            preferredTime: true,
+            rush: true,
+            status: true,
+            address: true,
+            createdAt: true,
+          },
+          orderBy: { createdAt: "desc" },
+        }),
       ]);
 
     const stripeKey =
@@ -103,6 +120,7 @@ export async function GET() {
       stripeKey,
       services,
       addOns,
+      handymanInquiries,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);

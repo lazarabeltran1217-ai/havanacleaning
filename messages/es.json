@@ -529,7 +529,19 @@
     "time_afternoon_full": "Tarde (2pm - 5pm)",
     "addr_Home": "Casa",
     "addr_Work": "Trabajo",
-    "addr_Other": "Otro"
+    "addr_Other": "Otro",
+    "bookAHandyman": "Reservar Mantenimiento",
+    "myHandymanRequests": "Mis Solicitudes de Mantenimiento",
+    "noHandymanRequests": "Aun no hay solicitudes de mantenimiento",
+    "bookHandymanPrompt": "Necesitas reparaciones o ensamblaje?",
+    "rushLabel": "Urgente",
+    "handymanStatus_NEW": "Nuevo",
+    "handymanStatus_CONTACTED": "Contactado",
+    "handymanStatus_QUOTE_SENT": "Cotizacion Enviada",
+    "handymanStatus_SCHEDULED": "Programado",
+    "handymanStatus_COMPLETED": "Completado",
+    "handymanStatus_CANCELLED": "Cancelado",
+    "handymanBookingSuccess": "Solicitud de mantenimiento enviada!"
   },
   "handyman": {
     "label": "Servicios de Mantenimiento",

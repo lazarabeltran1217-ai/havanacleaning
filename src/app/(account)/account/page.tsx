@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import {
   Calendar,
   MapPin,
@@ -16,6 +17,8 @@ import {
   Sparkles,
   X,
   CheckCircle,
+  Wrench,
+  Zap,
 } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
 import { BookingPayment } from "@/components/website/BookingPayment";
@@ -95,6 +98,18 @@ interface AddOnData {
   price: number;
 }
 
+interface HandymanInquiryData {
+  id: string;
+  serviceCategories: string[] | null;
+  projectDescription: string;
+  preferredDate: string | null;
+  preferredTime: string | null;
+  rush: boolean;
+  status: string;
+  address: string;
+  createdAt: string;
+}
+
 interface DashboardData {
   profile: {
     id: string;
@@ -111,6 +126,7 @@ interface DashboardData {
   stripeKey: string;
   services: ServiceData[];
   addOns: AddOnData[];
+  handymanInquiries: HandymanInquiryData[];
 }
 
 /* ─── Main Dashboard ─── */
@@ -121,6 +137,15 @@ const STATUS_KEY: Record<string, string> = {
   COMPLETED: "status_completed",
   CANCELLED: "status_cancelled",
   NO_SHOW: "status_no_show",
+};
+
+const handymanStatusColors: Record<string, string> = {
+  NEW: "bg-amber/10 text-amber",
+  CONTACTED: "bg-teal/10 text-teal",
+  QUOTE_SENT: "bg-gold/10 text-gold",
+  SCHEDULED: "bg-green/10 text-green",
+  COMPLETED: "bg-gold/20 text-gold",
+  CANCELLED: "bg-red-500/10 text-red-400",
 };
 
 const FILTER_KEY: Record<string, string> = {
@@ -134,6 +159,7 @@ export default function CustomerDashboard() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const t = useTranslations("account");
+  const th = useTranslations("handyman");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
 
@@ -379,11 +405,19 @@ export default function CustomerDashboard() {
 
           <button
             onClick={() => setShowBookingWizard(true)}
-            className="flex items-center gap-3 w-full px-4 py-3.5 bg-green text-white rounded-[3px] font-semibold text-[0.88rem] tracking-[0.06em] uppercase hover:bg-green-light transition-colors mb-3"
+            className="flex items-center gap-3 w-full px-4 py-3.5 bg-green text-white rounded-[3px] font-semibold text-[0.88rem] tracking-[0.06em] uppercase hover:bg-green-light transition-colors mb-2"
           >
             <Plus className="w-5 h-5" />
             <span>{t("bookACleaning")}</span>
           </button>
+
+          <Link
+            href="/handyman#book"
+            className="flex items-center gap-3 w-full px-4 py-3.5 bg-tobacco dark:bg-gold/15 text-cream rounded-[3px] font-semibold text-[0.88rem] tracking-[0.06em] uppercase hover:bg-tobacco/90 dark:hover:bg-gold/25 transition-colors mb-3"
+          >
+            <Wrench className="w-5 h-5" />
+            <span>{t("bookAHandyman")}</span>
+          </Link>
 
           <div className="grid grid-cols-2 gap-2 mt-3">
             <div className={`${INNER_BG} rounded-lg p-3 text-center`}>
@@ -562,6 +596,76 @@ export default function CustomerDashboard() {
                     </div>
                     <div className="text-gray-500 dark:text-sand/60 text-[0.72rem] truncate">
                       {addr.street}{addr.unit && ` ${addr.unit}`}, {addr.city}, {addr.state} {addr.zipCode}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ─── MY HANDYMAN REQUESTS CARD ─── */}
+        <div className={`${CARD} md:col-span-2`}>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className={`font-display text-lg ${TEXT_PRIMARY} flex items-center gap-2`}>
+              <Wrench className="w-4 h-4 text-gold" /> {t("myHandymanRequests")}
+            </h3>
+            <Link href="/handyman#book" className="text-gold text-[0.75rem] font-semibold hover:underline">
+              + {t("bookAHandyman")}
+            </Link>
+          </div>
+
+          {(!data.handymanInquiries || data.handymanInquiries.length === 0) ? (
+            <div className="text-center py-6">
+              <Wrench className={`w-8 h-8 mx-auto mb-2 ${TEXT_MUTED}`} />
+              <p className={`${TEXT_MUTED} text-sm`}>{t("noHandymanRequests")}</p>
+              <Link href="/handyman#book" className="text-gold text-[0.82rem] font-medium hover:underline mt-1 inline-block">
+                {t("bookHandymanPrompt")} &rarr;
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {data.handymanInquiries.map((inq) => (
+                <div key={inq.id} className={`border ${INNER_BORDER} rounded-xl p-3`}>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className={`text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${handymanStatusColors[inq.status] || "bg-gray-100 text-gray-500"}`}>
+                          {t(`handymanStatus_${inq.status}`)}
+                        </span>
+                        {inq.rush && (
+                          <span className="text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium bg-amber/15 text-amber flex items-center gap-0.5">
+                            <Zap className="w-3 h-3" /> {t("rushLabel")}
+                          </span>
+                        )}
+                      </div>
+                      {/* Service category tags */}
+                      {inq.serviceCategories && Array.isArray(inq.serviceCategories) && (
+                        <div className="flex flex-wrap gap-1 mb-1.5">
+                          {(inq.serviceCategories as string[]).map((cat) => (
+                            <span key={cat} className={`text-[0.68rem] ${INNER_BG} border ${INNER_BORDER} px-2 py-0.5 rounded-full ${TEXT_MUTED}`}>
+                              {th(cat)}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      <div className="text-gray-500 dark:text-sand/60 text-[0.72rem] space-y-0.5">
+                        {inq.preferredDate && (
+                          <div>{fmtDate(inq.preferredDate)} {inq.preferredTime && <>&middot; <span className="capitalize">{inq.preferredTime}</span></>}</div>
+                        )}
+                        {inq.address && (
+                          <div className="flex items-start gap-1">
+                            <MapPin className="w-3 h-3 mt-0.5 shrink-0" />
+                            <span className="truncate">{inq.address}</span>
+                          </div>
+                        )}
+                        {inq.projectDescription && (
+                          <p className="truncate">{inq.projectDescription}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className={`${TEXT_MUTED} text-[0.68rem] whitespace-nowrap ml-2`}>
+                      {fmtDate(inq.createdAt)}
                     </div>
                   </div>
                 </div>

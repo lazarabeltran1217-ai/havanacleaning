@@ -529,7 +529,19 @@
     "time_afternoon_full": "Afternoon (2pm - 5pm)",
     "addr_Home": "Home",
     "addr_Work": "Work",
-    "addr_Other": "Other"
+    "addr_Other": "Other",
+    "bookAHandyman": "Book a Handyman",
+    "myHandymanRequests": "My Handyman Requests",
+    "noHandymanRequests": "No handyman requests yet",
+    "bookHandymanPrompt": "Need repairs or assembly?",
+    "rushLabel": "Rush",
+    "handymanStatus_NEW": "New",
+    "handymanStatus_CONTACTED": "Contacted",
+    "handymanStatus_QUOTE_SENT": "Quote Sent",
+    "handymanStatus_SCHEDULED": "Scheduled",
+    "handymanStatus_COMPLETED": "Completed",
+    "handymanStatus_CANCELLED": "Cancelled",
+    "handymanBookingSuccess": "Handyman request submitted!"
   },
   "handyman": {
     "label": "Handyman Services",
