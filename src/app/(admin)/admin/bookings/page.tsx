@@ -3,6 +3,7 @@ import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
 import Link from "next/link";
 import { ServiceIcon } from "@/lib/service-icons";
 import { QuickBookForm } from "@/components/admin/QuickBookForm";
+import { CheckCircle } from "lucide-react";
 
 export default async function AdminBookingsPage() {
   const fetchBookings = () =>
@@ -12,6 +13,7 @@ export default async function AdminBookingsPage() {
         customer: { select: { name: true, email: true, phone: true } },
         address: true,
         assignments: { include: { employee: { select: { name: true } } } },
+        payments: { select: { status: true }, where: { status: "SUCCEEDED" }, take: 1 },
       },
       orderBy: { scheduledDate: "desc" },
       take: 50,
@@ -107,7 +109,16 @@ export default async function AdminBookingsPage() {
                 </span>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                <span className="font-medium text-green">{formatCurrency(b.total)}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-green">{formatCurrency(b.total)}</span>
+                  {b.payments.length > 0 ? (
+                    <span className="text-green flex items-center gap-0.5 text-[0.68rem] font-medium">
+                      <CheckCircle className="w-3 h-3" /> Paid
+                    </span>
+                  ) : (
+                    <span className="text-gray-300 text-[0.68rem]">Unpaid</span>
+                  )}
+                </div>
                 <Link href={`/admin/bookings/${b.id}`} className="text-green text-[0.78rem] font-medium hover:underline">View →</Link>
               </div>
             </div>
@@ -132,6 +143,7 @@ export default async function AdminBookingsPage() {
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Status</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Assigned</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium text-right">Total</th>
+              <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Paid</th>
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
@@ -160,13 +172,22 @@ export default async function AdminBookingsPage() {
                 </td>
                 <td className="px-4 py-3 text-right font-medium">{formatCurrency(b.total)}</td>
                 <td className="px-4 py-3">
+                  {b.payments.length > 0 ? (
+                    <span className="text-green flex items-center gap-0.5 text-[0.78rem] font-medium">
+                      <CheckCircle className="w-3.5 h-3.5" /> Paid
+                    </span>
+                  ) : (
+                    <span className="text-gray-300 text-[0.78rem]">Unpaid</span>
+                  )}
+                </td>
+                <td className="px-4 py-3">
                   <Link href={`/admin/bookings/${b.id}`} className="text-green text-[0.78rem] hover:underline">View</Link>
                 </td>
               </tr>
             ))}
             {bookings.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-gray-400">
+                <td colSpan={9} className="px-4 py-12 text-center text-gray-400">
                   No bookings yet.
                 </td>
               </tr>

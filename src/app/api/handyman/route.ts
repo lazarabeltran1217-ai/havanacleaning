@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
 import { calculateHandymanTotal } from "@/lib/handyman-pricing";
+import { generateHandymanBookingNumber } from "@/lib/booking-number";
 
 export const dynamic = "force-dynamic";
 
@@ -32,8 +33,10 @@ export async function POST(req: NextRequest) {
     const prices = await prisma.handymanServicePrice.findMany({ where: { isActive: true } });
     const serverPricing = calculateHandymanTotal(prices, body.serviceCategories, body.rush || false);
 
+    const bookingNumber = await generateHandymanBookingNumber();
     const inquiry = await prisma.handymanInquiry.create({
       data: {
+        bookingNumber,
         fullName: user.name,
         email: user.email,
         phone: user.phone || "",
@@ -117,8 +120,10 @@ export async function POST(req: NextRequest) {
   const prices = await prisma.handymanServicePrice.findMany({ where: { isActive: true } });
   const serverPricing = calculateHandymanTotal(prices, body.serviceCategories, body.rush || false);
 
+  const bookingNumber = await generateHandymanBookingNumber();
   const inquiry = await prisma.handymanInquiry.create({
     data: {
+      bookingNumber,
       fullName: body.fullName.trim(),
       email: emailLower,
       phone: body.phone?.trim() || "",

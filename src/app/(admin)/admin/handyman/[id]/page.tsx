@@ -81,6 +81,7 @@ export default async function AdminHandymanDetailPage({ params }: Props) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="font-display text-xl">Handyman Inquiry</h2>
+          <div className="text-[0.82rem] text-gray-400 tracking-wide">{inquiry.bookingNumber}</div>
           <div className="flex items-center gap-2 mt-1">
             <span className={`inline-block text-[0.72rem] uppercase tracking-wider px-3 py-1 rounded-full font-medium ${statusColors[inquiry.status] || ""}`}>
               {inquiry.status.replace("_", " ")}

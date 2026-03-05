@@ -101,6 +101,7 @@ interface AddOnData {
 
 interface HandymanInquiryData {
   id: string;
+  bookingNumber: string;
   serviceCategories: string[] | null;
   projectDescription: string;
   preferredDate: string | null;
@@ -688,6 +689,7 @@ export default function CustomerDashboard() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className={`text-[0.75rem] tracking-wide font-medium ${TEXT_PRIMARY}`}>{inq.bookingNumber}</span>
                         <span className={`text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${handymanStatusColors[inq.status] || statusColors[inq.status] || "bg-gray-100 text-gray-500"}`}>
                           {fmtStatus(inq.status)}
                         </span>

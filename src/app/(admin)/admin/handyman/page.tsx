@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { formatDate, formatCurrency } from "@/lib/utils";
-import { Zap } from "lucide-react";
+import { Zap, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 const SERVICE_LABELS: Record<string, string> = {
@@ -32,6 +32,7 @@ export default async function AdminHandymanPage() {
     prisma.handymanInquiry.findMany({
       include: {
         user: { select: { name: true, email: true, phone: true } },
+        payments: { select: { status: true }, where: { status: "SUCCEEDED" }, take: 1 },
       },
       orderBy: { createdAt: "desc" },
       take: 50,
@@ -79,17 +80,26 @@ export default async function AdminHandymanPage() {
       <div className="md:hidden space-y-3">
         {inquiries.map((inq) => {
           const cats = (Array.isArray(inq.serviceCategories) ? inq.serviceCategories : []) as string[];
+          const isPaid = inq.payments.length > 0;
           return (
             <div key={inq.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
               <div className="flex items-center justify-between mb-3">
-                <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[inq.status] || ""}`}>
-                  {inq.status.replace("_", " ")}
-                </span>
-                {inq.rush && (
-                  <span className="text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium bg-amber/15 text-amber flex items-center gap-0.5">
-                    <Zap className="w-3 h-3" /> Rush
+                <span className="text-[0.8rem] tracking-wide font-medium">{inq.bookingNumber}</span>
+                <div className="flex items-center gap-1.5">
+                  {isPaid && (
+                    <span className="text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium bg-green/10 text-green flex items-center gap-0.5">
+                      <CheckCircle className="w-3 h-3" /> Paid
+                    </span>
+                  )}
+                  <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[inq.status] || ""}`}>
+                    {inq.status.replace("_", " ")}
                   </span>
-                )}
+                  {inq.rush && (
+                    <span className="text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium bg-amber/15 text-amber flex items-center gap-0.5">
+                      <Zap className="w-3 h-3" /> Rush
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="text-[0.88rem] font-medium mb-1">{inq.user?.name || inq.fullName}</div>
               <div className="text-gray-400 text-[0.75rem] mb-2">{inq.user?.email || inq.email}</div>
@@ -150,21 +160,24 @@ export default async function AdminHandymanPage() {
         <table className="w-full text-left text-[0.85rem]">
           <thead>
             <tr className="bg-ivory/50 border-b border-[#ece6d9]">
+              <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Booking #</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Customer</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Services</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Date</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Status</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Price</th>
+              <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Paid</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Rush</th>
-              <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Address</th>
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
             {inquiries.map((inq) => {
               const cats = (Array.isArray(inq.serviceCategories) ? inq.serviceCategories : []) as string[];
+              const isPaid = inq.payments.length > 0;
               return (
                 <tr key={inq.id} className="border-b border-gray-50 hover:bg-ivory/30">
+                  <td className="px-4 py-3 text-[0.8rem] tracking-wide">{inq.bookingNumber}</td>
                   <td className="px-4 py-3">
                     <div>{inq.user?.name || inq.fullName}</div>
                     <div className="text-gray-400 text-[0.75rem]">{inq.user?.email || inq.email}</div>
@@ -207,6 +220,15 @@ export default async function AdminHandymanPage() {
                     )}
                   </td>
                   <td className="px-4 py-3">
+                    {isPaid ? (
+                      <span className="text-green flex items-center gap-0.5 text-[0.78rem] font-medium">
+                        <CheckCircle className="w-3.5 h-3.5" /> Paid
+                      </span>
+                    ) : (
+                      <span className="text-gray-300 text-[0.78rem]">Unpaid</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
                     {inq.rush ? (
                       <span className="text-amber flex items-center gap-0.5 text-[0.82rem] font-medium">
                         <Zap className="w-3.5 h-3.5" /> Yes
@@ -215,7 +237,6 @@ export default async function AdminHandymanPage() {
                       <span className="text-gray-300">No</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-[0.82rem] max-w-[200px] truncate">{inq.address}</td>
                   <td className="px-4 py-3">
                     <Link href={`/admin/handyman/${inq.id}`} prefetch={false} className="text-green hover:text-green/80 text-[0.82rem] font-medium transition-colors">
                       View
@@ -226,7 +247,7 @@ export default async function AdminHandymanPage() {
             })}
             {inquiries.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-gray-400">
+                <td colSpan={9} className="px-4 py-12 text-center text-gray-400">
                   No handyman inquiries yet.
                 </td>
               </tr>

@@ -609,6 +609,7 @@ model CommercialQuote {
 
 model HandymanInquiry {
   id                 String                @id @default(cuid())
+  bookingNumber      String                @unique
   fullName           String
   email              String
   phone              String

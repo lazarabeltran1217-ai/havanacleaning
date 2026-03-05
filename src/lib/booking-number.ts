@@ -21,3 +21,24 @@ export async function generateBookingNumber(): Promise<string> {
 
   return `${prefix}-${String(seq).padStart(3, "0")}`;
 }
+
+/** Generate a handyman booking number like HM-20260305-001 */
+export async function generateHandymanBookingNumber(): Promise<string> {
+  const dateStr = todayDateStringET();
+
+  const prefix = `HM-${dateStr}`;
+
+  const last = await prisma.handymanInquiry.findFirst({
+    where: { bookingNumber: { startsWith: prefix } },
+    orderBy: { bookingNumber: "desc" },
+    select: { bookingNumber: true },
+  });
+
+  let seq = 1;
+  if (last) {
+    const parts = last.bookingNumber.split("-");
+    seq = parseInt(parts[2], 10) + 1;
+  }
+
+  return `${prefix}-${String(seq).padStart(3, "0")}`;
+}

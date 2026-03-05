@@ -90,6 +90,7 @@ export async function GET() {
           where: { userId: uid },
           select: {
             id: true,
+            bookingNumber: true,
             serviceCategories: true,
             projectDescription: true,
             preferredDate: true,
