@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import {
   Calendar,
   MapPin,
@@ -23,6 +22,7 @@ import {
 import { ServiceIcon } from "@/lib/service-icons";
 import { BookingPayment } from "@/components/website/BookingPayment";
 import { PortalBookingWizard } from "@/components/website/PortalBookingWizard";
+import { PortalHandymanWizard } from "@/components/website/PortalHandymanWizard";
 
 /* ─── Card class helpers (light / dark) ─── */
 const CARD = "bg-white dark:bg-[#382618] rounded-2xl border border-gray-200 dark:border-gold/20 shadow-sm dark:shadow-none p-5";
@@ -174,6 +174,10 @@ export default function CustomerDashboard() {
   // Booking wizard
   const [showBookingWizard, setShowBookingWizard] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+
+  // Handyman wizard
+  const [showHandymanWizard, setShowHandymanWizard] = useState(false);
+  const [handymanSuccess, setHandymanSuccess] = useState(false);
 
   // Address form
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -411,13 +415,13 @@ export default function CustomerDashboard() {
             <span>{t("bookACleaning")}</span>
           </button>
 
-          <Link
-            href="/handyman#book"
-            className="flex items-center gap-3 w-full px-4 py-3.5 bg-tobacco dark:bg-gold/15 text-cream rounded-[3px] font-semibold text-[0.88rem] tracking-[0.06em] uppercase hover:bg-tobacco/90 dark:hover:bg-gold/25 transition-colors mb-3"
+          <button
+            onClick={() => setShowHandymanWizard(true)}
+            className="flex items-center gap-3 w-full px-4 py-3.5 bg-green text-white rounded-[3px] font-semibold text-[0.88rem] tracking-[0.06em] uppercase hover:bg-green-light transition-colors mb-3"
           >
             <Wrench className="w-5 h-5" />
             <span>{t("bookAHandyman")}</span>
-          </Link>
+          </button>
 
           <div className="grid grid-cols-2 gap-2 mt-3">
             <div className={`${INNER_BG} rounded-lg p-3 text-center`}>
@@ -610,18 +614,18 @@ export default function CustomerDashboard() {
             <h3 className={`font-display text-lg ${TEXT_PRIMARY} flex items-center gap-2`}>
               <Wrench className="w-4 h-4 text-gold" /> {t("myHandymanRequests")}
             </h3>
-            <Link href="/handyman#book" className="text-gold text-[0.75rem] font-semibold hover:underline">
+            <button onClick={() => setShowHandymanWizard(true)} className="text-gold text-[0.75rem] font-semibold hover:underline">
               + {t("bookAHandyman")}
-            </Link>
+            </button>
           </div>
 
           {(!data.handymanInquiries || data.handymanInquiries.length === 0) ? (
             <div className="text-center py-6">
               <Wrench className={`w-8 h-8 mx-auto mb-2 ${TEXT_MUTED}`} />
               <p className={`${TEXT_MUTED} text-sm`}>{t("noHandymanRequests")}</p>
-              <Link href="/handyman#book" className="text-gold text-[0.82rem] font-medium hover:underline mt-1 inline-block">
+              <button onClick={() => setShowHandymanWizard(true)} className="text-gold text-[0.82rem] font-medium hover:underline mt-1 inline-block">
                 {t("bookHandymanPrompt")} &rarr;
-              </Link>
+              </button>
             </div>
           ) : (
             <div className="space-y-2">
@@ -796,6 +800,18 @@ export default function CustomerDashboard() {
         />
       )}
 
+      {/* ═══ HANDYMAN WIZARD MODAL ═══ */}
+      {showHandymanWizard && (
+        <PortalHandymanWizard
+          onClose={() => setShowHandymanWizard(false)}
+          onSuccess={() => {
+            setShowHandymanWizard(false);
+            setHandymanSuccess(true);
+            fetchDashboard();
+          }}
+        />
+      )}
+
       {/* ═══ SUCCESS TOASTS ═══ */}
       {paymentSuccess && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green text-white px-6 py-3 rounded-[3px] shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
@@ -809,6 +825,14 @@ export default function CustomerDashboard() {
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green text-white px-6 py-3 rounded-[3px] shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
           <CheckCircle className="w-5 h-5" /> {t("bookingSuccess")}
           <button onClick={() => setBookingSuccess(false)} className="ml-2 text-tobacco/70 hover:text-tobacco">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+      {handymanSuccess && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green text-white px-6 py-3 rounded-[3px] shadow-lg flex items-center gap-2 text-[0.88rem] font-medium">
+          <CheckCircle className="w-5 h-5" /> {t("handymanBookingSuccess")}
+          <button onClick={() => setHandymanSuccess(false)} className="ml-2 text-tobacco/70 hover:text-tobacco">
             <X className="w-4 h-4" />
           </button>
         </div>

@@ -6,11 +6,48 @@ import { hash } from "bcryptjs";
 
 export const dynamic = "force-dynamic";
 
-// POST — Public submission (booking wizard)
+// POST — Public submission (booking wizard) or portal submission (logged-in user)
 export async function POST(req: NextRequest) {
   const body = await req.json();
+  const isPortal = body.fromPortal === true;
 
-  // Validate required fields
+  // Portal path: user is already logged in
+  if (isPortal) {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!body.address || !body.serviceCategories?.length) {
+      return NextResponse.json({ error: "Please fill in all required fields" }, { status: 400 });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const inquiry = await prisma.handymanInquiry.create({
+      data: {
+        fullName: user.name,
+        email: user.email,
+        phone: user.phone || "",
+        borough: body.borough || null,
+        address: body.address,
+        serviceCategories: body.serviceCategories || [],
+        projectDescription: body.projectDescription || "",
+        preferredDate: body.preferredDate ? new Date(body.preferredDate) : null,
+        preferredTime: body.preferredTime || null,
+        rush: body.rush || false,
+        spamScore: 0,
+        userId: user.id,
+      },
+    });
+
+    return NextResponse.json({ id: inquiry.id });
+  }
+
+  // Public path: validate required fields
   if (
     !body.fullName ||
     !body.email ||
