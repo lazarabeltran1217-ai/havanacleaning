@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { HANDYMAN_SERVICES, NYC_BOROUGHS } from "@/lib/handyman-constants";
+import { calculateHandymanTotal, HANDYMAN_RUSH_FEE, type HandymanPriceEntry } from "@/lib/handyman-pricing";
 import { useTranslations } from "next-intl";
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -23,14 +24,13 @@ const INPUT_CLS =
   "w-full px-3 py-2.5 border border-gray-300 dark:border-gold/20 rounded-lg text-sm bg-white dark:bg-[#2f1f14] text-tobacco dark:text-cream placeholder:text-gray-400 dark:placeholder:text-sand/40 focus:outline-none focus:ring-2 focus:ring-gold/30";
 const LABEL_CLS = "block text-[0.72rem] font-medium uppercase tracking-wider mb-1.5";
 
-const RUSH_FEE = 50;
-
 interface Props {
   onClose: () => void;
   onSuccess: () => void;
+  handymanPrices: HandymanPriceEntry[];
 }
 
-export function PortalHandymanWizard({ onClose, onSuccess }: Props) {
+export function PortalHandymanWizard({ onClose, onSuccess, handymanPrices }: Props) {
   const t = useTranslations("handymanBooking");
   const th = useTranslations("handyman");
 
@@ -64,6 +64,10 @@ export function PortalHandymanWizard({ onClose, onSuccess }: Props) {
     );
   }
 
+  // Pricing
+  const pricing = calculateHandymanTotal(handymanPrices, serviceCategories, rush);
+  const getPrice = (key: string) => handymanPrices.find((p) => p.key === key)?.basePrice ?? 0;
+
   // Min date
   const etNow = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
   const etMinDay = new Date(etNow.getFullYear(), etNow.getMonth(), etNow.getDate() + (rush ? 0 : 1));
@@ -94,6 +98,7 @@ export function PortalHandymanWizard({ onClose, onSuccess }: Props) {
           preferredDate: scheduledDate || null,
           preferredTime: scheduledTime || null,
           rush,
+          estimatedTotal: pricing.total,
           jsToken,
           fromPortal: true,
         }),
@@ -170,6 +175,7 @@ export function PortalHandymanWizard({ onClose, onSuccess }: Props) {
                     >
                       <Icon className={`w-7 h-7 mx-auto mb-1 ${TEXT_MUTED}`} />
                       <div className={`text-[0.78rem] font-medium ${TEXT_PRIMARY}`}>{th(service.key)}</div>
+                      <div className="text-green font-semibold text-[0.75rem] mt-0.5">${getPrice(service.key)}</div>
                     </button>
                   );
                 })}
@@ -220,7 +226,7 @@ export function PortalHandymanWizard({ onClose, onSuccess }: Props) {
                   </div>
                   <div className={`text-[0.72rem] ${TEXT_MUTED} mt-0.5`}>{t("rushDescription")}</div>
                 </div>
-                <span className="text-amber font-bold text-[0.88rem] whitespace-nowrap ml-4">+${RUSH_FEE}</span>
+                <span className="text-amber font-bold text-[0.88rem] whitespace-nowrap ml-4">+${HANDYMAN_RUSH_FEE}</span>
               </button>
 
               {/* Description */}
@@ -288,17 +294,28 @@ export function PortalHandymanWizard({ onClose, onSuccess }: Props) {
                 <div className="space-y-2 text-[0.85rem]">
                   <div className={`text-[0.72rem] ${TEXT_MUTED} uppercase tracking-wider mb-1`}>{t("selectedServices")}</div>
                   {serviceCategories.map((key) => (
-                    <div key={key} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-green rounded-full" />
-                      <span className={TEXT_PRIMARY}>{th(key)}</span>
+                    <div key={key} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 bg-green rounded-full" />
+                        <span className={TEXT_PRIMARY}>{th(key)}</span>
+                      </div>
+                      <span className={TEXT_MUTED}>${getPrice(key)}</span>
                     </div>
                   ))}
                   {rush && (
                     <div className="flex justify-between text-amber mt-2 pt-2 border-t border-gray-200 dark:border-gold/15">
                       <span className="flex items-center gap-1"><Zap className="w-3.5 h-3.5" /> {t("rush")}</span>
-                      <span>+${RUSH_FEE}</span>
+                      <span>+${HANDYMAN_RUSH_FEE}</span>
                     </div>
                   )}
+                  <div className={`flex justify-between ${TEXT_MUTED} text-[0.78rem] mt-2 pt-2 border-t border-gray-200 dark:border-gold/15`}>
+                    <span>Tax (7%)</span>
+                    <span>${pricing.tax.toFixed(2)}</span>
+                  </div>
+                  <div className={`flex justify-between font-semibold text-[0.95rem] mt-1 pt-2 border-t border-gray-200 dark:border-gold/15`}>
+                    <span className={TEXT_PRIMARY}>Estimated Total</span>
+                    <span className="text-gold">${pricing.total.toFixed(2)}</span>
+                  </div>
                   {scheduledDate && (
                     <div className={`${TEXT_MUTED} text-[0.82rem] mt-2 pt-2 border-t border-gray-200 dark:border-gold/15`}>
                       {new Date(scheduledDate + "T12:00:00").toLocaleDateString("en-US", {

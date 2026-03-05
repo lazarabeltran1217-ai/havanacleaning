@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
 import { ServiceEditButton } from "@/components/admin/ServiceEditor";
 import { ServiceIcon } from "@/lib/service-icons";
+import { HandymanPriceEditor } from "@/components/admin/HandymanPriceEditor";
 
 export default async function AdminServicesPage() {
   const fetchServices = () =>
@@ -12,9 +13,13 @@ export default async function AdminServicesPage() {
       },
       orderBy: { sortOrder: "asc" },
     });
+  const fetchHandymanPrices = () =>
+    prisma.handymanServicePrice.findMany({ orderBy: { sortOrder: "asc" } });
+
   let services: Awaited<ReturnType<typeof fetchServices>> = [];
+  let handymanPrices: Awaited<ReturnType<typeof fetchHandymanPrices>> = [];
   try {
-    services = await fetchServices();
+    [services, handymanPrices] = await Promise.all([fetchServices(), fetchHandymanPrices()]);
   } catch (error) {
     console.error("Failed to fetch services:", error);
   }
@@ -91,6 +96,10 @@ export default async function AdminServicesPage() {
           </div>
         ))}
       </div>
+
+      {/* ── HANDYMAN SERVICES ── */}
+      <h2 className="font-display text-xl mt-10 mb-4">Handyman Services Pricing</h2>
+      <HandymanPriceEditor prices={handymanPrices} />
     </div>
   );
 }

@@ -109,6 +109,7 @@ interface HandymanInquiryData {
   status: string;
   address: string;
   quotedPrice: number | null;
+  estimatedTotal: number | null;
   createdAt: string;
   payments: { status: string }[];
 }
@@ -130,6 +131,7 @@ interface DashboardData {
   services: ServiceData[];
   addOns: AddOnData[];
   handymanInquiries: HandymanInquiryData[];
+  handymanPrices: { key: string; basePrice: number }[];
 }
 
 /* ─── Main Dashboard ─── */
@@ -363,7 +365,7 @@ export default function CustomerDashboard() {
 
           {(() => {
             const scheduledHandyman = (data.handymanInquiries || []).filter(
-              (inq) => inq.status === "SCHEDULED" && inq.quotedPrice && !inq.payments.some((p) => p.status === "SUCCEEDED")
+              (inq) => inq.status === "SCHEDULED" && (inq.quotedPrice || inq.estimatedTotal) && !inq.payments.some((p) => p.status === "SUCCEEDED")
             );
             const hasUpcoming = data.upcomingBookings.length > 0 || scheduledHandyman.length > 0;
 
@@ -447,7 +449,7 @@ export default function CustomerDashboard() {
                       )}
                     </div>
                     <div className="flex items-center justify-between mt-2">
-                      <span className="text-amber font-semibold text-[0.88rem]">{fmtCurrency(inq.quotedPrice!)}</span>
+                      <span className="text-amber font-semibold text-[0.88rem]">{fmtCurrency((inq.quotedPrice ?? inq.estimatedTotal)!)}</span>
                       <button
                         onClick={() => setPayingHandyman(inq)}
                         className="flex items-center gap-1 px-3 py-1.5 bg-green text-white rounded-lg text-[0.75rem] font-semibold hover:bg-green-light transition-colors"
@@ -729,8 +731,13 @@ export default function CustomerDashboard() {
                         )}
                       </div>
                     </div>
-                    <div className={`${TEXT_MUTED} text-[0.68rem] whitespace-nowrap ml-2`}>
-                      {fmtDate(inq.createdAt)}
+                    <div className="text-right ml-2 shrink-0">
+                      {(inq.quotedPrice ?? inq.estimatedTotal) ? (
+                        <div className="text-amber font-semibold text-[0.82rem]">{fmtCurrency((inq.quotedPrice ?? inq.estimatedTotal)!)}</div>
+                      ) : null}
+                      <div className={`${TEXT_MUTED} text-[0.68rem] whitespace-nowrap`}>
+                        {fmtDate(inq.createdAt)}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -875,12 +882,12 @@ export default function CustomerDashboard() {
                 </div>
                 <div className={`mt-3 pt-3 border-t ${INNER_BORDER} flex justify-between font-semibold`}>
                   <span className={TEXT_PRIMARY}>{t("total")}</span>
-                  <span className="text-amber text-lg">{fmtCurrency(payingHandyman.quotedPrice!)}</span>
+                  <span className="text-amber text-lg">{fmtCurrency((payingHandyman.quotedPrice ?? payingHandyman.estimatedTotal)!)}</span>
                 </div>
               </div>
               <HandymanPayment
                 inquiryId={payingHandyman.id}
-                amount={payingHandyman.quotedPrice!}
+                amount={(payingHandyman.quotedPrice ?? payingHandyman.estimatedTotal)!}
                 stripeKey={data.stripeKey}
                 returnUrl="/account"
                 onSuccess={() => {
@@ -913,6 +920,7 @@ export default function CustomerDashboard() {
       {/* ═══ HANDYMAN WIZARD MODAL ═══ */}
       {showHandymanWizard && (
         <PortalHandymanWizard
+          handymanPrices={data.handymanPrices}
           onClose={() => setShowHandymanWizard(false)}
           onSuccess={() => {
             setShowHandymanWizard(false);

@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { Check, MapPin, Wrench, Package, Tv, DoorOpen, Lightbulb, Grid3x3, Paintbrush, Droplets, Waves, Wifi, Fence, LayoutGrid } from "lucide-react";
 import { HANDYMAN_SERVICES, NYC_BOROUGHS, NYC_NEIGHBORHOODS } from "@/lib/handyman-constants";
 import { HandymanBookingWizard } from "@/components/website/HandymanBookingWizard";
+import { prisma } from "@/lib/prisma";
 import type { LucideIcon } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -30,6 +31,13 @@ const ICON_MAP: Record<string, LucideIcon> = {
 
 export default async function HandymanPage() {
   const t = await getTranslations("handyman");
+
+  const handymanPrices = await prisma.handymanServicePrice.findMany({
+    where: { isActive: true },
+    orderBy: { sortOrder: "asc" },
+    select: { key: true, basePrice: true },
+  });
+  const priceMap = Object.fromEntries(handymanPrices.map((p) => [p.key, p.basePrice]));
 
   const trustItems = [t("trust1"), t("trust2"), t("trust3"), t("trust4"), t("trust5")];
 
@@ -104,7 +112,7 @@ export default async function HandymanPage() {
           <p className="text-center text-tobacco/60 text-[0.9rem] mb-10">
             {t("formSubtitle")}
           </p>
-          <HandymanBookingWizard />
+          <HandymanBookingWizard handymanPrices={handymanPrices} />
         </div>
       </section>
 
@@ -191,6 +199,11 @@ export default async function HandymanPage() {
                 >
                   <Icon className="w-9 h-9 text-green mb-4" />
                   <h3 className="font-display text-tobacco text-lg mb-2">{t(service.key)}</h3>
+                  {priceMap[service.key] && (
+                    <div className="text-green font-semibold text-[0.82rem] mb-1">
+                      {t("startingAt", { price: `$${priceMap[service.key]}` })}
+                    </div>
+                  )}
                   <p className="text-tobacco/70 text-[0.88rem] leading-relaxed">
                     {t(`${service.key}Desc`)}
                   </p>

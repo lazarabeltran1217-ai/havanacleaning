@@ -80,7 +80,7 @@ export function HandymanActions({ inquiryId, currentStatus, currentNotes, curren
           ))}
         </select>
         <div className="mb-3">
-          <label className="text-[0.72rem] uppercase tracking-wider text-sand font-medium mb-1 block">Quoted Price ($)</label>
+          <label className="text-[0.72rem] uppercase tracking-wider text-sand font-medium mb-1 block">Adjusted Price ($) <span className="normal-case text-gray-400">optional</span></label>
           <input
             type="number"
             step="0.01"

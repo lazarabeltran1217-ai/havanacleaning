@@ -98,12 +98,20 @@ export async function GET() {
             status: true,
             address: true,
             quotedPrice: true,
+            estimatedTotal: true,
             createdAt: true,
             payments: { select: { status: true } },
           },
           orderBy: { createdAt: "desc" },
         }),
       ]);
+
+    // Handyman service prices (for the portal wizard)
+    const handymanPrices = await prisma.handymanServicePrice.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: "asc" },
+      select: { key: true, basePrice: true },
+    });
 
     const stripeKey =
       (typeof stripeSetting?.value === "string" ? stripeSetting.value : "") ||
@@ -123,6 +131,7 @@ export async function GET() {
       services,
       addOns,
       handymanInquiries,
+      handymanPrices,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);

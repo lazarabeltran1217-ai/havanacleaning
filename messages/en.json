@@ -614,7 +614,8 @@
     "faq6a": "Absolutely. Many property managers and homeowners schedule regular maintenance visits. Contact us to set up a recurring plan.",
     "ctaReady": "Ready to Get It Fixed?",
     "ctaReadySubtitle": "Professional handyman services across NYC. Request your free quote today.",
-    "ctaButton": "Get a Free Quote"
+    "ctaButton": "Get a Free Quote",
+    "startingAt": "Starting at {price}"
   },
   "handymanBooking": {
     "heroTitle": "Book a Handyman",

@@ -631,6 +631,7 @@ model HandymanInquiry {
   notes              String?
   assignedEmployees  Json?
   quotedPrice        Float?
+  estimatedTotal     Float?
   userId             String?
   user               User?                 @relation(fields: [userId], references: [id])
   payments           Payment[]
@@ -639,6 +640,14 @@ model HandymanInquiry {
 
   @@index([status])
   @@index([createdAt])
+}
+
+model HandymanServicePrice {
+  id        String  @id @default(cuid())
+  key       String  @unique
+  basePrice Float
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
 }
 
 // ── SEO / AEO / GEO / CRO ──

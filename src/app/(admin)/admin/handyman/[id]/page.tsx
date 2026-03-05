@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatCurrency } from "@/lib/utils";
 import { HandymanActions } from "@/components/admin/HandymanActions";
 import Link from "next/link";
 import { Zap } from "lucide-react";
@@ -127,6 +127,18 @@ export default async function AdminHandymanDetailPage({ params }: Props) {
                 <dt className="text-gray-400 text-[0.75rem] uppercase tracking-wider">Submitted</dt>
                 <dd className="mt-1">{formatDate(inquiry.createdAt)}</dd>
               </div>
+              {inquiry.estimatedTotal && (
+                <div>
+                  <dt className="text-gray-400 text-[0.75rem] uppercase tracking-wider">Customer Estimate</dt>
+                  <dd className="mt-1 text-green font-semibold">{formatCurrency(inquiry.estimatedTotal)}</dd>
+                </div>
+              )}
+              {inquiry.quotedPrice && (
+                <div>
+                  <dt className="text-gray-400 text-[0.75rem] uppercase tracking-wider">Adjusted Price</dt>
+                  <dd className="mt-1 text-amber font-semibold">{formatCurrency(inquiry.quotedPrice)}</dd>
+                </div>
+              )}
             </dl>
             {inquiry.projectDescription && (
               <div className="mt-4 pt-4 border-t border-gray-100">

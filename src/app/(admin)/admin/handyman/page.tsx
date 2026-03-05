@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatCurrency } from "@/lib/utils";
 import { Zap } from "lucide-react";
 import Link from "next/link";
 
@@ -117,6 +117,15 @@ export default async function AdminHandymanPage() {
                   <span className="text-sand">Address</span>
                   <span className="text-right text-[0.78rem] max-w-[60%] truncate">{inq.address}</span>
                 </div>
+                {(inq.quotedPrice ?? inq.estimatedTotal) ? (
+                  <div className="flex justify-between">
+                    <span className="text-sand">Price</span>
+                    <span className="text-green font-semibold">
+                      {formatCurrency(inq.quotedPrice ?? inq.estimatedTotal!)}
+                      {inq.quotedPrice && <span className="text-gray-400 text-[0.68rem] ml-1">(adjusted)</span>}
+                    </span>
+                  </div>
+                ) : null}
                 {inq.projectDescription && (
                   <div className="pt-2 border-t border-gray-100 text-[0.78rem] text-tobacco/60 truncate">
                     {inq.projectDescription}
@@ -145,6 +154,7 @@ export default async function AdminHandymanPage() {
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Services</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Date</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Status</th>
+              <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Price</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Rush</th>
               <th className="px-4 py-3 text-[0.72rem] uppercase tracking-wider text-sand font-medium">Address</th>
               <th className="px-4 py-3"></th>
@@ -187,6 +197,16 @@ export default async function AdminHandymanPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
+                    {(inq.quotedPrice ?? inq.estimatedTotal) ? (
+                      <span className="text-green font-semibold text-[0.82rem]">
+                        {formatCurrency(inq.quotedPrice ?? inq.estimatedTotal!)}
+                        {inq.quotedPrice && <span className="text-[0.68rem] text-gray-400 block">adjusted</span>}
+                      </span>
+                    ) : (
+                      <span className="text-gray-300">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
                     {inq.rush ? (
                       <span className="text-amber flex items-center gap-0.5 text-[0.82rem] font-medium">
                         <Zap className="w-3.5 h-3.5" /> Yes
@@ -206,7 +226,7 @@ export default async function AdminHandymanPage() {
             })}
             {inquiries.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-gray-400">
+                <td colSpan={8} className="px-4 py-12 text-center text-gray-400">
                   No handyman inquiries yet.
                 </td>
               </tr>

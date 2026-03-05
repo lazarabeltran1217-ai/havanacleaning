@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { HANDYMAN_SERVICES, NYC_BOROUGHS } from "@/lib/handyman-constants";
+import { calculateHandymanTotal, HANDYMAN_RUSH_FEE, type HandymanPriceEntry } from "@/lib/handyman-pricing";
 import {
   Wrench, Package, Tv, DoorOpen, Lightbulb, Grid3x3,
   Paintbrush, Droplets, Waves, Wifi, Fence, LayoutGrid,
@@ -15,9 +16,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Paintbrush, Droplets, Waves, Wifi, Fence, LayoutGrid,
 };
 
-const RUSH_FEE = 50;
-
-export function HandymanBookingWizard() {
+export function HandymanBookingWizard({ handymanPrices }: { handymanPrices: HandymanPriceEntry[] }) {
   const router = useRouter();
   const t = useTranslations("handymanBooking");
   const th = useTranslations("handyman");
@@ -58,6 +57,10 @@ export function HandymanBookingWizard() {
     );
   }
 
+  // Pricing
+  const pricing = calculateHandymanTotal(handymanPrices, serviceCategories, rush);
+  const getPrice = (key: string) => handymanPrices.find((p) => p.key === key)?.basePrice ?? 0;
+
   // Date minimum: today if rush, otherwise tomorrow (Eastern Time)
   const etNow = new Date(
     new Date().toLocaleString("en-US", { timeZone: "America/New_York" })
@@ -94,8 +97,8 @@ export function HandymanBookingWizard() {
           preferredDate: scheduledDate || null,
           preferredTime: scheduledTime || null,
           rush,
+          estimatedTotal: pricing.total,
           jsToken,
-          // Also pass account creation fields for the API
           customerPassword: customerPassword || undefined,
         }),
       });
@@ -177,6 +180,7 @@ export function HandymanBookingWizard() {
                 >
                   <Icon className="w-7 h-7 mx-auto mb-1 text-tobacco/70" />
                   <div className="text-[0.8rem] font-medium text-tobacco">{th(service.key)}</div>
+                  <div className="text-green font-semibold text-[0.75rem] mt-0.5">${getPrice(service.key)}</div>
                 </button>
               );
             })}
@@ -238,7 +242,7 @@ export function HandymanBookingWizard() {
               <div className="text-[0.78rem] text-tobacco/50 mt-0.5">{t("rushDescription")}</div>
             </div>
             <span className="text-amber font-bold text-[0.9rem] whitespace-nowrap ml-4">
-              +${RUSH_FEE}
+              +${HANDYMAN_RUSH_FEE}
             </span>
           </button>
 
@@ -418,17 +422,28 @@ export function HandymanBookingWizard() {
                 {t("selectedServices")}
               </div>
               {serviceCategories.map((key) => (
-                <div key={key} className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-green rounded-full" />
-                  <span>{th(key)}</span>
+                <div key={key} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-green rounded-full" />
+                    <span>{th(key)}</span>
+                  </div>
+                  <span className="text-tobacco/50">${getPrice(key)}</span>
                 </div>
               ))}
               {rush && (
                 <div className="flex justify-between text-amber mt-2 pt-2 border-t border-tobacco/10">
                   <span>{t("rush")}</span>
-                  <span>+${RUSH_FEE}</span>
+                  <span>+${HANDYMAN_RUSH_FEE}</span>
                 </div>
               )}
+              <div className="flex justify-between text-tobacco/50 text-[0.78rem] mt-2 pt-2 border-t border-tobacco/10">
+                <span>Tax (7%)</span>
+                <span>${pricing.tax.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between font-semibold text-[0.95rem] mt-1 pt-2 border-t border-tobacco/10">
+                <span>Estimated Total</span>
+                <span className="text-green">${pricing.total.toFixed(2)}</span>
+              </div>
               {scheduledDate && (
                 <div className="text-tobacco/50 text-[0.85rem] mt-2 pt-2 border-t border-tobacco/10">
                   {new Date(scheduledDate + "T12:00:00").toLocaleDateString("en-US", {

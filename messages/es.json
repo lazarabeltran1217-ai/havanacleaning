@@ -614,7 +614,8 @@
     "faq6a": "Por supuesto. Muchos administradores de propiedades y propietarios programan visitas de mantenimiento regulares. Contactenos para establecer un plan recurrente.",
     "ctaReady": "Listo para Repararlo?",
     "ctaReadySubtitle": "Servicios profesionales de mantenimiento en toda NYC. Solicite su cotizacion gratis hoy.",
-    "ctaButton": "Cotizacion Gratis"
+    "ctaButton": "Cotizacion Gratis",
+    "startingAt": "Desde {price}"
   },
   "handymanBooking": {
     "heroTitle": "Reserve un Servicio de Mantenimiento",

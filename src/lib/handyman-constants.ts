@@ -1,16 +1,16 @@
 export const HANDYMAN_SERVICES = [
-  { key: "minorRepairs", icon: "Wrench" },
-  { key: "furnitureAssembly", icon: "Package" },
-  { key: "tvShelfMounting", icon: "Tv" },
-  { key: "doorWindowFixes", icon: "DoorOpen" },
-  { key: "lightFixtureInstall", icon: "Lightbulb" },
-  { key: "groutTileRepair", icon: "Grid3x3" },
-  { key: "paintingTouchUps", icon: "Paintbrush" },
-  { key: "gutterCleaning", icon: "Droplets" },
-  { key: "pressureWashing", icon: "Waves" },
-  { key: "smartHomeSetup", icon: "Wifi" },
-  { key: "deckFenceRepair", icon: "Fence" },
-  { key: "closetShelving", icon: "LayoutGrid" },
+  { key: "minorRepairs", icon: "Wrench", defaultPrice: 85 },
+  { key: "furnitureAssembly", icon: "Package", defaultPrice: 120 },
+  { key: "tvShelfMounting", icon: "Tv", defaultPrice: 95 },
+  { key: "doorWindowFixes", icon: "DoorOpen", defaultPrice: 110 },
+  { key: "lightFixtureInstall", icon: "Lightbulb", defaultPrice: 90 },
+  { key: "groutTileRepair", icon: "Grid3x3", defaultPrice: 130 },
+  { key: "paintingTouchUps", icon: "Paintbrush", defaultPrice: 100 },
+  { key: "gutterCleaning", icon: "Droplets", defaultPrice: 150 },
+  { key: "pressureWashing", icon: "Waves", defaultPrice: 175 },
+  { key: "smartHomeSetup", icon: "Wifi", defaultPrice: 95 },
+  { key: "deckFenceRepair", icon: "Fence", defaultPrice: 160 },
+  { key: "closetShelving", icon: "LayoutGrid", defaultPrice: 140 },
 ] as const;
 
 export const NYC_BOROUGHS = [

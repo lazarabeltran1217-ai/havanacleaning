@@ -24,7 +24,8 @@ export async function POST(req: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Inquiry not found" }, { status: 404 });
   }
 
-  if (inquiry.status !== "SCHEDULED" || !inquiry.quotedPrice) {
+  const paymentAmount = inquiry.quotedPrice ?? inquiry.estimatedTotal;
+  if (inquiry.status !== "SCHEDULED" || !paymentAmount) {
     return NextResponse.json({ error: "Inquiry not ready for payment" }, { status: 400 });
   }
 
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
     return NextResponse.json({ alreadyPaid: true });
   }
 
-  const amountInCents = Math.round(inquiry.quotedPrice * 100);
+  const amountInCents = Math.round(paymentAmount * 100);
 
   const paymentIntent = await stripe.paymentIntents.create({
     amount: amountInCents,
@@ -84,7 +85,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
     data: {
       handymanInquiryId: inquiry.id,
       customerId: session.user.id,
-      amount: inquiry.quotedPrice,
+      amount: paymentAmount,
       status: "PENDING",
       method: "STRIPE",
       stripePaymentIntentId: paymentIntent.id,

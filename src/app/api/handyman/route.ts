@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
+import { calculateHandymanTotal } from "@/lib/handyman-pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Server-side price calculation
+    const prices = await prisma.handymanServicePrice.findMany({ where: { isActive: true } });
+    const serverPricing = calculateHandymanTotal(prices, body.serviceCategories, body.rush || false);
+
     const inquiry = await prisma.handymanInquiry.create({
       data: {
         fullName: user.name,
@@ -39,6 +44,7 @@ export async function POST(req: NextRequest) {
         preferredDate: body.preferredDate ? new Date(body.preferredDate) : null,
         preferredTime: body.preferredTime || null,
         rush: body.rush || false,
+        estimatedTotal: serverPricing.total,
         spamScore: 0,
         userId: user.id,
       },
@@ -107,6 +113,10 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // Server-side price calculation
+  const prices = await prisma.handymanServicePrice.findMany({ where: { isActive: true } });
+  const serverPricing = calculateHandymanTotal(prices, body.serviceCategories, body.rush || false);
+
   const inquiry = await prisma.handymanInquiry.create({
     data: {
       fullName: body.fullName.trim(),
@@ -119,6 +129,7 @@ export async function POST(req: NextRequest) {
       preferredDate: body.preferredDate ? new Date(body.preferredDate) : null,
       preferredTime: body.preferredTime || null,
       rush: body.rush || false,
+      estimatedTotal: serverPricing.total,
       spamScore,
       userId: user.id,
     },
