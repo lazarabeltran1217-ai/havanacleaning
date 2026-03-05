@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import type { LucideIcon } from "lucide-react";
 import {
-  LayoutDashboard, CalendarCheck, Calendar, Clock, ClipboardList,
+  LayoutDashboard, CalendarCheck, Wrench, Calendar, Clock, ClipboardList,
   Building2, CreditCard, TrendingUp, Users, Home, Package,
   DollarSign, Sparkles, PenLine, Share2, FileText, Search, Settings,
 } from "lucide-react";
@@ -13,6 +13,7 @@ import {
 const navItems: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Bookings", href: "/admin/bookings", icon: CalendarCheck },
+  { label: "Handyman", href: "/admin/handyman", icon: Wrench },
   { label: "Schedule", href: "/admin/schedule", icon: Calendar },
   { label: "Clock", href: "/admin/clock", icon: Clock },
   { label: "Applicants", href: "/admin/applicants", icon: ClipboardList },
