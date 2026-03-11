@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Havana Cleaning — App Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: #FAF6ED;
+  --bg-card: #FFFFFF;
+  --bg-card-border: rgba(44,24,16,0.06);
+  --bg-card-shadow: rgba(44,24,16,0.04);
+  --bg-inner: #F5F0E6;
+  --text-primary: #2C1810;
+  --text-muted: rgba(44,24,16,0.55);
+  --text-faint: rgba(44,24,16,0.35);
+  --border-light: rgba(44,24,16,0.08);
+  --nav-bg: #FFFFFF;
+  --nav-border: rgba(44,24,16,0.06);
+  --nav-inactive: rgba(44,24,16,0.35);
+  --tobacco: #2C1810; --rum: #5C2E00; --gold: #C9941A; --amber: #E8A820;
+  --teal: #1A7A6E; --green: #2D6A4F; --green-light: #52B788; --green-mint: #D8F3DC;
+  --cream: #F5EDD8; --ivory: #FAF6ED; --sand: #D4B896; --white: #FFFFFF;
+}
+.dark {
+  --bg-primary: #1A1210; --bg-card: #2A1E16;
+  --bg-card-border: rgba(201,148,26,0.12); --bg-card-shadow: rgba(0,0,0,0.2);
+  --bg-inner: #221810; --text-primary: #F5EDD8;
+  --text-muted: rgba(212,184,150,0.65); --text-faint: rgba(212,184,150,0.4);
+  --border-light: rgba(201,148,26,0.1);
+  --nav-bg: #231C16; --nav-border: rgba(201,148,26,0.12);
+  --nav-inactive: rgba(212,184,150,0.4);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: #111; display: flex; justify-content: center;
+  align-items: flex-start; min-height: 100vh; padding: 20px 0;
+  color: var(--text-primary);
+}
+
+/* Phone Frame */
+.phone-frame {
+  width: 390px; height: 844px;
+  background: var(--bg-primary); border-radius: 44px;
+  overflow: hidden; position: relative;
+  box-shadow: 0 0 0 8px #111, 0 0 0 10px #333, 0 25px 60px rgba(0,0,0,0.5);
+  transition: background 0.3s;
+}
+.phone-frame::before {
+  content:''; position:absolute; top:10px; left:50%; transform:translateX(-50%);
+  width:126px; height:35px; background:#000; border-radius:20px; z-index:1000;
+}
+
+/* Nav HUD */
+.nav-hud {
+  position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
+  background:rgba(44,24,16,0.95); backdrop-filter:blur(12px);
+  border-radius:16px; padding:10px 16px; display:flex; gap:6px;
+  flex-wrap:wrap; justify-content:center; max-width:650px; z-index:10000;
+  box-shadow:0 8px 30px rgba(0,0,0,0.3);
+}
+.nav-hud button {
+  background:rgba(255,255,255,0.08); border:1px solid rgba(201,148,26,0.25);
+  color:var(--sand); padding:7px 12px; border-radius:10px;
+  font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500;
+  cursor:pointer; transition:all 0.2s; white-space:nowrap;
+}
+.nav-hud button:hover { background:rgba(201,148,26,0.2); color:var(--gold); }
+.nav-hud button.active { background:var(--gold); color:var(--tobacco); border-color:var(--gold); font-weight:600; }
+.theme-toggle { background:rgba(255,255,255,0.05)!important; border:1px solid rgba(255,255,255,0.15)!important; color:#fff!important; font-size:14px!important; padding:7px 14px!important; margin-left:6px; }
+
+/* Screens */
+.screen {
+  position:absolute; inset:0; opacity:0; pointer-events:none;
+  transition:opacity 0.3s; overflow-y:auto; overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+}
+.screen.active { opacity:1; pointer-events:auto; }
+.screen::-webkit-scrollbar { display:none; }
+
+/* Service icon helper */
+.svc-icon {
+  width:36px; height:36px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.svc-icon svg { width:20px; height:20px; stroke-width:2; fill:none; }
+
+/* ═══════════ SPLASH ═══════════ */
+.screen-splash {
+  background:var(--tobacco); display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+}
+.splash-pattern {
+  position:absolute; inset:0; opacity:0.04;
+  background-image:repeating-linear-gradient(45deg,var(--gold) 0,var(--gold) 1px,transparent 0,transparent 50%);
+  background-size:20px 20px;
+}
+.splash-content { position:relative; z-index:2; text-align:center; animation:splashFadeIn 1.2s ease-out; }
+.splash-logo {
+  width:140px; height:140px; background:transparent; border-radius:0;
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 32px;
+  animation:splashPulse 2s ease-in-out infinite; overflow:visible;
+}
+.splash-logo img { width:110px; height:110px; object-fit:contain; filter:brightness(0.85); }
+.splash-title { font-family:'Playfair Display',serif; font-size:34px; font-weight:800; color:var(--amber); line-height:1.1; }
+.splash-title span { color:var(--green-light); font-style:italic; }
+.splash-tagline { color:var(--sand); font-size:13px; letter-spacing:0.12em; text-transform:uppercase; margin-top:10px; opacity:0.7; }
+.splash-loader { width:32px; height:32px; border:3px solid rgba(201,148,26,0.15); border-top-color:var(--gold); border-radius:50%; margin:48px auto 0; animation:spin 0.8s linear infinite; }
+.splash-palm-left, .splash-palm-right { position:absolute; bottom:0; width:180px; opacity:0.06; z-index:1; }
+.splash-palm-left { left:-30px; }
+.splash-palm-right { right:-30px; transform:scaleX(-1); }
+@keyframes splashFadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes splashPulse { 0%,100%{filter:drop-shadow(0 4px 20px rgba(201,148,26,0.3))} 50%{filter:drop-shadow(0 4px 35px rgba(201,148,26,0.5))} }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ═══════════ ONBOARDING ═══════════ */
+.screen-onboarding { background:var(--tobacco); }
+.onboard-slides { height:100%; display:flex; flex-direction:column; }
+.onboard-slide { flex:1; display:none; flex-direction:column; align-items:center; justify-content:center; padding:80px 36px 140px; text-align:center; }
+.onboard-slide.active { display:flex; }
+.onboard-icon { width:160px; height:160px; background:rgba(201,148,26,0.08); border:2px solid rgba(201,148,26,0.15); border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:40px; }
+.onboard-icon svg { width:72px; height:72px; stroke:var(--gold); fill:none; stroke-width:1.5; }
+.onboard-title { font-family:'Playfair Display',serif; font-size:28px; font-weight:800; color:var(--cream); margin-bottom:14px; line-height:1.15; }
+.onboard-desc { color:var(--sand); font-size:15px; line-height:1.6; opacity:0.8; max-width:300px; }
+.onboard-footer { position:absolute; bottom:0; left:0; right:0; padding:0 36px 52px; display:flex; flex-direction:column; gap:16px; }
+.onboard-dots { display:flex; justify-content:center; gap:8px; }
+.onboard-dot { width:8px; height:8px; border-radius:50%; background:rgba(201,148,26,0.25); transition:all 0.3s; }
+.onboard-dot.active { width:24px; border-radius:4px; background:var(--gold); }
+.onboard-actions { display:flex; gap:12px; }
+.onboard-skip { flex:1; padding:16px; background:transparent; border:1.5px solid rgba(212,184,150,0.25); border-radius:12px; color:var(--sand); font-family:'DM Sans',sans-serif; font-size:15px; font-weight:500; cursor:pointer; }
+.onboard-next { flex:2; padding:16px; background:var(--gold); border:none; border-radius:12px; color:var(--tobacco); font-family:'DM Sans',sans-serif; font-size:15px; font-weight:600; cursor:pointer; }
+.onboard-next:hover { background:var(--amber); }
+
+/* ═══════════ LOGIN ═══════════ */
+.screen-login { background:var(--tobacco); }
+.login-pattern { position:absolute; inset:0; opacity:0.04; background-image:repeating-linear-gradient(45deg,var(--gold) 0,var(--gold) 1px,transparent 0,transparent 50%); background-size:20px 20px; }
+.login-content { position:relative; z-index:2; padding:80px 28px 40px; min-height:100%; display:flex; flex-direction:column; }
+.login-header { text-align:center; margin-bottom:36px; }
+.login-brand { font-family:'Playfair Display',serif; font-size:28px; font-weight:800; color:var(--amber); }
+.login-brand span { color:var(--green-light); font-style:italic; }
+.login-subtitle { color:var(--sand); font-size:14px; margin-top:8px; opacity:0.7; }
+.login-card { background:var(--cream); border-radius:20px; padding:28px 24px; box-shadow:0 12px 40px rgba(0,0,0,0.2); }
+.dark .login-card { background:var(--bg-card); }
+.login-social { display:flex; flex-direction:column; gap:12px; margin-bottom:24px; }
+.btn-google { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:14px; background:var(--white); border:1.5px solid rgba(44,24,16,0.12); border-radius:12px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; color:var(--tobacco); cursor:pointer; }
+.dark .btn-google { background:rgba(255,255,255,0.06); border-color:rgba(201,148,26,0.2); color:var(--cream); }
+.btn-apple { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:14px; background:var(--tobacco); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; color:var(--cream); cursor:pointer; }
+.dark .btn-apple { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); }
+.login-divider { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
+.login-divider::before, .login-divider::after { content:''; flex:1; height:1px; background:var(--border-light); }
+.login-divider span { font-size:12px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.08em; }
+.form-group { margin-bottom:18px; }
+.form-label { display:block; font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-faint); margin-bottom:8px; }
+.form-label-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.form-link { font-size:12px; color:var(--green-light); text-decoration:none; font-weight:500; }
+.form-input { width:100%; padding:14px 16px; border:1.5px solid var(--border-light); border-radius:10px; background:var(--white); font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text-primary); outline:none; }
+.dark .form-input { background:var(--bg-inner); color:var(--cream); }
+.form-input:focus { border-color:var(--green); }
+.form-input::placeholder { color:var(--text-faint); }
+.btn-signin { width:100%; padding:16px; background:var(--gold); border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--tobacco); cursor:pointer; margin-top:4px; }
+.login-footer { text-align:center; margin-top:auto; padding-top:28px; }
+.login-footer a { color:var(--sand); font-size:14px; text-decoration:none; opacity:0.7; }
+.login-register { text-align:center; margin-top:20px; font-size:14px; color:var(--text-muted); }
+.login-register a { color:var(--green-light); text-decoration:none; font-weight:600; }
+
+/* ═══════════ DASHBOARD SHARED ═══════════ */
+.dash-header { background:var(--tobacco); padding:54px 24px 28px; border-radius:0 0 28px 28px; position:sticky; top:0; z-index:50; }
+.dark .dash-header { background:#1E1410; }
+.dash-header-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+.dash-greeting { color:var(--sand); font-size:13px; opacity:0.8; }
+.dash-name { font-family:'Playfair Display',serif; font-size:24px; font-weight:800; color:var(--cream); margin-top:2px; }
+.dash-avatar { width:44px; height:44px; background:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-weight:700; font-size:18px; color:var(--tobacco); }
+.quick-actions { display:flex; gap:10px; margin-top:16px; }
+.quick-action { flex:1; background:rgba(255,255,255,0.08); border:1px solid rgba(201,148,26,0.15); border-radius:14px; padding:14px 8px; text-align:center; cursor:pointer; }
+.quick-action-icon { width:36px; height:36px; background:rgba(201,148,26,0.15); border-radius:10px; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; }
+.quick-action-icon svg { width:18px; height:18px; stroke:var(--gold); fill:none; stroke-width:2; }
+.quick-action-label { font-size:11px; font-weight:500; color:var(--sand); }
+.dash-body { padding:20px 20px 100px; }
+.section-title { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--text-primary); margin-bottom:14px; }
+.section-see-all { font-size:13px; color:var(--green-light); font-weight:500; text-decoration:none; }
+.section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+
+/* Cards */
+.booking-card { background:var(--bg-card); border:1px solid var(--bg-card-border); border-radius:16px; padding:18px; margin-bottom:12px; box-shadow:0 1px 4px var(--bg-card-shadow); }
+.booking-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+.booking-service { display:flex; align-items:center; gap:10px; }
+.booking-service-name { font-weight:600; font-size:15px; color:var(--text-primary); }
+.booking-number { font-size:12px; color:var(--text-faint); margin-top:2px; }
+.badge { font-size:11px; font-weight:600; padding:4px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.03em; }
+.badge-confirmed { background:rgba(201,148,26,0.1); color:var(--gold); }
+.badge-pending { background:rgba(232,168,32,0.1); color:var(--amber); }
+.badge-completed { background:rgba(45,106,79,0.1); color:var(--green-light); }
+.booking-details { display:flex; flex-direction:column; gap:8px; }
+.booking-detail { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-muted); }
+.booking-detail svg { width:15px; height:15px; stroke:var(--text-faint); fill:none; stroke-width:2; flex-shrink:0; }
+.stats-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px; }
+.stat-card { background:var(--bg-card); border:1px solid var(--bg-card-border); border-radius:16px; padding:18px; box-shadow:0 1px 4px var(--bg-card-shadow); }
+.stat-value { font-family:'Playfair Display',serif; font-size:28px; font-weight:800; color:var(--text-primary); }
+.stat-label { font-size:12px; color:var(--text-muted); margin-top:2px; }
+
+/* Bottom Nav */
+.bottom-nav { position:sticky; bottom:0; left:0; right:0; background:var(--nav-bg); border-top:1px solid var(--nav-border); padding:8px 12px 28px; z-index:100; transition:background 0.3s; }
+.bottom-nav-inner { display:flex; justify-content:space-around; align-items:flex-end; max-width:400px; margin:0 auto; }
+.nav-tab { display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10px; font-weight:500; color:var(--nav-inactive); cursor:pointer; background:none; border:none; font-family:'DM Sans',sans-serif; }
+.nav-tab.active { color:var(--green-light); }
+.nav-tab svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:2; }
+.nav-tab-elevated { margin-top:-22px; }
+.nav-icon-elevated { width:52px; height:52px; background:var(--green); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(45,106,79,0.35); border:3.5px solid var(--nav-bg); transition:border-color 0.3s; }
+.nav-icon-elevated svg { width:22px; height:22px; stroke:white; }
+
+/* Employee */
+.clock-card { background:rgba(45,106,79,0.12); border:1.5px solid rgba(82,183,136,0.2); border-radius:16px; padding:18px; display:flex; align-items:center; gap:14px; }
+.clock-icon-wrap { width:48px; height:48px; background:var(--green); border-radius:14px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(45,106,79,0.3); }
+.clock-icon-wrap svg { width:24px; height:24px; stroke:white; fill:none; stroke-width:2; }
+.clock-info { flex:1; }
+.clock-status { font-weight:600; font-size:15px; color:var(--cream); }
+.clock-time { font-size:13px; color:var(--sand); opacity:0.7; margin-top:2px; }
+.clock-btn { padding:10px 22px; background:var(--green-light); border:none; border-radius:10px; color:white; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; }
+.week-summary { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:24px; }
+.week-stat { background:var(--bg-card); border:1px solid var(--bg-card-border); border-radius:14px; padding:14px 12px; text-align:center; box-shadow:0 1px 4px var(--bg-card-shadow); }
+.week-stat-value { font-family:'Playfair Display',serif; font-size:22px; font-weight:800; color:var(--text-primary); }
+.week-stat-label { font-size:11px; color:var(--text-muted); margin-top:2px; }
+.job-card { background:var(--bg-card); border:1px solid var(--bg-card-border); border-radius:16px; padding:16px; margin-bottom:12px; box-shadow:0 1px 4px var(--bg-card-shadow); }
+.job-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.job-time { font-weight:600; font-size:15px; color:var(--text-primary); }
+.job-customer { font-size:13px; color:var(--text-muted); margin-bottom:6px; }
+.job-address { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-faint); }
+.job-address svg { width:14px; height:14px; stroke:var(--text-faint); fill:none; stroke-width:2; }
+
+/* Admin */
+.overview-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
+.overview-card { background:rgba(255,255,255,0.06); border:1px solid rgba(201,148,26,0.12); border-radius:14px; padding:14px 16px; }
+.overview-card-label { font-size:11px; color:var(--sand); opacity:0.7; text-transform:uppercase; letter-spacing:0.06em; }
+.overview-card-value { font-family:'Playfair Display',serif; font-size:24px; font-weight:800; color:var(--cream); margin-top:4px; }
+.overview-card-change { font-size:11px; color:var(--green-light); margin-top:2px; }
+.admin-quick-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:24px; }
+.admin-quick-item { background:var(--bg-card); border:1px solid var(--bg-card-border); border-radius:14px; padding:16px 10px; text-align:center; cursor:pointer; box-shadow:0 1px 4px var(--bg-card-shadow); }
+.admin-quick-item:hover { border-color:var(--gold); }
+.admin-quick-icon { width:40px; height:40px; background:rgba(201,148,26,0.08); border-radius:12px; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; }
+.dark .admin-quick-icon { background:rgba(201,148,26,0.15); }
+.admin-quick-icon svg { width:20px; height:20px; stroke:var(--gold); fill:none; stroke-width:2; }
+.admin-quick-label { font-size:11px; font-weight:500; color:var(--text-muted); }
+.chart-card { background:var(--bg-card); border:1px solid var(--bg-card-border); border-radius:16px; padding:18px; margin-bottom:16px; box-shadow:0 1px 4px var(--bg-card-shadow); }
+.chart-title { font-weight:600; font-size:14px; color:var(--text-primary); margin-bottom:14px; }
+.chart-bars { display:flex; align-items:flex-end; gap:8px; height:120px; padding-top:8px; }
+.chart-bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end; }
+.chart-bar { width:100%; background:var(--gold); border-radius:6px 6px 0 0; opacity:0.7; min-height:4px; }
+.chart-bar:hover { opacity:1; }
+.chart-bar-label { font-size:10px; color:var(--text-faint); }
+.admin-booking-row { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid var(--border-light); }
+.admin-booking-row:last-child { border-bottom:none; }
+.admin-booking-info { flex:1; }
+.admin-booking-name { font-weight:600; font-size:14px; color:var(--text-primary); }
+.admin-booking-meta { font-size:12px; color:var(--text-muted); margin-top:1px; }
+.admin-booking-amount { font-weight:700; font-size:15px; color:var(--text-primary); }
+.attention-card { border-left:3px solid var(--amber); }
+.attention-row { display:flex; align-items:center; gap:10px; font-size:13px; }
+.attention-icon { width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.attention-icon svg { width:16px; height:16px; stroke-width:2; fill:none; }
+.attention-text { flex:1; color:var(--text-primary); }
+
+@media (max-width:430px) {
+  body { padding:0; background:var(--bg-primary); }
+  .phone-frame { width:100%; height:100dvh; border-radius:0; box-shadow:none; }
+  .phone-frame::before { display:none; }
+  .nav-hud { bottom:0; border-radius:16px 16px 0 0; max-width:100%; width:100%; padding:10px 16px 14px; }
+}
+</style>
+</head>
+<body>
+
+<div class="nav-hud">
+  <button class="active" onclick="showScreen('splash',this)">Splash</button>
+  <button onclick="showScreen('onboarding',this)">Onboarding</button>
+  <button onclick="showScreen('login',this)">Login</button>
+  <button onclick="showScreen('customer',this)">Customer</button>
+  <button onclick="showScreen('employee',this)">Employee</button>
+  <button onclick="showScreen('admin',this)">Admin</button>
+  <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">Dark</button>
+</div>
+
+<div class="phone-frame" id="phoneFrame">
+
+  <!-- SPLASH -->
+  <div class="screen screen-splash active" id="screen-splash">
+    <div class="splash-pattern"></div>
+    <svg class="splash-palm-left" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"><g id="palm_tree"><g><path fill="#C98C40" d="M236.38,125.98c0,0-41.82,165.77,0,362.2h45.82c0,0-64.41-156.52-20.81-362.2H236.38z"/><path fill="#15AA78" d="M311.49,108.36c-0.79-0.64-1.56-1.24-2.3-1.75c-6.14-3.37-11.59-4.39-11.59-4.39 c9.18-2.25,17.81,2.25,22.23,5.2c9.12-2.06,18.12-3.47,26.89-4.39c-7.27-7.97-15.87-11.79-15.87-11.79 c10.47-0.05,18.85,6.48,23.48,11.12c11.57-0.85,22.63-0.87,32.9-0.35c-4.14-7.78-9.95-13.5-13.49-16.53 c-0.36-0.2-0.57-0.31-0.57-0.31c0.13,0.05,0.26,0.1,0.39,0.15c-1.79-1.52-2.95-2.32-2.95-2.32c13.25,2.49,21.66,13.94,25.05,19.55 c33.88,2.71,57.13,10.63,57.13,10.63C389.58,46.76,332.27,51.8,294.89,68.15c2.57-3.3,5.24-6.4,7.96-9.3 c-5.72-0.68-10.56,0.82-10.56,0.82c4.3-3.75,9.98-4.06,13.46-3.81c4.47-4.47,9.02-8.43,13.43-11.88c-4.36-1.72-8.71-2-11.2-1.98 c-0.21,0.05-0.34,0.08-0.34,0.08c0.07-0.03,0.14-0.05,0.21-0.08c-1.25,0.01-2.01,0.1-2.01,0.1c6.31-3.71,13.68-2,17-0.9 c14.88-10.97,27.15-16.01,27.15-16.01c-61.59-6.01-80.28,31.59-85.9,52.66c-8.9-27.12-38.53-83.88-128.21-65.96 c0,0,17.73,5.28,39.89,18.43c4.45-1.98,14.44-5.37,23.7-1.11c0,0-1.06-0.01-2.8,0.14c0.1,0.03,0.2,0.05,0.3,0.08 c0,0-0.18-0.03-0.48-0.06c-3.46,0.32-9.45,1.31-15.26,4.31c6.59,4.17,13.45,9.02,20.28,14.61c4.8-0.84,12.72-1.2,19.21,3.41 c0,0-6.93-1.41-14.77,0.34c5.06,4.4,10.06,9.21,14.86,14.47c3.97,0.11,11.2,1.11,15.96,6.51c0,0-3.81-1.75-9.03-2.36 c-0.46,0-0.94,0-1.44,0.03c-31.82-20.82-85.2-36.21-152.58,17.71c0,0,21.94-4.17,52.98-2.38c3.67-4.59,12.49-13.77,24.78-14.34 c0,0-1.14,0.57-2.92,1.71c0.12-0.03,0.24-0.06,0.37-0.08c0,0-0.2,0.07-0.55,0.2c-3.53,2.27-9.4,6.65-13.97,13.08 c9.38,0.82,19.42,2.21,29.84,4.41c4.68-3.56,12.97-8.35,22.47-7c0,0-8.21,2.34-15.64,8.55c7.86,1.91,15.89,4.29,23.96,7.26 c4.31-2.08,12.62-5.02,20.72-1.88c0,0-5.05,0.24-10.98,2.48c-1.03,0.52-2.12,1.14-3.26,1.9c0.11,0.05,0.23,0.09,0.34,0.14 C157,97.4,86.47,108.31,47.23,210.57c0,0,19.85-17.32,52.52-33.99c1-6.86,4.51-21.46,16.69-29.37c0,0-0.82,1.27-1.96,3.48 c0.11-0.1,0.21-0.21,0.32-0.31c0,0-0.17,0.19-0.44,0.53c-2.24,4.41-5.61,12.37-6.43,21.64c10.03-4.75,21.09-9.32,33-13.29 c2.64-6.42,8.23-16.23,18.71-20.52c0,0-6.96,7.27-10.83,18.02c9.14-2.74,18.74-5.1,28.72-6.88c3.15-4.69,9.86-12.64,19.98-14.26 c0,0-5.01,3.25-9.7,9.07c-0.74,1.14-1.48,2.43-2.19,3.87c7.44-1.07,15.09-1.81,22.9-2.15c-20.39,9.98-41.92,31.79-40.24,79.45 c0,0,6.06-12.49,18.47-27.31c-0.93-3.53-2.23-11.34,2.05-17.68c0,0-0.14,0.78-0.23,2.09c0.03-0.07,0.06-0.14,0.09-0.21 c0,0-0.04,0.13-0.1,0.35c-0.18,2.6-0.17,7.15,1.34,11.82c3.89-4.37,8.31-8.87,13.27-13.25c-0.04-3.66,0.65-9.57,4.85-13.81 c0,0-1.88,4.96-1.54,10.97c3.87-3.21,8.04-6.33,12.51-9.25c0.56-2.92,2.18-8.16,6.76-11.03c0,0-1.76,2.61-2.84,6.4 c-0.12,0.71-0.22,1.48-0.27,2.33c7.61-4.61,16.06-8.61,25.32-11.56c7.42,6.34,13.95,13.18,19.69,20.26 c0.31-1.06,0.54-2.05,0.7-2.96c0.34-5.1-0.65-9.05-0.65-9.05c4.32,5.51,4,12.6,3.4,16.42c4.18,5.53,7.89,11.16,11.2,16.78 c3.05-7.18,2.94-14.06,2.94-14.06c3.26,7.02,1.5,14.52-0.15,18.97c4.13,7.52,7.55,14.94,10.37,21.98 c3.89-5.03,5.9-10.57,6.82-13.83c0.02-0.3,0.03-0.47,0.03-0.47c0.01,0.1,0.01,0.2,0.02,0.3c0.46-1.64,0.63-2.65,0.63-2.65 c2.43,9.61-2.58,18.56-5.26,22.46c8.64,23.52,10.55,41.41,10.55,41.41c24.14-60.34,4.45-97.09-17.4-117.7 c1.44,0.49,2.87,0.98,4.29,1.49c-0.43-1.63-0.91-3.1-1.43-4.42c-3.58-6.93-8.01-11.3-8.01-11.3c10,3.78,15.18,13.3,17.41,18.75 c9.82,3.92,19.12,8.33,27.89,13.05c-1.69-11.79-7.28-20.68-7.28-20.68c9.8,6.59,13.44,17.78,14.8,24.88 c11.33,6.55,21.67,13.54,30.92,20.5c1.11-9.64-0.66-18.47-2.02-23.45c-0.2-0.4-0.34-0.64-0.34-0.64c0.09,0.13,0.17,0.25,0.27,0.38 c-0.7-2.5-1.27-3.97-1.27-3.97c10.77,10.63,11.3,26.28,10.88,33.49c29.87,23.88,46.5,45.73,46.5,45.73 C407.7,152.32,355.55,119.01,311.49,108.36z"/></g><path fill="#C98C40" d="M295.87,491.54c-5.9-19.75-24.2-34.16-45.87-34.16c-21.67,0-39.97,14.4-45.87,34.16H295.87z"/></g></svg>
+    <svg class="splash-palm-right" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"><g><g><path fill="#C98C40" d="M236.38,125.98c0,0-41.82,165.77,0,362.2h45.82c0,0-64.41-156.52-20.81-362.2H236.38z"/><path fill="#15AA78" d="M311.49,108.36c-0.79-0.64-1.56-1.24-2.3-1.75c-6.14-3.37-11.59-4.39-11.59-4.39 c9.18-2.25,17.81,2.25,22.23,5.2c9.12-2.06,18.12-3.47,26.89-4.39c-7.27-7.97-15.87-11.79-15.87-11.79 c10.47-0.05,18.85,6.48,23.48,11.12c11.57-0.85,22.63-0.87,32.9-0.35c-4.14-7.78-9.95-13.5-13.49-16.53 c13.25,2.49,21.66,13.94,25.05,19.55c33.88,2.71,57.13,10.63,57.13,10.63C389.58,46.76,332.27,51.8,294.89,68.15 c-61.59-6.01-80.28,31.59-85.9,52.66c-8.9-27.12-38.53-83.88-128.21-65.96c0,0,17.73,5.28,39.89,18.43 c-31.82-20.82-85.2-36.21-152.58,17.71c0,0,21.94-4.17,52.98-2.38 C157,97.4,86.47,108.31,47.23,210.57c0,0,19.85-17.32,52.52-33.99 c-20.39,9.98-41.92,31.79-40.24,79.45c0,0,6.06-12.49,18.47-27.31 c7.61-4.61,16.06-8.61,25.32-11.56c7.42,6.34,13.95,13.18,19.69,20.26 c8.64,23.52,10.55,41.41,10.55,41.41c24.14-60.34,4.45-97.09-17.4-117.7 c10.77,10.63,11.3,26.28,10.88,33.49c29.87,23.88,46.5,45.73,46.5,45.73 C407.7,152.32,355.55,119.01,311.49,108.36z"/></g><path fill="#C98C40" d="M295.87,491.54c-5.9-19.75-24.2-34.16-45.87-34.16c-21.67,0-39.97,14.4-45.87,34.16H295.87z"/></g></svg>
+    <div class="splash-content">
+      <div class="splash-logo">
+        <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" style="width:130px;height:130px"><g><g><path fill="#C98C40" d="M236.38,125.98c0,0-41.82,165.77,0,362.2h45.82c0,0-64.41-156.52-20.81-362.2H236.38z"/><path fill="#15AA78" d="M311.49,108.36c-0.79-0.64-1.56-1.24-2.3-1.75c-6.14-3.37-11.59-4.39-11.59-4.39 c9.18-2.25,17.81,2.25,22.23,5.2c9.12-2.06,18.12-3.47,26.89-4.39c-7.27-7.97-15.87-11.79-15.87-11.79 c10.47-0.05,18.85,6.48,23.48,11.12c11.57-0.85,22.63-0.87,32.9-0.35c-4.14-7.78-9.95-13.5-13.49-16.53 c-0.36-0.2-0.57-0.31-0.57-0.31c0.13,0.05,0.26,0.1,0.39,0.15c-1.79-1.52-2.95-2.32-2.95-2.32c13.25,2.49,21.66,13.94,25.05,19.55 c33.88,2.71,57.13,10.63,57.13,10.63C389.58,46.76,332.27,51.8,294.89,68.15c2.57-3.3,5.24-6.4,7.96-9.3 c-5.72-0.68-10.56,0.82-10.56,0.82c4.3-3.75,9.98-4.06,13.46-3.81c4.47-4.47,9.02-8.43,13.43-11.88c-4.36-1.72-8.71-2-11.2-1.98 c-0.21,0.05-0.34,0.08-0.34,0.08c0.07-0.03,0.14-0.05,0.21-0.08c-1.25,0.01-2.01,0.1-2.01,0.1c6.31-3.71,13.68-2,17-0.9 c14.88-10.97,27.15-16.01,27.15-16.01c-61.59-6.01-80.28,31.59-85.9,52.66c-8.9-27.12-38.53-83.88-128.21-65.96 c0,0,17.73,5.28,39.89,18.43c4.45-1.98,14.44-5.37,23.7-1.11c0,0-1.06-0.01-2.8,0.14c0.1,0.03,0.2,0.05,0.3,0.08 c0,0-0.18-0.03-0.48-0.06c-3.46,0.32-9.45,1.31-15.26,4.31c6.59,4.17,13.45,9.02,20.28,14.61c4.8-0.84,12.72-1.2,19.21,3.41 c0,0-6.93-1.41-14.77,0.34c5.06,4.4,10.06,9.21,14.86,14.47c3.97,0.11,11.2,1.11,15.96,6.51c0,0-3.81-1.75-9.03-2.36 c-0.46,0-0.94,0-1.44,0.03c-31.82-20.82-85.2-36.21-152.58,17.71c0,0,21.94-4.17,52.98-2.38c3.67-4.59,12.49-13.77,24.78-14.34 c0,0-1.14,0.57-2.92,1.71c0.12-0.03,0.24-0.06,0.37-0.08c0,0-0.2,0.07-0.55,0.2c-3.53,2.27-9.4,6.65-13.97,13.08 c9.38,0.82,19.42,2.21,29.84,4.41c4.68-3.56,12.97-8.35,22.47-7c0,0-8.21,2.34-15.64,8.55c7.86,1.91,15.89,4.29,23.96,7.26 c4.31-2.08,12.62-5.02,20.72-1.88c0,0-5.05,0.24-10.98,2.48c-1.03,0.52-2.12,1.14-3.26,1.9c0.11,0.05,0.23,0.09,0.34,0.14 C157,97.4,86.47,108.31,47.23,210.57c0,0,19.85-17.32,52.52-33.99c1-6.86,4.51-21.46,16.69-29.37c0,0-0.82,1.27-1.96,3.48 c0.11-0.1,0.21-0.21,0.32-0.31c0,0-0.17,0.19-0.44,0.53c-2.24,4.41-5.61,12.37-6.43,21.64c10.03-4.75,21.09-9.32,33-13.29 c2.64-6.42,8.23-16.23,18.71-20.52c0,0-6.96,7.27-10.83,18.02c9.14-2.74,18.74-5.1,28.72-6.88c3.15-4.69,9.86-12.64,19.98-14.26 c0,0-5.01,3.25-9.7,9.07c-0.74,1.14-1.48,2.43-2.19,3.87c7.44-1.07,15.09-1.81,22.9-2.15c-20.39,9.98-41.92,31.79-40.24,79.45 c0,0,6.06-12.49,18.47-27.31c-0.93-3.53-2.23-11.34,2.05-17.68c0,0-0.14,0.78-0.23,2.09c0.03-0.07,0.06-0.14,0.09-0.21 c0,0-0.04,0.13-0.1,0.35c-0.18,2.6-0.17,7.15,1.34,11.82c3.89-4.37,8.31-8.87,13.27-13.25c-0.04-3.66,0.65-9.57,4.85-13.81 c0,0-1.88,4.96-1.54,10.97c3.87-3.21,8.04-6.33,12.51-9.25c0.56-2.92,2.18-8.16,6.76-11.03c0,0-1.76,2.61-2.84,6.4 c-0.12,0.71-0.22,1.48-0.27,2.33c7.61-4.61,16.06-8.61,25.32-11.56c7.42,6.34,13.95,13.18,19.69,20.26 c0.31-1.06,0.54-2.05,0.7-2.96c0.34-5.1-0.65-9.05-0.65-9.05c4.32,5.51,4,12.6,3.4,16.42c4.18,5.53,7.89,11.16,11.2,16.78 c3.05-7.18,2.94-14.06,2.94-14.06c3.26,7.02,1.5,14.52-0.15,18.97c4.13,7.52,7.55,14.94,10.37,21.98 c3.89-5.03,5.9-10.57,6.82-13.83c0.02-0.3,0.03-0.47,0.03-0.47c0.01,0.1,0.01,0.2,0.02,0.3c0.46-1.64,0.63-2.65,0.63-2.65 c2.43,9.61-2.58,18.56-5.26,22.46c8.64,23.52,10.55,41.41,10.55,41.41c24.14-60.34,4.45-97.09-17.4-117.7 c1.44,0.49,2.87,0.98,4.29,1.49c-0.43-1.63-0.91-3.1-1.43-4.42c-3.58-6.93-8.01-11.3-8.01-11.3c10,3.78,15.18,13.3,17.41,18.75 c9.82,3.92,19.12,8.33,27.89,13.05c-1.69-11.79-7.28-20.68-7.28-20.68c9.8,6.59,13.44,17.78,14.8,24.88 c11.33,6.55,21.67,13.54,30.92,20.5c1.11-9.64-0.66-18.47-2.02-23.45c-0.2-0.4-0.34-0.64-0.34-0.64c0.09,0.13,0.17,0.25,0.27,0.38 c-0.7-2.5-1.27-3.97-1.27-3.97c10.77,10.63,11.3,26.28,10.88,33.49c29.87,23.88,46.5,45.73,46.5,45.73 C407.7,152.32,355.55,119.01,311.49,108.36z"/></g><path fill="#C98C40" d="M295.87,491.54c-5.9-19.75-24.2-34.16-45.87-34.16c-21.67,0-39.97,14.4-45.87,34.16H295.87z"/></g></svg>
+      </div>
+      <div class="splash-title">Havana<br><span>Cleaning</span></div>
+      <div class="splash-tagline">Where Spotless Meets Soul</div>
+      <div class="splash-loader"></div>
+    </div>
+  </div>
+
+  <!-- ONBOARDING -->
+  <div class="screen screen-onboarding" id="screen-onboarding">
+    <div class="onboard-slides">
+      <div class="onboard-slide active" id="onboard-1">
+        <div class="onboard-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <div class="onboard-title">Welcome to<br>Havana Cleaning</div>
+        <div class="onboard-desc">Professional, family-owned cleaning service bringing warmth and care to every home we touch.</div>
+      </div>
+      <div class="onboard-slide" id="onboard-2">
+        <div class="onboard-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg></div>
+        <div class="onboard-title">Book in<br>Just Minutes</div>
+        <div class="onboard-desc">Choose your service, pick a date, and get instant pricing. No phone calls needed.</div>
+      </div>
+      <div class="onboard-slide" id="onboard-3">
+        <div class="onboard-icon"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+        <div class="onboard-title">Track &<br>Manage</div>
+        <div class="onboard-desc">View upcoming bookings, manage payments, and stay updated with your cleaning schedule.</div>
+      </div>
+    </div>
+    <div class="onboard-footer">
+      <div class="onboard-dots"><div class="onboard-dot active" id="dot-1"></div><div class="onboard-dot" id="dot-2"></div><div class="onboard-dot" id="dot-3"></div></div>
+      <div class="onboard-actions">
+        <button class="onboard-skip" onclick="showScreen('login',document.querySelectorAll('.nav-hud button')[2])">Skip</button>
+        <button class="onboard-next" id="onboard-next-btn" onclick="nextSlide()">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="screen screen-login" id="screen-login">
+    <div class="login-pattern"></div>
+    <div class="login-content">
+      <div class="login-header">
+        <div class="login-brand">Havana <span>Cleaning</span></div>
+        <div class="login-subtitle">Sign in to your account</div>
+      </div>
+      <div class="login-card">
+        <div class="login-social">
+          <button class="btn-google">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Continue with Google
+          </button>
+          <button class="btn-apple">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            Continue with Apple
+          </button>
+        </div>
+        <div class="login-divider"><span>or sign in with email</span></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="hello@havanacleaning.com"></div>
+        <div class="form-group">
+          <div class="form-label-row"><label class="form-label" style="margin-bottom:0">Password</label><a href="#" class="form-link">Forgot Password?</a></div>
+          <input type="password" class="form-input" placeholder="Enter your password">
+        </div>
+        <button class="btn-signin" onclick="showScreen('customer',document.querySelectorAll('.nav-hud button')[3])">Sign In</button>
+        <div class="login-register">Don't have an account? <a href="#">Sign Up</a></div>
+      </div>
+      <div class="login-footer"><a href="#">Privacy Policy</a> &middot; <a href="#">Terms of Service</a></div>
+    </div>
+  </div>
+
+  <!-- CUSTOMER DASHBOARD -->
+  <div class="screen screen-customer" id="screen-customer">
+    <div class="dash-header">
+      <div class="dash-header-top">
+        <div><div class="dash-greeting">Good morning</div><div class="dash-name">Maria Garcia</div></div>
+        <div class="dash-avatar">MG</div>
+      </div>
+      <div class="quick-actions">
+        <div class="quick-action"><div class="quick-action-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg></div><div class="quick-action-label">Book</div></div>
+        <div class="quick-action"><div class="quick-action-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div class="quick-action-label">History</div></div>
+        <div class="quick-action"><div class="quick-action-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="quick-action-label">Profile</div></div>
+        <div class="quick-action"><div class="quick-action-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><div class="quick-action-label">Settings</div></div>
+      </div>
+    </div>
+    <div class="dash-body">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-value">12</div><div class="stat-label">Total Bookings</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:var(--green-light)">2</div><div class="stat-label">Upcoming</div></div>
+      </div>
+      <div class="section-header"><div class="section-title">Upcoming</div><a href="#" class="section-see-all">See all</a></div>
+      <!-- Booking 1 -->
+      <div class="booking-card">
+        <div class="booking-card-header">
+          <div class="booking-service">
+            <div class="svc-icon" style="background:rgba(201,148,26,0.1)"><svg viewBox="0 0 24 24" stroke="var(--gold)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+            <div><div class="booking-service-name">Standard Cleaning</div><div class="booking-number">#HC-1042</div></div>
+          </div>
+          <div class="badge badge-confirmed">Confirmed</div>
+        </div>
+        <div class="booking-details">
+          <div class="booking-detail"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>March 8, 2026 at 9:00 AM</div>
+          <div class="booking-detail"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>1234 Ocean Dr, Miami Beach, FL</div>
+        </div>
+      </div>
+      <!-- Booking 2 -->
+      <div class="booking-card">
+        <div class="booking-card-header">
+          <div class="booking-service">
+            <div class="svc-icon" style="background:rgba(26,122,110,0.1)"><svg viewBox="0 0 24 24" stroke="var(--teal)"><path d="M12 3l1.5 3.2 3.5.5-2.5 2.5.6 3.5L12 11l-3.1 1.7.6-3.5L7 6.7l3.5-.5z"/><path d="M5 19l2-2M19 19l-2-2M12 17v4"/></svg></div>
+            <div><div class="booking-service-name">Deep Cleaning</div><div class="booking-number">#HC-1048</div></div>
+          </div>
+          <div class="badge badge-pending">Pending</div>
+        </div>
+        <div class="booking-details">
+          <div class="booking-detail"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>March 15, 2026 at 10:00 AM</div>
+          <div class="booking-detail"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>456 Collins Ave, Miami Beach, FL</div>
+        </div>
+      </div>
+      <div class="section-header" style="margin-top:24px"><div class="section-title">Recent</div><a href="#" class="section-see-all">See all</a></div>
+      <div class="booking-card" style="opacity:0.7">
+        <div class="booking-card-header">
+          <div class="booking-service">
+            <div class="svc-icon" style="background:rgba(45,106,79,0.1)"><svg viewBox="0 0 24 24" stroke="var(--green)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M16 3v4M8 3v4"/></svg></div>
+            <div><div class="booking-service-name">Move-Out Cleaning</div><div class="booking-number">#HC-1035</div></div>
+          </div>
+          <div class="badge badge-completed">Completed</div>
+        </div>
+        <div class="booking-details">
+          <div class="booking-detail"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Feb 22, 2026</div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="bottom-nav-inner">
+        <button class="nav-tab active"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></button>
+        <button class="nav-tab"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>Bookings</span></button>
+        <button class="nav-tab nav-tab-elevated"><div class="nav-icon-elevated"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg></div><span>Book</span></button>
+        <button class="nav-tab"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>Addresses</span></button>
+        <button class="nav-tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Settings</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPLOYEE DASHBOARD -->
+  <div class="screen screen-employee" id="screen-employee">
+    <div class="dash-header">
+      <div class="dash-header-top">
+        <div><div class="dash-greeting">Good morning</div><div class="dash-name">Carlos Rodriguez</div></div>
+        <div class="dash-avatar" style="background:var(--green)">CR</div>
+      </div>
+      <div class="clock-card">
+        <div class="clock-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="clock-info"><div class="clock-status">Not Clocked In</div><div class="clock-time">Tap to start your shift</div></div>
+        <button class="clock-btn">Clock In</button>
+      </div>
+    </div>
+    <div class="dash-body">
+      <div class="week-summary">
+        <div class="week-stat"><div class="week-stat-value">24.5</div><div class="week-stat-label">Hours</div></div>
+        <div class="week-stat"><div class="week-stat-value">8</div><div class="week-stat-label">Jobs</div></div>
+        <div class="week-stat"><div class="week-stat-value" style="color:var(--green-light)">$490</div><div class="week-stat-label">Earnings</div></div>
+      </div>
+      <div class="section-header"><div class="section-title">Today's Jobs</div><span style="font-size:13px;color:var(--text-faint)">3 jobs</span></div>
+      <div class="job-card">
+        <div class="job-card-header"><div><div class="job-time">9:00 AM - Standard Cleaning</div><div class="booking-number">#HC-1042</div></div><div class="badge badge-confirmed">Confirmed</div></div>
+        <div class="job-customer">Maria Garcia - (305) 555-0142</div>
+        <div class="job-address"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>1234 Ocean Dr, Miami Beach</div>
+      </div>
+      <div class="job-card">
+        <div class="job-card-header"><div><div class="job-time">11:30 AM - Deep Cleaning</div><div class="booking-number">#HC-1044</div></div><div class="badge badge-confirmed">Confirmed</div></div>
+        <div class="job-customer">James Wilson - (786) 555-0198</div>
+        <div class="job-address"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>789 Brickell Ave, Miami</div>
+      </div>
+      <div class="job-card">
+        <div class="job-card-header"><div><div class="job-time">3:00 PM - Standard Cleaning</div><div class="booking-number">#HC-1046</div></div><div class="badge badge-pending">Pending</div></div>
+        <div class="job-customer">Ana Martinez - (305) 555-0267</div>
+        <div class="job-address"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>567 Coral Way, Miami</div>
+      </div>
+      <div class="section-header" style="margin-top:24px"><div class="section-title">This Week</div><a href="#" class="section-see-all">Full schedule</a></div>
+      <div class="job-card" style="opacity:0.65">
+        <div class="job-card-header"><div><div class="job-time">Tomorrow - 2 jobs</div></div></div>
+        <div class="job-address"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Standard Cleaning, Deep Cleaning</div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="bottom-nav-inner">
+        <button class="nav-tab active"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Today</span></button>
+        <button class="nav-tab"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>Jobs</span></button>
+        <button class="nav-tab nav-tab-elevated"><div class="nav-icon-elevated"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><span>Clock</span></button>
+        <button class="nav-tab"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Schedule</span></button>
+        <button class="nav-tab"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Pay</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD -->
+  <div class="screen screen-admin" id="screen-admin">
+    <div class="dash-header">
+      <div class="dash-header-top">
+        <div><div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:800;color:var(--cream)">Dashboard</div><div style="font-size:13px;color:var(--sand);opacity:0.7">March 4, 2026</div></div>
+        <div class="dash-avatar" style="background:var(--rum)">HC</div>
+      </div>
+      <div class="overview-stats">
+        <div class="overview-card"><div class="overview-card-label">Revenue (MTD)</div><div class="overview-card-value">$8,420</div><div class="overview-card-change">+12% vs last month</div></div>
+        <div class="overview-card"><div class="overview-card-label">Bookings Today</div><div class="overview-card-value">6</div><div class="overview-card-change">3 confirmed</div></div>
+        <div class="overview-card"><div class="overview-card-label">Active Staff</div><div class="overview-card-value">4</div><div class="overview-card-change">2 clocked in</div></div>
+        <div class="overview-card"><div class="overview-card-label">Customers</div><div class="overview-card-value">156</div><div class="overview-card-change">+8 this month</div></div>
+      </div>
+    </div>
+    <div class="dash-body">
+      <div class="section-title" style="margin-bottom:12px">Quick Actions</div>
+      <div class="admin-quick-grid">
+        <div class="admin-quick-item"><div class="admin-quick-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="admin-quick-label">Bookings</div></div>
+        <div class="admin-quick-item"><div class="admin-quick-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="admin-quick-label">Staff</div></div>
+        <div class="admin-quick-item"><div class="admin-quick-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="admin-quick-label">Payroll</div></div>
+        <div class="admin-quick-item"><div class="admin-quick-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="admin-quick-label">Clients</div></div>
+        <div class="admin-quick-item"><div class="admin-quick-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div class="admin-quick-label">Schedule</div></div>
+        <div class="admin-quick-item"><div class="admin-quick-icon"><svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></div><div class="admin-quick-label">Revenue</div></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Monthly Revenue</div>
+        <div class="chart-bars">
+          <div class="chart-bar-col"><div class="chart-bar" style="height:45%"></div><div class="chart-bar-label">Oct</div></div>
+          <div class="chart-bar-col"><div class="chart-bar" style="height:60%"></div><div class="chart-bar-label">Nov</div></div>
+          <div class="chart-bar-col"><div class="chart-bar" style="height:55%"></div><div class="chart-bar-label">Dec</div></div>
+          <div class="chart-bar-col"><div class="chart-bar" style="height:72%"></div><div class="chart-bar-label">Jan</div></div>
+          <div class="chart-bar-col"><div class="chart-bar" style="height:85%"></div><div class="chart-bar-label">Feb</div></div>
+          <div class="chart-bar-col"><div class="chart-bar" style="height:40%;background:var(--green-light)"></div><div class="chart-bar-label">Mar</div></div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="section-header" style="margin-bottom:4px"><div class="chart-title" style="margin-bottom:0">Recent Bookings</div><a href="#" class="section-see-all">View all</a></div>
+        <div class="admin-booking-row">
+          <div class="svc-icon" style="background:rgba(201,148,26,0.1)"><svg viewBox="0 0 24 24" stroke="var(--gold)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          <div class="admin-booking-info"><div class="admin-booking-name">Maria Garcia</div><div class="admin-booking-meta">Standard Cleaning - Today 9 AM</div></div>
+          <div class="admin-booking-amount">$150</div>
+        </div>
+        <div class="admin-booking-row">
+          <div class="svc-icon" style="background:rgba(26,122,110,0.1)"><svg viewBox="0 0 24 24" stroke="var(--teal)"><path d="M12 3l1.5 3.2 3.5.5-2.5 2.5.6 3.5L12 11l-3.1 1.7.6-3.5L7 6.7l3.5-.5z"/><path d="M5 19l2-2M19 19l-2-2M12 17v4"/></svg></div>
+          <div class="admin-booking-info"><div class="admin-booking-name">James Wilson</div><div class="admin-booking-meta">Deep Cleaning - Today 11:30 AM</div></div>
+          <div class="admin-booking-amount">$280</div>
+        </div>
+        <div class="admin-booking-row">
+          <div class="svc-icon" style="background:rgba(201,148,26,0.1)"><svg viewBox="0 0 24 24" stroke="var(--gold)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          <div class="admin-booking-info"><div class="admin-booking-name">Ana Martinez</div><div class="admin-booking-meta">Standard Cleaning - Today 3 PM</div></div>
+          <div class="admin-booking-amount">$135</div>
+        </div>
+        <div class="admin-booking-row">
+          <div class="svc-icon" style="background:rgba(92,46,0,0.1)"><svg viewBox="0 0 24 24" stroke="var(--rum)"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg></div>
+          <div class="admin-booking-info"><div class="admin-booking-name">Coral Gables Office</div><div class="admin-booking-meta">Commercial - Tomorrow 7 AM</div></div>
+          <div class="admin-booking-amount">$450</div>
+        </div>
+        <div class="admin-booking-row">
+          <div class="svc-icon" style="background:rgba(45,106,79,0.1)"><svg viewBox="0 0 24 24" stroke="var(--green)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M16 3v4M8 3v4"/></svg></div>
+          <div class="admin-booking-info"><div class="admin-booking-name">David Chen</div><div class="admin-booking-meta">Move-Out - Mar 6</div></div>
+          <div class="admin-booking-amount">$320</div>
+        </div>
+      </div>
+      <div class="chart-card attention-card">
+        <div class="chart-title">Needs Attention</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="attention-row">
+            <span class="attention-icon" style="background:rgba(232,168,32,0.1)"><svg viewBox="0 0 24 24" stroke="var(--amber)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+            <span class="attention-text">3 bookings pending confirmation</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="attention-row">
+            <span class="attention-icon" style="background:rgba(26,122,110,0.1)"><svg viewBox="0 0 24 24" stroke="var(--teal)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+            <span class="attention-text">2 new job applications</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="attention-row">
+            <span class="attention-icon" style="background:rgba(201,148,26,0.1)"><svg viewBox="0 0 24 24" stroke="var(--gold)"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+            <span class="attention-text">1 payroll ready to process</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="bottom-nav-inner">
+        <button class="nav-tab active"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></button>
+        <button class="nav-tab"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Bookings</span></button>
+        <button class="nav-tab nav-tab-elevated"><div class="nav-icon-elevated" style="background:var(--gold)"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><span>New</span></button>
+        <button class="nav-tab"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Clients</span></button>
+        <button class="nav-tab"><svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg><span>More</span></button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let currentSlide = 1;
+function showScreen(name, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('screen-' + name).scrollTop = 0;
+  document.querySelectorAll('.nav-hud button:not(.theme-toggle)').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+function nextSlide() {
+  if (currentSlide < 3) {
+    document.getElementById('onboard-' + currentSlide).classList.remove('active');
+    document.getElementById('dot-' + currentSlide).classList.remove('active');
+    currentSlide++;
+    document.getElementById('onboard-' + currentSlide).classList.add('active');
+    document.getElementById('dot-' + currentSlide).classList.add('active');
+    if (currentSlide === 3) {
+      document.getElementById('onboard-next-btn').textContent = 'Get Started';
+      document.getElementById('onboard-next-btn').onclick = function() {
+        showScreen('login', document.querySelectorAll('.nav-hud button')[2]);
+      };
+    }
+  }
+}
+let isDark = false;
+function toggleTheme() {
+  isDark = !isDark;
+  document.getElementById('phoneFrame').classList.toggle('dark', isDark);
+  document.getElementById('themeBtn').textContent = isDark ? 'Light' : 'Dark';
+}
+</script>
+</body>
+</html>

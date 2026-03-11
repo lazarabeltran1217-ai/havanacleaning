@@ -1,10 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Check, MapPin, Wrench, Package, Tv, DoorOpen, Lightbulb, Grid3x3, Paintbrush, Droplets, Waves, Wifi, Fence, LayoutGrid } from "lucide-react";
 import { HANDYMAN_SERVICES, NYC_BOROUGHS, NYC_NEIGHBORHOODS } from "@/lib/handyman-constants";
 import { HandymanBookingWizard } from "@/components/website/HandymanBookingWizard";
 import { prisma } from "@/lib/prisma";
+import { buildContentMap } from "@/lib/i18n-content";
+import { PageHeroImage } from "@/components/website/PageHeroImage";
 import type { LucideIcon } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -30,7 +32,15 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 export default async function HandymanPage() {
+  const locale = await getLocale();
   const t = await getTranslations("handyman");
+
+  let heroImageUrl = "";
+  try {
+    const contentRows = await prisma.content.findMany({ where: { published: true } });
+    const contentMap = buildContentMap(contentRows, locale);
+    heroImageUrl = (contentMap.handyman_page_media as { heroImageUrl?: string } | undefined)?.heroImageUrl || "";
+  } catch { /* use default */ }
 
   const handymanPrices = await prisma.handymanServicePrice.findMany({
     where: { isActive: true },
@@ -53,39 +63,42 @@ export default async function HandymanPage() {
   return (
     <>
       {/* HERO */}
-      <section className="bg-tobacco pt-36 pb-16 px-6 md:px-20 text-center">
-        <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center justify-center gap-3">
-          <span className="w-8 h-px bg-green-light" />
-          {t("heroEyebrow")}
-          <span className="w-8 h-px bg-green-light" />
-        </div>
-        <h1
-          className="font-display text-cream mb-6"
-          style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
-        >
-          {t("heroTitle")}
-        </h1>
-        <p className="text-sand max-w-[600px] mx-auto leading-relaxed mb-4">
-          {t("heroSubtitle")}
-        </p>
-        <div className="flex items-center justify-center gap-2 mb-10">
-          <span className="inline-flex items-center gap-2 bg-green/20 text-green-light px-4 py-2 rounded-full text-[0.8rem] font-medium">
-            <MapPin className="w-4 h-4" /> {t("nycBadge")}
-          </span>
-        </div>
-        <div className="flex gap-4 flex-wrap justify-center">
-          <a
-            href="#book"
-            className="bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber hover:-translate-y-0.5 transition-all"
+      <section className="bg-tobacco pt-36 pb-16 px-6 md:px-20 text-center relative overflow-hidden">
+        {heroImageUrl && <PageHeroImage imageUrl={heroImageUrl} />}
+        <div className="relative z-10">
+          <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center justify-center gap-3">
+            <span className="w-8 h-px bg-green-light" />
+            {t("heroEyebrow")}
+            <span className="w-8 h-px bg-green-light" />
+          </div>
+          <h1
+            className="font-display text-cream mb-6"
+            style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
           >
-            {t("bookHandyman")}
-          </a>
-          <a
-            href="#services"
-            className="border-[1.5px] border-cream/30 text-cream px-9 py-4 text-[0.9rem] font-medium tracking-[0.08em] uppercase rounded-[3px] hover:border-cream transition-colors"
-          >
-            {t("ctaServices")}
-          </a>
+            {t("heroTitle")}
+          </h1>
+          <p className="text-sand max-w-[600px] mx-auto leading-relaxed mb-4">
+            {t("heroSubtitle")}
+          </p>
+          <div className="flex items-center justify-center gap-2 mb-10">
+            <span className="inline-flex items-center gap-2 bg-green/20 text-green-light px-4 py-2 rounded-full text-[0.8rem] font-medium">
+              <MapPin className="w-4 h-4" /> {t("nycBadge")}
+            </span>
+          </div>
+          <div className="flex gap-4 flex-wrap justify-center">
+            <a
+              href="#book"
+              className="bg-gold text-tobacco px-9 py-4 text-[0.9rem] font-semibold tracking-[0.08em] uppercase rounded-[3px] hover:bg-amber hover:-translate-y-0.5 transition-all"
+            >
+              {t("bookHandyman")}
+            </a>
+            <a
+              href="#services"
+              className="border-[1.5px] border-cream/30 text-cream px-9 py-4 text-[0.9rem] font-medium tracking-[0.08em] uppercase rounded-[3px] hover:border-cream transition-colors"
+            >
+              {t("ctaServices")}
+            </a>
+          </div>
         </div>
       </section>
 

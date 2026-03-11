@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getServiceDefaults } from "@/lib/service-defaults";
+import { MediaInput } from "@/components/admin/MediaInput";
 
 interface ServiceInfo {
   id: string;
@@ -46,6 +47,12 @@ const DEFAULTS = {
     title: "What Our Clients Are Saying",
     subtitle: "Real reviews from real families across the country.",
   },
+  hero_media: { videoUrl: "", posterUrl: "", fallbackImageUrl: "" },
+  about_page_media: { heroImageUrl: "", storyImageUrl: "" },
+  services_page_media: { heroImageUrl: "" },
+  commercial_page_media: { heroImageUrl: "" },
+  careers_page_media: { heroImageUrl: "" },
+  handyman_page_media: { heroImageUrl: "" },
 };
 
 export function ContentManager({ initialContent, services = [] }: Props) {
@@ -93,12 +100,30 @@ export function ContentManager({ initialContent, services = [] }: Props) {
   // Reviews Page
   const [reviewsTitle, setReviewsTitle] = useState(get("reviews_page").title || "");
   const [reviewsSubtitle, setReviewsSubtitle] = useState(get("reviews_page").subtitle || "");
+  const [reviewsHeroImage, setReviewsHeroImage] = useState(get("reviews_page").heroImageUrl || "");
+
+  // Hero Media
+  const [heroVideoUrl, setHeroVideoUrl] = useState(get("hero_media").videoUrl || "");
+  const [heroPosterUrl, setHeroPosterUrl] = useState(get("hero_media").posterUrl || "");
+  const [heroFallbackUrl, setHeroFallbackUrl] = useState(get("hero_media").fallbackImageUrl || "");
+
+  // About Section Image
+  const [aboutImageUrl, setAboutImageUrl] = useState(get("about_section").imageUrl || "");
+
+  // Page Hero Images
+  const [aboutHeroImage, setAboutHeroImage] = useState(get("about_page_media").heroImageUrl || "");
+  const [aboutStoryImage, setAboutStoryImage] = useState(get("about_page_media").storyImageUrl || "");
+  const [servicesHeroImage, setServicesHeroImage] = useState(get("services_page_media").heroImageUrl || "");
+  const [commercialHeroImage, setCommercialHeroImage] = useState(get("commercial_page_media").heroImageUrl || "");
+  const [careersHeroImage, setCareersHeroImage] = useState(get("careers_page_media").heroImageUrl || "");
+  const [handymanHeroImage, setHandymanHeroImage] = useState(get("handyman_page_media").heroImageUrl || "");
 
   // Service page content
   const [selectedService, setSelectedService] = useState(services[0]?.slug || "");
   const [svcLongDesc, setSvcLongDesc] = useState("");
   const [svcFeatures, setSvcFeatures] = useState<string[]>([]);
   const [svcBenefits, setSvcBenefits] = useState<{ title: string; text: string }[]>([]);
+  const [svcImageUrl, setSvcImageUrl] = useState("");
 
   // Load service content when selection changes
   function loadServiceContent(slug: string) {
@@ -117,6 +142,7 @@ export function ContentManager({ initialContent, services = [] }: Props) {
         ? saved.benefits
         : defaults.benefits
     );
+    setSvcImageUrl(saved?.imageUrl || "");
   }
 
   // Initialize on first render if services exist
@@ -139,9 +165,15 @@ export function ContentManager({ initialContent, services = [] }: Props) {
       { key: "hero_cta_secondary", dataEn: { text: ctaSecondaryText, href: ctaSecondaryHref } },
       { key: "hero_stats", dataEn: { items: stats } },
       { key: "trust_bar", dataEn: { items: trustItems } },
-      { key: "about_section", dataEn: { label: aboutLabel, title: aboutTitle, paragraphs: aboutParagraphs } },
+      { key: "about_section", dataEn: { label: aboutLabel, title: aboutTitle, paragraphs: aboutParagraphs, imageUrl: aboutImageUrl } },
       { key: "about_page", dataEn: { mission: aboutMission, values: aboutValues } },
-      { key: "reviews_page", dataEn: { title: reviewsTitle, subtitle: reviewsSubtitle } },
+      { key: "reviews_page", dataEn: { title: reviewsTitle, subtitle: reviewsSubtitle, heroImageUrl: reviewsHeroImage } },
+      { key: "hero_media", dataEn: { videoUrl: heroVideoUrl, posterUrl: heroPosterUrl, fallbackImageUrl: heroFallbackUrl } },
+      { key: "about_page_media", dataEn: { heroImageUrl: aboutHeroImage, storyImageUrl: aboutStoryImage } },
+      { key: "services_page_media", dataEn: { heroImageUrl: servicesHeroImage } },
+      { key: "commercial_page_media", dataEn: { heroImageUrl: commercialHeroImage } },
+      { key: "careers_page_media", dataEn: { heroImageUrl: careersHeroImage } },
+      { key: "handyman_page_media", dataEn: { heroImageUrl: handymanHeroImage } },
     ];
 
     // Include current service content if a service is selected
@@ -152,6 +184,7 @@ export function ContentManager({ initialContent, services = [] }: Props) {
           longDescription: svcLongDesc,
           features: svcFeatures,
           benefits: svcBenefits,
+          imageUrl: svcImageUrl,
         },
       });
     }
@@ -183,6 +216,7 @@ export function ContentManager({ initialContent, services = [] }: Props) {
             longDescription: svcLongDesc,
             features: svcFeatures,
             benefits: svcBenefits,
+            imageUrl: svcImageUrl,
           },
         }],
       }),
@@ -224,6 +258,19 @@ export function ContentManager({ initialContent, services = [] }: Props) {
             <label className={labelClass}>Subtitle</label>
             <textarea value={subtitle} onChange={(e) => setSubtitle(e.target.value)} rows={3} className={inputClass} />
           </div>
+        </div>
+      </div>
+
+      {/* HERO MEDIA */}
+      <div className={sectionClass}>
+        <h3 className="font-display text-base mb-4">Hero Background Video</h3>
+        <p className="text-gray-400 text-[0.78rem] mb-4">
+          Paste a direct video URL from Pexels. Leave empty to keep the default tobacco background.
+        </p>
+        <div className="space-y-3">
+          <MediaInput label="Video URL (MP4)" value={heroVideoUrl} onChange={setHeroVideoUrl} type="video" helpText="Right-click a Pexels video and copy the video address" />
+          <MediaInput label="Poster Image (shown while video loads)" value={heroPosterUrl} onChange={setHeroPosterUrl} />
+          <MediaInput label="Mobile Fallback Image" value={heroFallbackUrl} onChange={setHeroFallbackUrl} helpText="Shown on mobile instead of video to save bandwidth" />
         </div>
       </div>
 
@@ -301,6 +348,7 @@ export function ContentManager({ initialContent, services = [] }: Props) {
               <textarea value={p} onChange={(e) => { const n = [...aboutParagraphs]; n[i] = e.target.value; setAboutParagraphs(n); }} rows={3} className={inputClass} />
             </div>
           ))}
+          <MediaInput label="Section Image (replaces right text column)" value={aboutImageUrl} onChange={setAboutImageUrl} helpText="When set, paragraphs stack on the left and this image fills the right" />
         </div>
       </div>
 
@@ -366,6 +414,23 @@ export function ContentManager({ initialContent, services = [] }: Props) {
             <label className={labelClass}>Page Subtitle</label>
             <textarea value={reviewsSubtitle} onChange={(e) => setReviewsSubtitle(e.target.value)} rows={2} className={inputClass} />
           </div>
+          <MediaInput label="Hero Background Image" value={reviewsHeroImage} onChange={setReviewsHeroImage} />
+        </div>
+      </div>
+
+      {/* PAGE HERO IMAGES */}
+      <div className={sectionClass}>
+        <h3 className="font-display text-base mb-4">Page Hero Images</h3>
+        <p className="text-gray-400 text-[0.78rem] mb-4">
+          Background images for each page&apos;s hero section. Leave empty for the default tobacco background.
+        </p>
+        <div className="space-y-4">
+          <MediaInput label="About Page Hero" value={aboutHeroImage} onChange={setAboutHeroImage} />
+          <MediaInput label="About Page Story Image" value={aboutStoryImage} onChange={setAboutStoryImage} helpText="Shown alongside the story text on the /about page" />
+          <MediaInput label="Services Page Hero" value={servicesHeroImage} onChange={setServicesHeroImage} />
+          <MediaInput label="Commercial Page Hero" value={commercialHeroImage} onChange={setCommercialHeroImage} />
+          <MediaInput label="Careers Page Hero" value={careersHeroImage} onChange={setCareersHeroImage} />
+          <MediaInput label="Handyman Page Hero" value={handymanHeroImage} onChange={setHandymanHeroImage} />
         </div>
       </div>
 
@@ -407,6 +472,9 @@ export function ContentManager({ initialContent, services = [] }: Props) {
 
             {selectedService && (
               <div className="space-y-5">
+                {/* Service Image */}
+                <MediaInput label="Service Image" value={svcImageUrl} onChange={setSvcImageUrl} helpText="Used on the services listing card and as the service detail page hero background" />
+
                 {/* Long Description */}
                 <div>
                   <label className={labelClass}>Long Description</label>

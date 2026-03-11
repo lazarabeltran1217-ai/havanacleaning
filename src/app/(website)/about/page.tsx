@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { getTranslations, getLocale } from "next-intl/server";
 import { buildContentMap } from "@/lib/i18n-content";
+import { PageHeroImage } from "@/components/website/PageHeroImage";
 
 export const metadata: Metadata = {
   title: "About Us — Our Story",
@@ -27,6 +29,8 @@ export default async function AboutPage() {
   } catch (error) {
     console.error("Failed to fetch content:", error);
   }
+
+  const aboutPageMedia = getContent(contentMap, "about_page_media", { heroImageUrl: "", storyImageUrl: "" });
 
   const aboutSection = getContent(contentMap, "about_section", {
     label: t("about.label"),
@@ -54,18 +58,21 @@ export default async function AboutPage() {
   return (
     <>
       {/* HERO */}
-      <section className="bg-tobacco pt-36 pb-20 px-6 md:px-20 text-center">
-        <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center justify-center gap-3">
-          <span className="w-8 h-px bg-green-light" />
-          {aboutSection.label || t("about.label")}
-          <span className="w-8 h-px bg-green-light" />
+      <section className="bg-tobacco pt-36 pb-20 px-6 md:px-20 text-center relative overflow-hidden">
+        {aboutPageMedia.heroImageUrl && <PageHeroImage imageUrl={aboutPageMedia.heroImageUrl} />}
+        <div className="relative z-10">
+          <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center justify-center gap-3">
+            <span className="w-8 h-px bg-green-light" />
+            {aboutSection.label || t("about.label")}
+            <span className="w-8 h-px bg-green-light" />
+          </div>
+          <h1
+            className="font-display text-cream mb-6"
+            style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
+          >
+            {aboutSection.title}
+          </h1>
         </div>
-        <h1
-          className="font-display text-cream mb-6"
-          style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
-        >
-          {aboutSection.title}
-        </h1>
       </section>
 
       {/* STORY */}
@@ -76,12 +83,21 @@ export default async function AboutPage() {
               {(aboutSection.paragraphs as string[]).slice(0, 2).map((p: string, i: number) => (
                 <p key={i} className="text-[#5a4535] text-[0.95rem] leading-relaxed">{p}</p>
               ))}
-            </div>
-            <div className="space-y-5">
-              {(aboutSection.paragraphs as string[]).slice(2).map((p: string, i: number) => (
+              {!aboutPageMedia.storyImageUrl && (aboutSection.paragraphs as string[]).slice(2).map((p: string, i: number) => (
                 <p key={i} className="text-[#5a4535] text-[0.95rem] leading-relaxed">{p}</p>
               ))}
             </div>
+            {aboutPageMedia.storyImageUrl ? (
+              <div className="relative rounded-lg overflow-hidden min-h-[300px]">
+                <Image src={aboutPageMedia.storyImageUrl} alt="About Havana Cleaning" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+              </div>
+            ) : (
+              <div className="space-y-5">
+                {(aboutSection.paragraphs as string[]).slice(2).map((p: string, i: number) => (
+                  <p key={i} className="text-[#5a4535] text-[0.95rem] leading-relaxed">{p}</p>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>

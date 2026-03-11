@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { FileText } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
@@ -50,8 +51,14 @@ export default async function BlogPage() {
             <Link
               key={post.id}
               href={`/blog/${post.slug}`}
-              className="block bg-white rounded-xl border border-gray-100 p-6 hover:border-green/40 hover:shadow-sm transition-all"
+              className="block bg-white rounded-xl border border-gray-100 overflow-hidden hover:border-green/40 hover:shadow-sm transition-all"
             >
+              {post.featuredImage && (
+                <div className="relative w-full h-48">
+                  <Image src={post.featuredImage} alt={localized(post.title, post.titleEs, locale)} fill className="object-cover" sizes="(max-width: 768px) 100vw, 800px" />
+                </div>
+              )}
+              <div className="p-6">
               <h2 className="font-display text-xl text-tobacco mb-2">
                 {localized(post.title, post.titleEs, locale)}
               </h2>
@@ -71,6 +78,7 @@ export default async function BlogPage() {
                     })}
                   </span>
                 )}
+              </div>
               </div>
             </Link>
           ))}

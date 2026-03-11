@@ -2,6 +2,7 @@ export interface ServiceContent {
   longDescription: string;
   features: string[];
   benefits: { title: string; text: string }[];
+  imageUrl?: string;
 }
 
 export const SERVICE_DEFAULTS: Record<string, ServiceContent> = {

@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
     scheduledDate,
     scheduledTime,
     addOnIds = [],
+    selectedItemIds = [],
     customerNotes,
     customerName,
     customerEmail,
@@ -135,12 +136,24 @@ export async function POST(req: NextRequest) {
   for (let i = 0; i < serviceIds.length; i++) {
     const sid = serviceIds[i];
 
+    // Resolve selected items for this service
+    const serviceItemIds: string[] = i === 0 ? selectedItemIds : [];
+    let validItemIds: string[] = [];
+    if (serviceItemIds.length > 0) {
+      const validItems = await prisma.serviceItem.findMany({
+        where: { id: { in: serviceItemIds }, serviceId: sid, isActive: true },
+        select: { id: true },
+      });
+      validItemIds = validItems.map((v) => v.id);
+    }
+
     // Calculate price server-side (add-ons + rush fee only on first booking)
     const pricing = await calculatePrice({
       serviceId: sid,
       bedrooms: bedrooms || 2,
       bathrooms: bathrooms || 2,
       addOnIds: i === 0 ? addOnIds : [],
+      selectedItemCount: validItemIds.length || undefined,
     });
 
     const rushFee = (i === 0 && rush) ? 50 : 0;
@@ -182,6 +195,22 @@ export async function POST(req: NextRequest) {
           : {}),
       },
     });
+    // Create BookingItem records
+    if (validItemIds.length > 0) {
+      const svc = await prisma.service.findUnique({
+        where: { id: sid },
+        select: { includedItems: true },
+      });
+      const included = svc?.includedItems ?? 0;
+      await prisma.bookingItem.createMany({
+        data: validItemIds.map((itemId, idx) => ({
+          bookingId: booking.id,
+          serviceItemId: itemId,
+          isExtra: included > 0 && idx >= included,
+        })),
+      });
+    }
+
     bookings.push({ id: booking.id, bookingNumber: booking.bookingNumber });
   }
 

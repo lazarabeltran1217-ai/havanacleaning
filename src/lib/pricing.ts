@@ -6,11 +6,13 @@ interface PriceCalcInput {
   bedrooms: number;
   bathrooms: number;
   addOnIds?: string[];
+  selectedItemCount?: number;
 }
 
 interface PriceResult {
   basePrice: number;
   addOnsTotal: number;
+  itemsExtra: number;
   subtotal: number;
   tax: number;
   total: number;
@@ -60,9 +62,21 @@ export async function calculatePrice(input: PriceCalcInput): Promise<PriceResult
     addOnsTotal = addOns.reduce((sum: number, a: { price: number }) => sum + a.price, 0);
   }
 
-  const subtotal = basePrice + addOnsTotal;
+  // Calculate extra items cost
+  let itemsExtra = 0;
+  if (input.selectedItemCount != null && input.selectedItemCount > 0) {
+    const svc = await prisma.service.findUnique({
+      where: { id: input.serviceId },
+      select: { includedItems: true, extraItemPrice: true },
+    });
+    if (svc && svc.includedItems > 0 && input.selectedItemCount > svc.includedItems) {
+      itemsExtra = (input.selectedItemCount - svc.includedItems) * svc.extraItemPrice;
+    }
+  }
+
+  const subtotal = basePrice + addOnsTotal + itemsExtra;
   const tax = Math.round(subtotal * BUSINESS.taxRate * 100) / 100;
   const total = Math.round((subtotal + tax) * 100) / 100;
 
-  return { basePrice, addOnsTotal, subtotal, tax, total };
+  return { basePrice, addOnsTotal, itemsExtra, subtotal, tax, total };
 }

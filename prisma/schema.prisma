@@ -173,12 +173,43 @@ model Service {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
+  includedItems  Int      @default(0)
+  extraItemPrice Float    @default(25)
+
   addOns       ServiceAddOn[]
   pricingRules PricingRule[]
   bookings     Booking[]
+  items        ServiceItem[]
 
   @@index([slug])
   @@index([isActive])
+}
+
+model ServiceItem {
+  id        String  @id @default(cuid())
+  serviceId String
+  name      String
+  nameEs    String?
+  icon      String?
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+
+  service      Service       @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  bookingItems BookingItem[]
+
+  @@index([serviceId])
+}
+
+model BookingItem {
+  id            String  @id @default(cuid())
+  bookingId     String
+  serviceItemId String
+  isExtra       Boolean @default(false)
+
+  booking     Booking     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  serviceItem ServiceItem @relation(fields: [serviceItemId], references: [id])
+
+  @@index([bookingId])
 }
 
 model ServiceAddOn {
@@ -242,6 +273,7 @@ model Booking {
   recurringParent   Booking?        @relation("RecurringBookings", fields: [recurringParentId], references: [id])
   recurringChildren Booking[]       @relation("RecurringBookings")
   addOns            BookingAddOn[]
+  items             BookingItem[]
   assignments       JobAssignment[]
   payments          Payment[]
   timeEntries       TimeEntry[]

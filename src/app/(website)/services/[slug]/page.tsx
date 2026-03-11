@@ -11,6 +11,7 @@ import { getServiceDefaults, type ServiceContent } from "@/lib/service-defaults"
 import { FAQSection } from "@/components/website/FAQSection";
 import { getTranslations, getLocale } from "next-intl/server";
 import { localized } from "@/lib/i18n-content";
+import { PageHeroImage } from "@/components/website/PageHeroImage";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -72,6 +73,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           longDescription: (data.longDescription as string) || defaults.longDescription,
           features: Array.isArray(data.features) && data.features.length > 0 ? data.features as string[] : defaults.features,
           benefits: Array.isArray(data.benefits) && data.benefits.length > 0 ? data.benefits as ServiceContent["benefits"] : defaults.benefits,
+          imageUrl: (data.imageUrl as string) || "",
         };
       }
     }
@@ -114,8 +116,9 @@ export default async function ServiceDetailPage({ params }: Props) {
       {faqs.length > 0 && <JsonLd data={faqPageSchema(faqs)} />}
 
       {/* HERO */}
-      <section className="bg-tobacco pt-36 pb-16 px-6 md:px-20">
-        <div className="max-w-4xl mx-auto">
+      <section className="bg-tobacco pt-36 pb-16 px-6 md:px-20 relative overflow-hidden">
+        {content.imageUrl && <PageHeroImage imageUrl={content.imageUrl} />}
+        <div className="max-w-4xl mx-auto relative z-10">
           <Link
             href="/services"
             className="text-sand text-[0.82rem] hover:text-cream transition-colors mb-6 inline-block"

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 interface EmployeeData {
   id: string;
-  name: string;
+  name: string | null;
   email: string;
   phone: string | null;
   hourlyRate: number | null;
@@ -22,7 +22,7 @@ export function StaffEditButton({ employee }: { employee: EmployeeData }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [message, setMessage] = useState("");
 
-  const [name, setName] = useState(employee.name);
+  const [name, setName] = useState(employee.name || "");
   const [phone, setPhone] = useState(employee.phone || "");
   const [hourlyRate, setHourlyRate] = useState(String(employee.hourlyRate || ""));
   const [isActive, setIsActive] = useState(employee.isActive);

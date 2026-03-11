@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/website/JsonLd";
 import { breadcrumbSchema, faqPageSchema } from "@/lib/schema";
@@ -98,6 +99,13 @@ export default async function AreaPage({
         {" / "}
         <span className="text-tobacco">{areaName}</span>
       </nav>
+
+      {/* Hero Image */}
+      {area.heroImage && (
+        <div className="relative w-full aspect-[3/1] rounded-xl overflow-hidden mb-8">
+          <Image src={area.heroImage} alt={areaName} fill className="object-cover" sizes="(max-width: 768px) 100vw, 800px" />
+        </div>
+      )}
 
       {/* Hero */}
       <h1 className="font-display text-4xl text-tobacco mb-4">

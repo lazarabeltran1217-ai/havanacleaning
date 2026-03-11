@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/website/JsonLd";
 import { breadcrumbSchema } from "@/lib/schema";
@@ -86,6 +87,13 @@ export default async function BlogPostPage({
           </span>
         )}
       </div>
+
+      {/* Featured Image */}
+      {post.featuredImage && (
+        <div className="relative w-full aspect-[2/1] rounded-xl overflow-hidden mb-8">
+          <Image src={post.featuredImage} alt={postTitle} fill className="object-cover" sizes="(max-width: 768px) 100vw, 800px" />
+        </div>
+      )}
 
       {/* Content */}
       {postContent ? (

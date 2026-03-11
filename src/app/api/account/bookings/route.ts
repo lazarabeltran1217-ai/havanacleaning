@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
       scheduledDate,
       scheduledTime,
       addOnIds = [],
+      selectedItemIds = [],
       customerNotes,
       addressId,
       newAddress,
@@ -37,8 +38,18 @@ export async function POST(req: NextRequest) {
 
     const customerId = session.user.id;
 
+    // Validate selected items
+    let validItemIds: string[] = [];
+    if (selectedItemIds.length > 0) {
+      const validItems = await prisma.serviceItem.findMany({
+        where: { id: { in: selectedItemIds }, serviceId, isActive: true },
+        select: { id: true },
+      });
+      validItemIds = validItems.map((v) => v.id);
+    }
+
     // Calculate price server-side
-    const pricing = await calculatePrice({ serviceId, bedrooms, bathrooms, addOnIds });
+    const pricing = await calculatePrice({ serviceId, bedrooms, bathrooms, addOnIds, selectedItemCount: validItemIds.length || undefined });
 
     const discountRates: Record<string, number> = { ONCE: 0, WEEKLY: 0.2, BIWEEKLY: 0.15, MONTHLY: 0.1 };
     const discountRate = discountRates[recurrence] ?? 0;
@@ -101,6 +112,22 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+
+    // Create BookingItem records
+    if (validItemIds.length > 0) {
+      const svcData = await prisma.service.findUnique({
+        where: { id: serviceId },
+        select: { includedItems: true },
+      });
+      const included = svcData?.includedItems ?? 0;
+      await prisma.bookingItem.createMany({
+        data: validItemIds.map((itemId, idx) => ({
+          bookingId: booking.id,
+          serviceItemId: itemId,
+          isExtra: included > 0 && idx >= included,
+        })),
+      });
+    }
 
     return NextResponse.json({ booking: { id: booking.id, bookingNumber: booking.bookingNumber } });
   } catch (err) {

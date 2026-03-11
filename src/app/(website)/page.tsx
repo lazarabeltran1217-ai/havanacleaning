@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import Image from "next/image";
 import { SERVICE_AREAS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import { JsonLd } from "@/components/website/JsonLd";
@@ -10,6 +11,7 @@ import { HANDYMAN_SERVICES } from "@/lib/handyman-constants";
 import type { LucideIcon } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { buildContentMap, localized } from "@/lib/i18n-content";
+import { HeroVideo } from "@/components/website/HeroVideo";
 
 // Helper to get content with fallback
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -57,6 +59,7 @@ export default async function HomePage() {
     title: t("about.title"),
     paragraphs: [t("about.p1"), t("about.p2"), t("about.p3")],
   });
+  const heroMedia = getContent(contentMap, "hero_media", { videoUrl: "", posterUrl: "", fallbackImageUrl: "" });
 
   const HANDYMAN_ICON_MAP: Record<string, LucideIcon> = {
     Wrench, Package, Tv, DoorOpen, Lightbulb, Grid3x3, Paintbrush, Droplets, Waves, Wifi, Fence, LayoutGrid,
@@ -75,18 +78,27 @@ export default async function HomePage() {
 
       {/* HERO */}
       <section className="min-h-screen bg-tobacco flex items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: "repeating-linear-gradient(45deg, #C9941A 0, #C9941A 1px, transparent 0, transparent 50%)",
-          backgroundSize: "20px 20px",
-        }} />
+        {/* Background video or fallback */}
+        {heroMedia.videoUrl ? (
+          <HeroVideo
+            videoUrl={heroMedia.videoUrl}
+            posterUrl={heroMedia.posterUrl}
+            fallbackImageUrl={heroMedia.fallbackImageUrl}
+          />
+        ) : (
+          <div className="absolute inset-0 opacity-[0.04]" style={{
+            backgroundImage: "repeating-linear-gradient(45deg, #C9941A 0, #C9941A 1px, transparent 0, transparent 50%)",
+            backgroundSize: "20px 20px",
+          }} />
+        )}
 
         {/* Left palm tree */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/palm-tree.svg" alt="Decorative palm tree silhouette" className="absolute left-0 bottom-0 hidden md:block md:w-[420px] h-auto pointer-events-none opacity-50" />
+        <img src="/palm-tree.svg" alt="Decorative palm tree silhouette" className="absolute left-0 bottom-0 hidden md:block md:w-[420px] h-auto pointer-events-none opacity-50 z-[1]" />
 
         {/* Right palm tree (flipped) */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/palm-tree.svg" alt="Decorative palm tree silhouette" className="absolute right-0 bottom-0 hidden md:block md:w-[380px] h-auto pointer-events-none opacity-50 -scale-x-100" />
+        <img src="/palm-tree.svg" alt="Decorative palm tree silhouette" className="absolute right-0 bottom-0 hidden md:block md:w-[380px] h-auto pointer-events-none opacity-50 -scale-x-100 z-[1]" />
 
         <div className="max-w-[800px] relative z-10 text-center px-6 pt-36 pb-20 mx-auto">
           <div className="text-[0.75rem] tracking-[0.25em] uppercase text-green-light mb-6 flex items-center justify-center gap-3">
@@ -178,15 +190,24 @@ export default async function HomePage() {
               {(aboutSection.paragraphs as string[]).slice(0, 2).map((p: string, i: number) => (
                 <p key={i} className="text-[#5a4535] text-[0.95rem] leading-relaxed">{p}</p>
               ))}
-            </div>
-            <div className="space-y-5">
-              {(aboutSection.paragraphs as string[]).slice(2).map((p: string, i: number) => (
+              {!aboutSection.imageUrl && (aboutSection.paragraphs as string[]).slice(2).map((p: string, i: number) => (
                 <p key={i} className="text-[#5a4535] text-[0.95rem] leading-relaxed">{p}</p>
               ))}
               <Link href="/book" className="inline-block bg-green text-white px-8 py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-green-light hover:text-tobacco transition-colors">
                 {t("about.bookToday")}
               </Link>
             </div>
+            {aboutSection.imageUrl ? (
+              <div className="relative rounded-lg overflow-hidden min-h-[300px]">
+                <Image src={aboutSection.imageUrl} alt="About Havana Cleaning" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+              </div>
+            ) : (
+              <div className="space-y-5">
+                {(aboutSection.paragraphs as string[]).slice(2).map((p: string, i: number) => (
+                  <p key={i} className="text-[#5a4535] text-[0.95rem] leading-relaxed">{p}</p>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>

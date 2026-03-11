@@ -50,3 +50,29 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ address });
 }
+
+export async function DELETE(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await req.json();
+
+  if (!id) {
+    return NextResponse.json({ error: "Address ID is required" }, { status: 400 });
+  }
+
+  // Verify the address belongs to the user
+  const address = await prisma.address.findFirst({
+    where: { id, userId: session.user.id },
+  });
+
+  if (!address) {
+    return NextResponse.json({ error: "Address not found" }, { status: 404 });
+  }
+
+  await prisma.address.delete({ where: { id } });
+
+  return NextResponse.json({ success: true });
+}

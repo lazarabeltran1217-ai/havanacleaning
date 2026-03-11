@@ -1,6 +1,9 @@
 import { CareerApplication } from "@/components/website/CareerApplication";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { prisma } from "@/lib/prisma";
+import { buildContentMap } from "@/lib/i18n-content";
+import { PageHeroImage } from "@/components/website/PageHeroImage";
 
 export const metadata: Metadata = {
   title: "Careers — Join Our Team",
@@ -10,7 +13,15 @@ export const metadata: Metadata = {
 };
 
 export default async function CareersPage() {
+  const locale = await getLocale();
   const t = await getTranslations("careers");
+
+  let heroImageUrl = "";
+  try {
+    const contentRows = await prisma.content.findMany({ where: { published: true } });
+    const contentMap = buildContentMap(contentRows, locale);
+    heroImageUrl = (contentMap.careers_page_media as { heroImageUrl?: string } | undefined)?.heroImageUrl || "";
+  } catch { /* use default */ }
 
   const benefits = [
     t("benefit1"),
@@ -24,21 +35,24 @@ export default async function CareersPage() {
   return (
     <>
       {/* HERO */}
-      <section className="bg-tobacco pt-36 pb-16 px-6 md:px-20 text-center">
-        <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center justify-center gap-3">
-          <span className="w-8 h-px bg-green-light" />
-          {t("heroLabel")}
-          <span className="w-8 h-px bg-green-light" />
+      <section className="bg-tobacco pt-36 pb-16 px-6 md:px-20 text-center relative overflow-hidden">
+        {heroImageUrl && <PageHeroImage imageUrl={heroImageUrl} />}
+        <div className="relative z-10">
+          <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center justify-center gap-3">
+            <span className="w-8 h-px bg-green-light" />
+            {t("heroLabel")}
+            <span className="w-8 h-px bg-green-light" />
+          </div>
+          <h1
+            className="font-display text-cream mb-6"
+            style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
+          >
+            {t("heroTitle")}
+          </h1>
+          <p className="text-sand max-w-[600px] mx-auto leading-relaxed">
+            {t("heroSubtitle")}
+          </p>
         </div>
-        <h1
-          className="font-display text-cream mb-6"
-          style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
-        >
-          {t("heroTitle")}
-        </h1>
-        <p className="text-sand max-w-[600px] mx-auto leading-relaxed">
-          {t("heroSubtitle")}
-        </p>
       </section>
 
       {/* BENEFITS */}

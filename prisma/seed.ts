@@ -106,6 +106,115 @@ async function main() {
   }
   console.log("✅ Add-ons seeded:", addOns.length);
 
+  // ── SERVICE ITEMS ──
+  const serviceItemsData: Record<string, { items: { name: string; nameEs: string; icon: string }[]; includedItems: number; extraItemPrice: number }> = {
+    "residential-cleaning": {
+      includedItems: 3, extraItemPrice: 25,
+      items: [
+        { name: "Kitchen clean & sanitize", nameEs: "Cocina limpieza y desinfección", icon: "ChefHat" },
+        { name: "Bathroom scrub & sanitize", nameEs: "Baño limpieza y desinfección", icon: "Bath" },
+        { name: "Living room dust & vacuum", nameEs: "Sala desempolvado y aspirado", icon: "Sofa" },
+        { name: "Bedroom dust & vacuum", nameEs: "Habitación desempolvado y aspirado", icon: "BedDouble" },
+        { name: "Dining area wipe & mop", nameEs: "Comedor limpieza y trapeado", icon: "Utensils" },
+        { name: "Hallway & entryway", nameEs: "Pasillo y entrada", icon: "DoorOpen" },
+        { name: "Laundry room tidy", nameEs: "Cuarto de lavado", icon: "Shirt" },
+      ],
+    },
+    "deep-cleaning": {
+      includedItems: 5, extraItemPrice: 30,
+      items: [
+        { name: "Kitchen deep scrub", nameEs: "Cocina limpieza profunda", icon: "ChefHat" },
+        { name: "Bathroom deep sanitize", nameEs: "Baño desinfección profunda", icon: "Bath" },
+        { name: "Living room deep clean", nameEs: "Sala limpieza profunda", icon: "Sofa" },
+        { name: "Bedroom deep clean", nameEs: "Habitación limpieza profunda", icon: "BedDouble" },
+        { name: "Baseboard & trim scrub", nameEs: "Zócalos y molduras", icon: "Columns" },
+        { name: "Ceiling fan & light fixtures", nameEs: "Ventiladores y lámparas", icon: "Fan" },
+        { name: "Window sills & tracks", nameEs: "Marcos y rieles de ventanas", icon: "Square" },
+        { name: "Inside cabinets & drawers", nameEs: "Interior de gabinetes y cajones", icon: "Archive" },
+      ],
+    },
+    "move-in-move-out": {
+      includedItems: 5, extraItemPrice: 35,
+      items: [
+        { name: "Kitchen full deep clean", nameEs: "Cocina limpieza completa", icon: "ChefHat" },
+        { name: "All bathrooms sanitize", nameEs: "Todos los baños desinfección", icon: "Bath" },
+        { name: "All bedrooms clean", nameEs: "Todas las habitaciones", icon: "BedDouble" },
+        { name: "Closet interiors", nameEs: "Interior de closets", icon: "DoorOpen" },
+        { name: "Inside appliances", nameEs: "Interior de electrodomésticos", icon: "Archive" },
+        { name: "Garage sweep", nameEs: "Barrido de garaje", icon: "Warehouse" },
+        { name: "Windows interior", nameEs: "Ventanas interiores", icon: "Square" },
+        { name: "Baseboards & trim", nameEs: "Zócalos y molduras", icon: "Columns" },
+      ],
+    },
+    "airbnb-turnover": {
+      includedItems: 3, extraItemPrice: 20,
+      items: [
+        { name: "Kitchen quick clean", nameEs: "Cocina limpieza rápida", icon: "ChefHat" },
+        { name: "Bathroom refresh", nameEs: "Baño refresco", icon: "Bath" },
+        { name: "Bedroom linen change", nameEs: "Cambio de sábanas", icon: "BedDouble" },
+        { name: "Living area tidy", nameEs: "Sala ordenar", icon: "Sofa" },
+        { name: "Trash & recycling", nameEs: "Basura y reciclaje", icon: "Trash2" },
+      ],
+    },
+    "green-clean": {
+      includedItems: 3, extraItemPrice: 25,
+      items: [
+        { name: "Kitchen eco clean", nameEs: "Cocina limpieza ecológica", icon: "ChefHat" },
+        { name: "Bathroom natural sanitize", nameEs: "Baño desinfección natural", icon: "Bath" },
+        { name: "Living room dust & vacuum", nameEs: "Sala desempolvado y aspirado", icon: "Sofa" },
+        { name: "Bedroom refresh", nameEs: "Habitación refresco", icon: "BedDouble" },
+        { name: "Dining area wipe", nameEs: "Comedor limpieza", icon: "Utensils" },
+      ],
+    },
+    "post-construction": {
+      includedItems: 5, extraItemPrice: 35,
+      items: [
+        { name: "Dust & debris removal", nameEs: "Remoción de polvo y escombros", icon: "Minus" },
+        { name: "Surface scrub & wipe", nameEs: "Limpieza de superficies", icon: "Square" },
+        { name: "Floor deep clean", nameEs: "Limpieza profunda de pisos", icon: "Columns" },
+        { name: "Window & frame cleaning", nameEs: "Limpieza de ventanas y marcos", icon: "Square" },
+        { name: "Fixture polish", nameEs: "Pulido de accesorios", icon: "Fan" },
+        { name: "Cabinet clean-out", nameEs: "Limpieza de gabinetes", icon: "Archive" },
+        { name: "Final detail pass", nameEs: "Repaso final de detalles", icon: "Sparkles" },
+      ],
+    },
+    "recurring-plans": {
+      includedItems: 3, extraItemPrice: 25,
+      items: [
+        { name: "Kitchen clean & sanitize", nameEs: "Cocina limpieza y desinfección", icon: "ChefHat" },
+        { name: "Bathroom scrub & sanitize", nameEs: "Baño limpieza y desinfección", icon: "Bath" },
+        { name: "Living room dust & vacuum", nameEs: "Sala desempolvado y aspirado", icon: "Sofa" },
+        { name: "Bedroom dust & vacuum", nameEs: "Habitación desempolvado y aspirado", icon: "BedDouble" },
+        { name: "Dining area wipe & mop", nameEs: "Comedor limpieza y trapeado", icon: "Utensils" },
+        { name: "Hallway & entryway", nameEs: "Pasillo y entrada", icon: "DoorOpen" },
+        { name: "Laundry room tidy", nameEs: "Cuarto de lavado", icon: "Shirt" },
+      ],
+    },
+  };
+
+  for (const [slug, data] of Object.entries(serviceItemsData)) {
+    const service = await prisma.service.findUnique({ where: { slug } });
+    if (!service) continue;
+
+    await prisma.service.update({
+      where: { id: service.id },
+      data: { includedItems: data.includedItems, extraItemPrice: data.extraItemPrice },
+    });
+
+    for (let i = 0; i < data.items.length; i++) {
+      const item = data.items[i];
+      const existing = await prisma.serviceItem.findFirst({
+        where: { serviceId: service.id, name: item.name },
+      });
+      if (!existing) {
+        await prisma.serviceItem.create({
+          data: { serviceId: service.id, name: item.name, nameEs: item.nameEs, icon: item.icon, sortOrder: i, isActive: true },
+        });
+      }
+    }
+  }
+  console.log("✅ Service items seeded");
+
   // ── TESTIMONIALS ──
   const testimonials = [
     { customerName: "Sofia Reyes", content: "These ladies are absolutely incredible. My apartment has never been this clean. They went above and beyond on everything — even organized my pantry without being asked!", contentEs: "Estas señoras son absolutamente increíbles. Mi apartamento nunca había estado tan limpio. Fueron más allá en todo — ¡incluso organizaron mi despensa sin que se lo pidiera!", rating: 5, location: "Brickell, Miami", isApproved: true, isFeatured: true },

@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getTranslations, getLocale } from "next-intl/server";
 import { buildContentMap, localized } from "@/lib/i18n-content";
+import { PageHeroImage } from "@/components/website/PageHeroImage";
 
 export const metadata: Metadata = {
   title: "Customer Reviews & Ratings",
@@ -37,6 +38,7 @@ export default async function ReviewsPage() {
   const pageContent = (contentMap.reviews_page ?? {}) as {
     title?: string;
     subtitle?: string;
+    heroImageUrl?: string;
   };
 
   const avgRating =
@@ -47,32 +49,35 @@ export default async function ReviewsPage() {
   return (
     <>
       {/* HERO */}
-      <section className="bg-tobacco pt-36 pb-20 px-6 md:px-20 text-center">
-        <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center justify-center gap-3">
-          <span className="w-8 h-px bg-green-light" />
-          {t("testimonials.label")}
-          <span className="w-8 h-px bg-green-light" />
-        </div>
-        <h1
-          className="font-display text-cream mb-6"
-          style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
-        >
-          {pageContent.title || t("testimonials.title")}
-        </h1>
-        <p className="text-sand max-w-[600px] mx-auto leading-relaxed">
-          {pageContent.subtitle || t("testimonials.subtitle")}
-        </p>
-        {testimonials.length > 0 && (
-          <div className="flex items-center justify-center gap-3 mt-8">
-            <span className="text-gold text-2xl">★★★★★</span>
-            <span className="text-cream text-lg font-semibold">
-              {(Math.round(avgRating * 10) / 10).toFixed(1)}
-            </span>
-            <span className="text-sand text-[0.9rem]">
-              {t("testimonials.fromReviews", { count: testimonials.length })}
-            </span>
+      <section className="bg-tobacco pt-36 pb-20 px-6 md:px-20 text-center relative overflow-hidden">
+        {pageContent.heroImageUrl && <PageHeroImage imageUrl={pageContent.heroImageUrl} />}
+        <div className="relative z-10">
+          <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green-light mb-4 flex items-center justify-center gap-3">
+            <span className="w-8 h-px bg-green-light" />
+            {t("testimonials.label")}
+            <span className="w-8 h-px bg-green-light" />
           </div>
-        )}
+          <h1
+            className="font-display text-cream mb-6"
+            style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
+          >
+            {pageContent.title || t("testimonials.title")}
+          </h1>
+          <p className="text-sand max-w-[600px] mx-auto leading-relaxed">
+            {pageContent.subtitle || t("testimonials.subtitle")}
+          </p>
+          {testimonials.length > 0 && (
+            <div className="flex items-center justify-center gap-3 mt-8">
+              <span className="text-gold text-2xl">★★★★★</span>
+              <span className="text-cream text-lg font-semibold">
+                {(Math.round(avgRating * 10) / 10).toFixed(1)}
+              </span>
+              <span className="text-sand text-[0.9rem]">
+                {t("testimonials.fromReviews", { count: testimonials.length })}
+              </span>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* REVIEWS GRID */}
