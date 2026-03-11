@@ -74,7 +74,6 @@ export function HeroVideo({ videoUrl, posterUrl, fallbackImageUrl }: HeroVideoPr
         playsInline
         preload="auto"
         poster={posterUrl}
-        crossOrigin="anonymous"
         onCanPlay={() => setVideoLoaded(true)}
         onError={() => setVideoError(true)}
         src={videoUrl}

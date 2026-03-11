@@ -265,16 +265,16 @@ export function ContentManager({ initialContent, services = [] }: Props) {
       <div className={sectionClass}>
         <h3 className="font-display text-base mb-4">Hero Background Video</h3>
         <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-4">
-          <p className="text-blue-800 text-[0.78rem] font-semibold mb-1">How to get the right URL from Pexels:</p>
+          <p className="text-blue-800 text-[0.78rem] font-semibold mb-1">How to add a video from Pexels:</p>
           <ol className="text-blue-700 text-[0.72rem] list-decimal list-inside space-y-0.5">
-            <li>Go to the video on pexels.com</li>
-            <li>Right-click on the playing video</li>
-            <li>Select &quot;Copy video address&quot;</li>
-            <li>The URL should look like: https://videos.pexels.com/video-files/...</li>
+            <li>Find a video on pexels.com</li>
+            <li>Copy the page URL (e.g. pexels.com/video/...4109227/) or the download link</li>
+            <li>Paste it below and click &quot;Get Video&quot;</li>
+            <li>The URL will be automatically converted to a direct video link</li>
           </ol>
         </div>
         <div className="space-y-3">
-          <MediaInput label="Video URL (direct MP4 link)" value={heroVideoUrl} onChange={setHeroVideoUrl} type="video" helpText="Must be a direct video file URL, not a Pexels page or download link" />
+          <MediaInput label="Video URL" value={heroVideoUrl} onChange={setHeroVideoUrl} onPosterResolved={(url) => { if (!heroPosterUrl) setHeroPosterUrl(url); if (!heroFallbackUrl) setHeroFallbackUrl(url); }} type="video" helpText="Paste any Pexels video URL and click 'Get Video'" />
           <MediaInput label="Poster Image (shown while video loads)" value={heroPosterUrl} onChange={setHeroPosterUrl} />
           <MediaInput label="Mobile Fallback Image" value={heroFallbackUrl} onChange={setHeroFallbackUrl} helpText="Shown on mobile instead of video to save bandwidth" />
         </div>
