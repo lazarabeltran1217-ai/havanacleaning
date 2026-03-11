@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default async function BookPage() {
   const t = await getTranslations("booking");
 
-  let services: { id: string; name: string; nameEs: string | null; slug: string; icon: string | null; basePrice: number; pricePerBedroom: number; pricePerBathroom: number; estimatedHours: number }[] = [];
+  let services: { id: string; name: string; nameEs: string | null; slug: string; icon: string | null; basePrice: number; pricePerBedroom: number; pricePerBathroom: number; estimatedHours: number; includedItems: number; extraItemPrice: number; items: { id: string; name: string; nameEs: string | null; icon: string | null }[] }[] = [];
   let addOns: { id: string; name: string; nameEs: string | null; price: number }[] = [];
   try {
     services = await prisma.service.findMany({
@@ -29,6 +29,13 @@ export default async function BookPage() {
         pricePerBedroom: true,
         pricePerBathroom: true,
         estimatedHours: true,
+        includedItems: true,
+        extraItemPrice: true,
+        items: {
+          where: { isActive: true },
+          orderBy: { sortOrder: "asc" },
+          select: { id: true, name: true, nameEs: true, icon: true },
+        },
       },
     });
     addOns = await prisma.serviceAddOn.findMany({

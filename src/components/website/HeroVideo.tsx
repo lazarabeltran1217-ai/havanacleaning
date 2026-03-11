@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 
 interface HeroVideoProps {
@@ -13,6 +13,7 @@ export function HeroVideo({ videoUrl, posterUrl, fallbackImageUrl }: HeroVideoPr
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 768px)");
@@ -25,8 +26,19 @@ export function HeroVideo({ videoUrl, posterUrl, fallbackImageUrl }: HeroVideoPr
     }
   }, []);
 
+  // Try to play video after it loads (some browsers need explicit play call)
+  useEffect(() => {
+    if (videoRef.current && !isMobile && videoUrl && !videoError) {
+      videoRef.current.play().catch(() => {
+        // Autoplay blocked — not an error, video will show but not play
+      });
+    }
+  }, [videoUrl, isMobile, videoError]);
+
+  if (!videoUrl) return null;
+
   // Mobile or error: show fallback image
-  if (isMobile || !videoUrl || videoError) {
+  if (isMobile || videoError) {
     const imgSrc = fallbackImageUrl || posterUrl;
     if (!imgSrc) return null;
     return (
@@ -55,20 +67,21 @@ export function HeroVideo({ videoUrl, posterUrl, fallbackImageUrl }: HeroVideoPr
         />
       )}
       <video
+        ref={videoRef}
         autoPlay
         muted
         loop
         playsInline
         preload="auto"
         poster={posterUrl}
+        crossOrigin="anonymous"
         onCanPlay={() => setVideoLoaded(true)}
         onError={() => setVideoError(true)}
+        src={videoUrl}
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
           videoLoaded ? "opacity-100" : "opacity-0"
         }`}
-      >
-        <source src={videoUrl} type="video/mp4" />
-      </video>
+      />
       <div className="absolute inset-0 bg-tobacco/60" />
     </div>
   );

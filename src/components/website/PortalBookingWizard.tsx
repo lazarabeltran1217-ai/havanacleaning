@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { X, ChevronLeft } from "lucide-react";
+import { X, ChevronLeft, Check } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
+import { ItemIcon } from "@/lib/item-icons";
 import { TIME_SLOTS } from "@/lib/constants";
 import { useTranslations } from "next-intl";
 
@@ -15,6 +16,13 @@ const INPUT_CLS =
   "w-full px-3 py-2.5 border border-gray-300 dark:border-gold/20 rounded-lg text-sm bg-white dark:bg-[#2f1f14] text-tobacco dark:text-cream placeholder:text-gray-400 dark:placeholder:text-sand/40 focus:outline-none focus:ring-2 focus:ring-gold/30";
 const LABEL_CLS = "block text-[0.72rem] font-medium uppercase tracking-wider mb-1.5";
 
+interface ServiceItemOption {
+  id: string;
+  name: string;
+  nameEs: string | null;
+  icon: string | null;
+}
+
 interface ServiceOption {
   id: string;
   name: string;
@@ -25,6 +33,9 @@ interface ServiceOption {
   pricePerBedroom: number;
   pricePerBathroom: number;
   estimatedHours: number;
+  includedItems: number;
+  extraItemPrice: number;
+  items: ServiceItemOption[];
 }
 
 interface AddOnOption {
@@ -80,13 +91,16 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
   const [bathrooms, setBathrooms] = useState(2);
   const [recurrence, setRecurrence] = useState<RecurrenceType>("ONCE");
 
-  // Step 2
+  // Step 2 — Selected areas
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
+  // Step 3
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("morning");
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
 
-  // Step 3
+  // Step 4
   const [addressId, setAddressId] = useState(addresses[0]?.id || "");
   const [useNewAddress, setUseNewAddress] = useState(addresses.length === 0);
   const [newStreet, setNewStreet] = useState("");
@@ -100,12 +114,36 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
     ? Math.max(0, selectedService.basePrice + (bedrooms - 2) * selectedService.pricePerBedroom + (bathrooms - 2) * selectedService.pricePerBathroom)
     : 0;
   const addOnsTotal = addOns.filter((a) => selectedAddOns.includes(a.id)).reduce((sum, a) => sum + a.price, 0);
+
+  // Items extra cost
+  const itemsExtraCalc = selectedService && selectedService.includedItems > 0 && selectedItems.length > selectedService.includedItems
+    ? (selectedItems.length - selectedService.includedItems) * selectedService.extraItemPrice
+    : 0;
+
   const discountRate = RECURRENCE_DISCOUNT[recurrence];
-  const subtotal = servicePrice + addOnsTotal;
+  const subtotal = servicePrice + addOnsTotal + itemsExtraCalc;
   const discount = Math.round(subtotal * discountRate * 100) / 100;
   const afterDiscount = subtotal - discount;
   const tax = Math.round(afterDiscount * 0.07 * 100) / 100;
   const total = Math.round((afterDiscount + tax) * 100) / 100;
+
+  const hasItemsStep = selectedService ? selectedService.includedItems > 0 && selectedService.items.length > 0 : false;
+
+  function toggleItem(itemId: string) {
+    setSelectedItems((prev) =>
+      prev.includes(itemId) ? prev.filter((i) => i !== itemId) : [...prev, itemId]
+    );
+  }
+
+  function handleServiceChange(id: string) {
+    setServiceId(id);
+    setSelectedItems([]);
+  }
+
+  function goFromStep1() {
+    if (!serviceId) return;
+    setStep(hasItemsStep ? 2 : 3);
+  }
 
   // Tomorrow's date as minimum (Eastern Time)
   const etNow = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
@@ -129,6 +167,7 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
         scheduledDate,
         scheduledTime,
         addOnIds: selectedAddOns,
+        selectedItemIds: selectedItems,
         customerNotes: notes,
       };
 
@@ -171,12 +210,15 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
         <div className={`flex items-center justify-between p-5 border-b ${INNER_BORDER}`}>
           <div className="flex items-center gap-3">
             {step > 1 && (
-              <button onClick={() => setStep(step - 1)} className={`${TEXT_MUTED} hover:text-gold transition-colors`}>
+              <button onClick={() => {
+                if (step === 3 && !hasItemsStep) setStep(1);
+                else setStep(step - 1);
+              }} className={`${TEXT_MUTED} hover:text-gold transition-colors`}>
                 <ChevronLeft className="w-5 h-5" />
               </button>
             )}
             <h3 className={`font-display text-lg ${TEXT_PRIMARY}`}>
-              {step === 1 ? t("wizard_step1") : step === 2 ? t("wizard_step2") : t("wizard_step3")}
+              {step === 1 ? t("wizard_step1") : step === 2 ? t("wizard_step2") : step === 3 ? t("wizard_step3") : t("wizard_step4")}
             </h3>
           </div>
           <button onClick={onClose} className={`${TEXT_MUTED} hover:text-tobacco dark:hover:text-cream`}>
@@ -186,12 +228,12 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
 
         {/* Progress */}
         <div className="flex items-center justify-center gap-2 py-4 px-5">
-          {[1, 2, 3].map((s) => (
+          {[1, 2, 3, 4].map((s) => (
             <div key={s} className="flex items-center gap-2">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[0.8rem] font-semibold transition-colors ${s <= step ? "bg-green text-white" : `${INNER_BG} ${TEXT_MUTED}`}`}>
                 {s}
               </div>
-              {s < 3 && <div className={`w-12 h-0.5 ${s < step ? "bg-gold" : "bg-gray-200 dark:bg-gold/20"}`} />}
+              {s < 4 && <div className={`w-10 h-0.5 ${s < step ? "bg-gold" : "bg-gray-200 dark:bg-gold/20"}`} />}
             </div>
           ))}
         </div>
@@ -205,7 +247,7 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
                   <button
                     key={s.id}
                     type="button"
-                    onClick={() => setServiceId(s.id)}
+                    onClick={() => handleServiceChange(s.id)}
                     className={`border rounded-xl p-3 text-center transition-all ${serviceId === s.id ? "border-gold bg-gold/10 ring-2 ring-gold/30" : `${INNER_BORDER} hover:border-gold/30`}`}
                   >
                     <ServiceIcon emoji={s.icon} className={`w-7 h-7 mx-auto mb-1 ${TEXT_MUTED}`} />
@@ -260,7 +302,7 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
 
               <button
                 type="button"
-                onClick={() => serviceId && setStep(2)}
+                onClick={goFromStep1}
                 disabled={!serviceId}
                 className="w-full bg-green text-white py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-green-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
@@ -269,8 +311,84 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
             </div>
           )}
 
-          {/* ═══ STEP 2 — SCHEDULE & ADD-ONS ═══ */}
-          {step === 2 && (
+          {/* ═══ STEP 2 — SELECT AREAS ═══ */}
+          {step === 2 && selectedService && (
+            <div className="space-y-5">
+              <p className={`text-[0.82rem] ${TEXT_MUTED} text-center`}>
+                {t("selectAreasHint")}
+              </p>
+
+              {/* Counter */}
+              {(() => {
+                const extraCount = Math.max(0, selectedItems.length - selectedService.includedItems);
+                const extraCost = extraCount * selectedService.extraItemPrice;
+                return (
+                  <div className="flex items-center justify-center gap-3 text-[0.78rem]">
+                    <span className={`px-3 py-1 rounded-full ${selectedItems.length <= selectedService.includedItems ? "bg-green/10 text-green" : "bg-amber/10 text-amber"}`}>
+                      {t("itemsIncluded", { selected: Math.min(selectedItems.length, selectedService.includedItems), included: selectedService.includedItems })}
+                    </span>
+                    {extraCount > 0 && (
+                      <span className="px-3 py-1 rounded-full bg-amber/10 text-amber">
+                        {t("extraItems", { count: extraCount, price: extraCost })}
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Items grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {selectedService.items.map((item) => {
+                  const isSelected = selectedItems.includes(item.id);
+                  const itemIndex = selectedItems.indexOf(item.id);
+                  const wouldBeExtra = !isSelected && selectedItems.length >= selectedService.includedItems;
+
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => toggleItem(item.id)}
+                      className={`border rounded-xl p-3 text-center transition-all relative ${
+                        isSelected
+                          ? itemIndex >= selectedService.includedItems
+                            ? "border-amber bg-amber/10 ring-2 ring-amber/30"
+                            : "border-gold bg-gold/10 ring-2 ring-gold/30"
+                          : `${INNER_BORDER} hover:border-gold/30`
+                      }`}
+                    >
+                      {isSelected && (
+                        <div className={`absolute top-1.5 right-1.5 w-5 h-5 rounded-full flex items-center justify-center ${
+                          itemIndex >= selectedService.includedItems ? "bg-amber" : "bg-green"
+                        }`}>
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                      )}
+                      <ItemIcon icon={item.icon} className={`w-5 h-5 mx-auto mb-1.5 ${TEXT_MUTED}`} />
+                      <div className={`text-[0.75rem] font-medium ${TEXT_PRIMARY}`}>
+                        {loc(item.name, item.nameEs)}
+                      </div>
+                      {wouldBeExtra && (
+                        <div className="text-[0.65rem] text-amber mt-0.5">
+                          {t("perExtraItem", { price: selectedService.extraItemPrice })}
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setStep(3)}
+                className="w-full bg-green text-white py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-green-light transition-colors"
+              >
+                {t("continue")}
+              </button>
+            </div>
+          )}
+
+          {/* ═══ STEP 3 — SCHEDULE & ADD-ONS ═══ */}
+          {step === 3 && (
             <div className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -319,7 +437,7 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
 
               <button
                 type="button"
-                onClick={() => scheduledDate && setStep(3)}
+                onClick={() => scheduledDate && setStep(4)}
                 disabled={!scheduledDate}
                 className="w-full bg-green text-white py-3.5 text-[0.88rem] font-semibold tracking-[0.06em] uppercase rounded-xl hover:bg-green-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
@@ -328,8 +446,8 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
             </div>
           )}
 
-          {/* ═══ STEP 3 — ADDRESS & REVIEW ═══ */}
-          {step === 3 && (
+          {/* ═══ STEP 4 — ADDRESS & REVIEW ═══ */}
+          {step === 4 && (
             <div className="space-y-5">
               {/* Address selection */}
               <div>
@@ -399,6 +517,12 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
                       <span className={TEXT_MUTED}>{fmtCurrency(a.price)}</span>
                     </div>
                   ))}
+                  {itemsExtraCalc > 0 && (
+                    <div className="flex justify-between text-amber">
+                      <span>Extra areas</span>
+                      <span>+{fmtCurrency(itemsExtraCalc)}</span>
+                    </div>
+                  )}
                   {discount > 0 && (
                     <div className="flex justify-between text-gold">
                       <span>{t("recurringDiscount", { percent: Math.round(discountRate * 100) })}</span>

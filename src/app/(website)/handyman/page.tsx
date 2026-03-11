@@ -36,17 +36,20 @@ export default async function HandymanPage() {
   const t = await getTranslations("handyman");
 
   let heroImageUrl = "";
+  let handymanPrices: { key: string; basePrice: number }[] = [];
   try {
-    const contentRows = await prisma.content.findMany({ where: { published: true } });
+    const [contentRows, prices] = await Promise.all([
+      prisma.content.findMany({ where: { published: true } }),
+      prisma.handymanServicePrice.findMany({
+        where: { isActive: true },
+        orderBy: { sortOrder: "asc" },
+        select: { key: true, basePrice: true },
+      }),
+    ]);
     const contentMap = buildContentMap(contentRows, locale);
     heroImageUrl = (contentMap.handyman_page_media as { heroImageUrl?: string } | undefined)?.heroImageUrl || "";
-  } catch { /* use default */ }
-
-  const handymanPrices = await prisma.handymanServicePrice.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: "asc" },
-    select: { key: true, basePrice: true },
-  });
+    handymanPrices = prices;
+  } catch { /* use defaults */ }
   const priceMap = Object.fromEntries(handymanPrices.map((p) => [p.key, p.basePrice]));
 
   const trustItems = [t("trust1"), t("trust2"), t("trust3"), t("trust4"), t("trust5")];

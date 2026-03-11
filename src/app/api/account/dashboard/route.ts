@@ -75,7 +75,16 @@ export async function GET() {
         prisma.service.findMany({
           where: { isActive: true },
           orderBy: { sortOrder: "asc" },
-          select: { id: true, name: true, nameEs: true, slug: true, icon: true, basePrice: true, pricePerBedroom: true, pricePerBathroom: true, estimatedHours: true },
+          select: {
+            id: true, name: true, nameEs: true, slug: true, icon: true,
+            basePrice: true, pricePerBedroom: true, pricePerBathroom: true, estimatedHours: true,
+            includedItems: true, extraItemPrice: true,
+            items: {
+              where: { isActive: true },
+              orderBy: { sortOrder: "asc" },
+              select: { id: true, name: true, nameEs: true, icon: true },
+            },
+          },
         }),
 
         // Add-ons for booking form

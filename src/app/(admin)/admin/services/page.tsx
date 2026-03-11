@@ -3,6 +3,7 @@ import { formatCurrency } from "@/lib/utils";
 import { ServiceEditButton } from "@/components/admin/ServiceEditor";
 import { ServiceIcon } from "@/lib/service-icons";
 import { HandymanPriceEditor } from "@/components/admin/HandymanPriceEditor";
+import { ServiceItemEditor } from "@/components/admin/ServiceItemEditor";
 
 export default async function AdminServicesPage() {
   const fetchServices = () =>
@@ -10,6 +11,7 @@ export default async function AdminServicesPage() {
       include: {
         addOns: { where: { isActive: true } },
         pricingRules: { orderBy: [{ bedroomsMin: "asc" }] },
+        items: { orderBy: { sortOrder: "asc" } },
       },
       orderBy: { sortOrder: "asc" },
     });
@@ -93,6 +95,14 @@ export default async function AdminServicesPage() {
                 </div>
               </div>
             )}
+
+            {/* SERVICE ITEMS */}
+            <ServiceItemEditor
+              serviceId={service.id}
+              items={service.items}
+              includedItems={service.includedItems}
+              extraItemPrice={service.extraItemPrice}
+            />
           </div>
         ))}
       </div>

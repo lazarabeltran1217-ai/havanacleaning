@@ -90,6 +90,9 @@ interface ServiceData {
   pricePerBedroom: number;
   pricePerBathroom: number;
   estimatedHours: number;
+  includedItems: number;
+  extraItemPrice: number;
+  items: { id: string; name: string; nameEs: string | null; icon: string | null }[];
 }
 
 interface AddOnData {

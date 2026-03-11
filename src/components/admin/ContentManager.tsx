@@ -264,11 +264,17 @@ export function ContentManager({ initialContent, services = [] }: Props) {
       {/* HERO MEDIA */}
       <div className={sectionClass}>
         <h3 className="font-display text-base mb-4">Hero Background Video</h3>
-        <p className="text-gray-400 text-[0.78rem] mb-4">
-          Paste a direct video URL from Pexels. Leave empty to keep the default tobacco background.
-        </p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-4">
+          <p className="text-blue-800 text-[0.78rem] font-semibold mb-1">How to get the right URL from Pexels:</p>
+          <ol className="text-blue-700 text-[0.72rem] list-decimal list-inside space-y-0.5">
+            <li>Go to the video on pexels.com</li>
+            <li>Right-click on the playing video</li>
+            <li>Select &quot;Copy video address&quot;</li>
+            <li>The URL should look like: https://videos.pexels.com/video-files/...</li>
+          </ol>
+        </div>
         <div className="space-y-3">
-          <MediaInput label="Video URL (MP4)" value={heroVideoUrl} onChange={setHeroVideoUrl} type="video" helpText="Right-click a Pexels video and copy the video address" />
+          <MediaInput label="Video URL (direct MP4 link)" value={heroVideoUrl} onChange={setHeroVideoUrl} type="video" helpText="Must be a direct video file URL, not a Pexels page or download link" />
           <MediaInput label="Poster Image (shown while video loads)" value={heroPosterUrl} onChange={setHeroPosterUrl} />
           <MediaInput label="Mobile Fallback Image" value={heroFallbackUrl} onChange={setHeroFallbackUrl} helpText="Shown on mobile instead of video to save bandwidth" />
         </div>

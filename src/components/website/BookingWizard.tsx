@@ -4,8 +4,17 @@ import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
 import { ServiceIcon } from "@/lib/service-icons";
+import { ItemIcon } from "@/lib/item-icons";
 import { useTranslations, useLocale } from "next-intl";
 import { localized } from "@/lib/i18n-content";
+import { Check } from "lucide-react";
+
+interface ServiceItemOption {
+  id: string;
+  name: string;
+  nameEs: string | null;
+  icon: string | null;
+}
 
 interface ServiceOption {
   id: string;
@@ -17,6 +26,9 @@ interface ServiceOption {
   pricePerBedroom: number;
   pricePerBathroom: number;
   estimatedHours: number;
+  includedItems: number;
+  extraItemPrice: number;
+  items: ServiceItemOption[];
 }
 
 interface AddOnOption {
@@ -63,14 +75,17 @@ export function BookingWizard({ services, addOns }: Props) {
   const [bathrooms, setBathrooms] = useState(2);
   const [recurrence, setRecurrence] = useState<RecurrenceType>("ONCE");
 
-  // Step 2 — Date, time, add-ons, notes
+  // Step 2 — Selected areas/items (keyed by service ID)
+  const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({});
+
+  // Step 3 — Date, time, add-ons, notes
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("morning");
   const [rush, setRush] = useState(false);
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
 
-  // Step 3 — Contact info + Address
+  // Step 4 — Contact info + Address
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -89,18 +104,48 @@ export function BookingWizard({ services, addOns }: Props) {
   const addOnsTotal = addOns
     .filter((a) => selectedAddOns.includes(a.id))
     .reduce((sum, a) => sum + a.price, 0);
+
+  // Items extra cost
+  const itemsExtraCalc = selectedServices.reduce((sum, s) => {
+    const selected = (selectedItems[s.id] || []).length;
+    if (s.includedItems > 0 && selected > s.includedItems) {
+      return sum + (selected - s.includedItems) * s.extraItemPrice;
+    }
+    return sum;
+  }, 0);
+
   const discountRate = RECURRENCE_DISCOUNT[recurrence];
   const rushCharge = rush ? RUSH_FEE : 0;
-  const subtotal = servicesPrice + addOnsTotal + rushCharge;
+  const subtotal = servicesPrice + addOnsTotal + itemsExtraCalc + rushCharge;
   const discount = Math.round(subtotal * discountRate * 100) / 100;
   const afterDiscount = subtotal - discount;
   const tax = Math.round(afterDiscount * 0.07 * 100) / 100;
   const total = Math.round((afterDiscount + tax) * 100) / 100;
 
+  function toggleItem(serviceId: string, itemId: string) {
+    setSelectedItems((prev) => {
+      const current = prev[serviceId] || [];
+      return {
+        ...prev,
+        [serviceId]: current.includes(itemId)
+          ? current.filter((i) => i !== itemId)
+          : [...current, itemId],
+      };
+    });
+  }
+
   function toggleAddOn(id: string) {
     setSelectedAddOns((prev) =>
       prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
     );
+  }
+
+  // Check if any selected service has items to show
+  const hasItemsStep = selectedServices.some((s) => s.includedItems > 0 && s.items.length > 0);
+
+  function goFromStep1() {
+    if (serviceIds.length === 0) return;
+    setStep(hasItemsStep ? 2 : 3);
   }
 
   // Date minimum: today if rush, otherwise tomorrow (Eastern Time)
@@ -138,6 +183,7 @@ export function BookingWizard({ services, addOns }: Props) {
           scheduledDate,
           scheduledTime,
           addOnIds: selectedAddOns,
+          selectedItemIds: Object.values(selectedItems).flat(),
           customerNotes: notes,
           customerName: customerName.trim(),
           customerEmail: customerEmail.trim().toLowerCase(),
@@ -176,7 +222,7 @@ export function BookingWizard({ services, addOns }: Props) {
     <div>
       {/* PROGRESS BAR */}
       <div className="flex items-center justify-center mb-10 gap-2">
-        {[1, 2, 3].map((s) => (
+        {[1, 2, 3, 4].map((s) => (
           <div key={s} className="flex items-center gap-2">
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center text-[0.85rem] font-semibold transition-colors ${
@@ -187,9 +233,9 @@ export function BookingWizard({ services, addOns }: Props) {
             >
               {s}
             </div>
-            {s < 3 && (
+            {s < 4 && (
               <div
-                className={`w-16 h-0.5 ${
+                className={`w-12 h-0.5 ${
                   s < step ? "bg-green" : "bg-tobacco/10"
                 }`}
               />
@@ -203,7 +249,9 @@ export function BookingWizard({ services, addOns }: Props) {
           ? t("wizard_step1")
           : step === 2
             ? t("wizard_step2")
-            : t("wizard_step3")}
+            : step === 3
+              ? t("wizard_step3")
+              : t("wizard_step4")}
       </div>
 
       {/* STEP 1 — SERVICE */}
@@ -319,7 +367,7 @@ export function BookingWizard({ services, addOns }: Props) {
 
           <button
             type="button"
-            onClick={() => serviceIds.length > 0 && setStep(2)}
+            onClick={goFromStep1}
             disabled={serviceIds.length === 0}
             className="w-full bg-gold text-tobacco py-4 text-[0.9rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
@@ -328,8 +376,101 @@ export function BookingWizard({ services, addOns }: Props) {
         </div>
       )}
 
-      {/* STEP 2 — SCHEDULE & ADD-ONS */}
+      {/* STEP 2 — SELECT AREAS */}
       {step === 2 && (
+        <div className="space-y-6">
+          <p className="text-[0.9rem] text-tobacco/70 text-center mb-2">
+            {t("selectAreasHint")}
+          </p>
+
+          {selectedServices.filter((s) => s.includedItems > 0 && s.items.length > 0).map((service) => {
+            const selected = selectedItems[service.id] || [];
+            const extraCount = Math.max(0, selected.length - service.includedItems);
+            const extraCost = extraCount * service.extraItemPrice;
+
+            return (
+              <div key={service.id}>
+                {selectedServices.length > 1 && (
+                  <h3 className="font-display text-[1rem] text-tobacco mb-3">{sName(service)}</h3>
+                )}
+
+                {/* Counter */}
+                <div className="flex items-center justify-center gap-3 mb-4 text-[0.82rem]">
+                  <span className={`px-3 py-1 rounded-full ${selected.length <= service.includedItems ? "bg-green/10 text-green" : "bg-amber/10 text-amber"}`}>
+                    {t("itemsIncluded", { selected: Math.min(selected.length, service.includedItems), included: service.includedItems })}
+                  </span>
+                  {extraCount > 0 && (
+                    <span className="px-3 py-1 rounded-full bg-amber/10 text-amber">
+                      {t("extraItems", { count: extraCount, price: extraCost })}
+                    </span>
+                  )}
+                </div>
+
+                {/* Items grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {service.items.map((item) => {
+                    const isSelected = selected.includes(item.id);
+                    const itemIndex = selected.indexOf(item.id);
+                    const wouldBeExtra = !isSelected && selected.length >= service.includedItems;
+
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => toggleItem(service.id, item.id)}
+                        className={`border rounded-lg p-4 text-center transition-all relative ${
+                          isSelected
+                            ? itemIndex >= service.includedItems
+                              ? "border-amber bg-amber/5 ring-2 ring-amber/30"
+                              : "border-green bg-green/5 ring-2 ring-green/30"
+                            : "border-tobacco/10 hover:border-green/30"
+                        }`}
+                      >
+                        {isSelected && (
+                          <div className={`absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center ${
+                            itemIndex >= service.includedItems ? "bg-amber" : "bg-green"
+                          }`}>
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+                        <ItemIcon icon={item.icon} className="w-6 h-6 mx-auto mb-2 text-tobacco/50" />
+                        <div className="text-[0.8rem] font-medium text-tobacco">
+                          {localized(item.name, item.nameEs, locale)}
+                        </div>
+                        {wouldBeExtra && (
+                          <div className="text-[0.7rem] text-amber mt-1">
+                            {t("perExtraItem", { price: service.extraItemPrice })}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              className="px-6 py-3 border border-tobacco/20 rounded-[3px] text-[0.85rem] hover:bg-tobacco/5 transition-colors"
+            >
+              {t("back")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setStep(3)}
+              className="flex-1 bg-gold text-tobacco py-3 text-[0.9rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-amber transition-colors"
+            >
+              {t("continue")}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* STEP 3 — SCHEDULE & ADD-ONS */}
+      {step === 3 && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -427,14 +568,14 @@ export function BookingWizard({ services, addOns }: Props) {
           <div className="flex gap-3">
             <button
               type="button"
-              onClick={() => setStep(1)}
+              onClick={() => setStep(hasItemsStep ? 2 : 1)}
               className="px-6 py-3 border border-tobacco/20 rounded-[3px] text-[0.85rem] hover:bg-tobacco/5 transition-colors"
             >
               {t("back")}
             </button>
             <button
               type="button"
-              onClick={() => scheduledDate && setStep(3)}
+              onClick={() => scheduledDate && setStep(4)}
               disabled={!scheduledDate}
               className="flex-1 bg-gold text-tobacco py-3 text-[0.9rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-amber disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
@@ -444,8 +585,8 @@ export function BookingWizard({ services, addOns }: Props) {
         </div>
       )}
 
-      {/* STEP 3 — CONTACT + ADDRESS + REVIEW */}
-      {step === 3 && (
+      {/* STEP 4 — CONTACT + ADDRESS + REVIEW */}
+      {step === 4 && (
         <div className="space-y-6">
           {/* CONTACT INFO */}
           <div>
@@ -602,6 +743,12 @@ export function BookingWizard({ services, addOns }: Props) {
                     <span>{formatCurrency(a.price)}</span>
                   </div>
                 ))}
+              {itemsExtraCalc > 0 && (
+                <div className="flex justify-between text-amber">
+                  <span>Extra areas</span>
+                  <span>+{formatCurrency(itemsExtraCalc)}</span>
+                </div>
+              )}
               {rush && (
                 <div className="flex justify-between text-amber">
                   <span>{t("rushLabel")}</span>
@@ -636,7 +783,7 @@ export function BookingWizard({ services, addOns }: Props) {
           <div className="flex gap-3">
             <button
               type="button"
-              onClick={() => setStep(2)}
+              onClick={() => setStep(3)}
               className="px-6 py-3 border border-tobacco/20 rounded-[3px] text-[0.85rem] hover:bg-tobacco/5 transition-colors"
             >
               {t("back")}
