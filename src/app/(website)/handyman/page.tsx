@@ -38,17 +38,16 @@ export default async function HandymanPage() {
   let heroImageUrl = "";
   let handymanPrices: { key: string; basePrice: number }[] = [];
   try {
-    const [contentRows, prices] = await Promise.all([
-      prisma.content.findMany({ where: { published: true } }),
-      prisma.handymanServicePrice.findMany({
-        where: { isActive: true },
-        orderBy: { sortOrder: "asc" },
-        select: { key: true, basePrice: true },
-      }),
-    ]);
+    const contentRows = await prisma.content.findMany({ where: { published: true } });
     const contentMap = buildContentMap(contentRows, locale);
     heroImageUrl = (contentMap.handyman_page_media as { heroImageUrl?: string } | undefined)?.heroImageUrl || "";
-    handymanPrices = prices;
+  } catch { /* use defaults */ }
+  try {
+    handymanPrices = await prisma.handymanServicePrice.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: "asc" },
+      select: { key: true, basePrice: true },
+    });
   } catch { /* use defaults */ }
   const priceMap = Object.fromEntries(handymanPrices.map((p) => [p.key, p.basePrice]));
 
