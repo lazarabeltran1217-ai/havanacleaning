@@ -8,6 +8,7 @@ import {
   LayoutDashboard, CalendarCheck, Wrench, Calendar, Clock, ClipboardList,
   Building2, CreditCard, TrendingUp, Users, Home, Package,
   DollarSign, Sparkles, PenLine, Share2, FileText, Search, Settings,
+  ClipboardCheck,
 } from "lucide-react";
 
 const navItems: { label: string; href: string; icon: LucideIcon }[] = [
@@ -30,6 +31,7 @@ const navItems: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Content", href: "/admin/content", icon: FileText },
   { label: "SEO Manager", href: "/admin/seo", icon: Search },
   { label: "Settings", href: "/admin/settings", icon: Settings },
+  { label: "UAT Testing", href: "/admin/uat", icon: ClipboardCheck },
 ];
 
 interface SidebarProps {
