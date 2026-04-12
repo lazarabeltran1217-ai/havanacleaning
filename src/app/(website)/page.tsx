@@ -107,7 +107,7 @@ export default async function HomePage() {
             <span className="w-10 h-px bg-green-light" />
           </div>
           <h1 className="font-display text-cream mb-7 leading-none" style={{ fontSize: "clamp(3.5rem, 6vw, 5.5rem)" }}>
-            {heroHeadline.line1}<br />
+            <strong>{heroHeadline.line1}</strong><br />
             <em className="text-amber">{heroHeadline.line2}</em><br />
             <span className="text-green-light">{heroHeadline.line3}</span>
           </h1>
