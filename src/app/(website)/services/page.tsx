@@ -9,9 +9,9 @@ import { localized, buildContentMap } from "@/lib/i18n-content";
 import { PageHeroImage } from "@/components/website/PageHeroImage";
 
 export const metadata: Metadata = {
-  title: "Our Services",
+  title: "Professional Cleaning Services — House, Deep Clean, Move-In & More",
   description:
-    "Professional cleaning services: residential, deep clean, move-in/out, commercial, post-construction, Airbnb turnover, and recurring plans.",
+    "Best house cleaning services in Miami. Residential, deep cleaning, move-in/out, commercial, Airbnb turnover, post-construction, and vacation rental cleaning. Book online today.",
   alternates: { canonical: "/services" },
 };
 

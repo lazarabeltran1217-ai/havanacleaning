@@ -11,27 +11,62 @@ import {
   ClipboardCheck,
 } from "lucide-react";
 
-const navItems: { label: string; href: string; icon: LucideIcon }[] = [
-  { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { label: "Bookings", href: "/admin/bookings", icon: CalendarCheck },
-  { label: "Handyman", href: "/admin/handyman", icon: Wrench },
-  { label: "Schedule", href: "/admin/schedule", icon: Calendar },
-  { label: "Clock", href: "/admin/clock", icon: Clock },
-  { label: "Applicants", href: "/admin/applicants", icon: ClipboardList },
-  { label: "Commercial", href: "/admin/commercial", icon: Building2 },
-  { label: "Payments", href: "/admin/payments", icon: CreditCard },
-  { label: "Revenue", href: "/admin/revenue", icon: TrendingUp },
-  { label: "Staff", href: "/admin/staff", icon: Users },
-  { label: "Clients", href: "/admin/clients", icon: Home },
-  { label: "Inventory", href: "/admin/inventory", icon: Package },
-  { label: "Payroll", href: "/admin/payroll", icon: DollarSign },
-  { label: "Services", href: "/admin/services", icon: Sparkles },
-  { label: "Blog", href: "/admin/blog", icon: PenLine },
-  { label: "Social Media", href: "/admin/social", icon: Share2 },
-  { label: "Content", href: "/admin/content", icon: FileText },
-  { label: "SEO Manager", href: "/admin/seo", icon: Search },
-  { label: "Settings", href: "/admin/settings", icon: Settings },
-  { label: "UAT Testing", href: "/admin/uat", icon: ClipboardCheck },
+const navGroups: { category: string; items: { label: string; href: string; icon: LucideIcon }[] }[] = [
+  {
+    category: "OVERVIEW",
+    items: [
+      { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+    ],
+  },
+  {
+    category: "OPERATIONS",
+    items: [
+      { label: "Bookings", href: "/admin/bookings", icon: CalendarCheck },
+      { label: "Handyman", href: "/admin/handyman", icon: Wrench },
+      { label: "Schedule", href: "/admin/schedule", icon: Calendar },
+      { label: "Clock Management", href: "/admin/clock", icon: Clock },
+    ],
+  },
+  {
+    category: "BUSINESS",
+    items: [
+      { label: "Applicants", href: "/admin/applicants", icon: ClipboardList },
+      { label: "Commercial", href: "/admin/commercial", icon: Building2 },
+    ],
+  },
+  {
+    category: "FINANCE",
+    items: [
+      { label: "Payments", href: "/admin/payments", icon: CreditCard },
+      { label: "Revenue", href: "/admin/revenue", icon: TrendingUp },
+      { label: "Payroll", href: "/admin/payroll", icon: DollarSign },
+    ],
+  },
+  {
+    category: "TEAM",
+    items: [
+      { label: "Staff", href: "/admin/staff", icon: Users },
+      { label: "Clients", href: "/admin/clients", icon: Home },
+    ],
+  },
+  {
+    category: "CONTENT",
+    items: [
+      { label: "Services", href: "/admin/services", icon: Sparkles },
+      { label: "Inventory", href: "/admin/inventory", icon: Package },
+      { label: "Blog", href: "/admin/blog", icon: PenLine },
+      { label: "Social Media", href: "/admin/social", icon: Share2 },
+      { label: "Content", href: "/admin/content", icon: FileText },
+      { label: "SEO Manager", href: "/admin/seo", icon: Search },
+    ],
+  },
+  {
+    category: "SETTINGS",
+    items: [
+      { label: "Settings", href: "/admin/settings", icon: Settings },
+      { label: "UAT Testing", href: "/admin/uat", icon: ClipboardCheck },
+    ],
+  },
 ];
 
 interface SidebarProps {
@@ -58,26 +93,33 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         </button>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-1">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              prefetch={false}
-              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13.5px] font-medium transition-colors ${
-                isActive
-                  ? "bg-gold text-tobacco"
-                  : "text-sand hover:bg-white/[0.07] hover:text-white"
-              }`}
-            >
-              <item.icon className="w-4 h-4 shrink-0" />
-              {item.label}
-            </Link>
-          );
-        })}
+      <nav className="flex-1 px-3 py-2 overflow-y-auto">
+        {navGroups.map((group, gi) => (
+          <div key={group.category}>
+            <p className={`text-[0.65rem] tracking-[0.15em] uppercase text-sand/60 font-medium mb-1 px-3 ${gi === 0 ? "mt-2" : "mt-5"}`}>
+              {group.category}
+            </p>
+            {group.items.map((item) => {
+              const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onClose}
+                  prefetch={false}
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13.5px] font-medium transition-colors ${
+                    isActive
+                      ? "bg-gold text-tobacco"
+                      : "text-sand hover:bg-white/[0.07] hover:text-white"
+                  }`}
+                >
+                  <item.icon className="w-4 h-4 shrink-0" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
       <div className="mt-auto px-4 py-4 border-t border-gold/20">

@@ -7,6 +7,8 @@ import { HandymanBookingWizard } from "@/components/website/HandymanBookingWizar
 import { prisma } from "@/lib/prisma";
 import { buildContentMap } from "@/lib/i18n-content";
 import { PageHeroImage } from "@/components/website/PageHeroImage";
+import { JsonLd } from "@/components/website/JsonLd";
+import { faqPageSchema } from "@/lib/schema";
 import type { LucideIcon } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -62,8 +64,11 @@ export default async function HandymanPage() {
     { q: t("faq6q"), a: t("faq6a") },
   ];
 
+  const faqSchema = faqPageSchema(faqs.map((f) => ({ question: f.q, answer: f.a })));
+
   return (
     <>
+      {faqSchema && <JsonLd data={faqSchema} />}
       {/* HERO */}
       <section className="bg-tobacco pt-36 pb-16 px-6 md:px-20 text-center relative overflow-hidden">
         {heroImageUrl && <PageHeroImage imageUrl={heroImageUrl} />}

@@ -6,9 +6,9 @@ import { buildContentMap, localized } from "@/lib/i18n-content";
 import { PageHeroImage } from "@/components/website/PageHeroImage";
 
 export const metadata: Metadata = {
-  title: "Customer Reviews & Ratings",
+  title: "Customer Reviews — Best Rated Cleaning Service in Miami",
   description:
-    "See what families say about Havana Cleaning. Real reviews from real customers — rated 5 stars for quality and reliability.",
+    "Read real reviews from Havana Cleaning customers. 4.9-star average rating for house cleaning, deep clean, and move-in/out services. See why we're Miami's best.",
   alternates: { canonical: "/reviews" },
 };
 

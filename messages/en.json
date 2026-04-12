@@ -13,7 +13,7 @@
   },
   "hero": {
     "eyebrow": "Professional Home & Business Cleaning",
-    "title1": "Family Homes,",
+    "title1": "Clean Homes,",
     "title2": "Happy",
     "title3": "Families.",
     "subtitle": "Family-owned and driven by quality. We treat every home like our own — with care, precision, and the kind of clean you'll notice.",
@@ -63,7 +63,8 @@
     "addOnsNote": "Additional add-ons available during booking",
     "readyToBook": "Ready to Book Your {service}?",
     "bookOnline": "Book online in minutes. Pick your time and we handle the rest.",
-    "serviceFaq": "{service} FAQ"
+    "serviceFaq": "{service} FAQ",
+    "otherServices": "Explore Our Other Services"
   },
   "pricing": {
     "label": "Transparent Pricing",

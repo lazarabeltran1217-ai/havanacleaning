@@ -1,10 +1,18 @@
 import { prisma } from "@/lib/prisma";
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { SERVICE_AREAS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import { JsonLd } from "@/components/website/JsonLd";
 import { aggregateRatingSchema, reviewSchema, faqPageSchema } from "@/lib/schema";
+
+export const metadata: Metadata = {
+  title: "Best House Cleaning Service in Miami — Havana Cleaning",
+  description:
+    "Top-rated professional house cleaning service in Miami. Get a home cleaning quote in minutes. Residential, deep clean, move-in/out, Airbnb turnover, and commercial cleaning. Book online today.",
+  alternates: { canonical: "/" },
+};
 import { Check, MapPin, Wrench, Package, Tv, DoorOpen, Lightbulb, Grid3x3, Paintbrush, Droplets, Waves, Wifi, Fence, LayoutGrid } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
 import { HANDYMAN_SERVICES } from "@/lib/handyman-constants";
@@ -99,11 +107,6 @@ export default async function HomePage() {
         {/* Right palm tree (flipped) */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/palm-tree.svg" alt="Decorative palm tree silhouette" className="absolute right-0 bottom-0 hidden md:block md:w-[380px] h-auto pointer-events-none opacity-50 -scale-x-100 z-[1]" />
-
-        {/* TEST BANNER - REMOVE AFTER VERIFYING DEPLOYMENT */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-red-600 text-white px-6 py-2 rounded-full font-bold text-sm">
-          DEPLOYMENT TEST - April 11
-        </div>
 
         <div className="max-w-[800px] relative z-10 text-center px-6 pt-36 pb-20 mx-auto">
           <div className="text-[0.75rem] tracking-[0.25em] uppercase text-green-light mb-6 flex items-center justify-center gap-3">

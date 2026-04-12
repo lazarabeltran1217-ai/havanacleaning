@@ -4,9 +4,9 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
-  title: "Book a Cleaning",
+  title: "Book Professional Cleaners Near Me — Online Scheduling",
   description:
-    "Book your professional cleaning in minutes. Choose your service, pick a date and time, and pay securely online. Same-week availability.",
+    "Book professional cleaners near you in minutes. Choose house cleaning, deep clean, or move-in/out service, pick a date, and pay securely online. Same-week availability.",
   alternates: { canonical: "/book" },
 };
 

@@ -57,6 +57,8 @@ export function localBusinessSchema() {
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "Commercial Cleaning" } },
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "Move-In/Move-Out Cleaning" } },
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "Airbnb Turnover Cleaning" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Post-Construction Cleaning" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Vacation Rental Cleaning" } },
       ],
     },
   };
@@ -109,6 +111,8 @@ export function organizationSchema() {
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "Commercial Cleaning" } },
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "Move-In/Move-Out Cleaning" } },
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "Airbnb Turnover Cleaning" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Post-Construction Cleaning" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Vacation Rental Cleaning" } },
       ],
     },
   };

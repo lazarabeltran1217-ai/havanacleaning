@@ -7,9 +7,9 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { localized } from "@/lib/i18n-content";
 
 export const metadata: Metadata = {
-  title: "Cleaning Prices & Rates",
+  title: "Home Cleaning Prices & Instant Quote — No Hidden Fees",
   description:
-    "Transparent cleaning prices for homes and businesses. Get instant pricing by bedroom and bathroom count. No hidden fees, no contracts required.",
+    "Get a home cleaning quote in minutes. Transparent pricing by bedroom and bathroom count for residential, deep clean, and move-in/out services. No hidden fees, no contracts.",
   alternates: { canonical: "/pricing" },
 };
 

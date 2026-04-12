@@ -44,14 +44,23 @@ export default async function ServiceDetailPage({ params }: Props) {
   const t = await getTranslations();
 
   let service = null;
+  let relatedServices: { name: string; nameEs: string | null; slug: string; icon: string | null }[] = [];
   try {
-    service = await prisma.service.findUnique({
-      where: { slug },
-      include: {
-        addOns: { where: { isActive: true } },
-        pricingRules: { orderBy: [{ bedroomsMin: "asc" }, { bathroomsMin: "asc" }] },
-      },
-    });
+    [service, relatedServices] = await Promise.all([
+      prisma.service.findUnique({
+        where: { slug },
+        include: {
+          addOns: { where: { isActive: true } },
+          pricingRules: { orderBy: [{ bedroomsMin: "asc" }, { bathroomsMin: "asc" }] },
+        },
+      }),
+      prisma.service.findMany({
+        where: { isActive: true, slug: { not: slug } },
+        select: { name: true, nameEs: true, slug: true, icon: true },
+        orderBy: { sortOrder: "asc" },
+        take: 4,
+      }),
+    ]);
   } catch (error) {
     console.error("Failed to fetch service:", error);
   }
@@ -275,6 +284,27 @@ export default async function ServiceDetailPage({ params }: Props) {
         <section className="bg-cream py-16 px-6 md:px-20">
           <div className="max-w-3xl mx-auto">
             <FAQSection faqs={localizedFaqs} title={t("services.serviceFaq", { service: serviceName })} />
+          </div>
+        </section>
+      )}
+
+      {/* RELATED SERVICES — Internal Linking */}
+      {relatedServices.length > 0 && (
+        <section className="bg-ivory py-16 px-6 md:px-20">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="font-display text-xl mb-6">{t("services.otherServices")}</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {relatedServices.map((rs) => (
+                <Link
+                  key={rs.slug}
+                  href={`/services/${rs.slug}`}
+                  className="bg-white border border-tobacco/10 rounded-lg p-5 text-center hover:border-green/30 hover:shadow-md transition-all"
+                >
+                  <ServiceIcon emoji={rs.icon || "✨"} className="w-8 h-8 text-green mx-auto mb-2" />
+                  <span className="text-[0.85rem] font-medium text-tobacco">{localized(rs.name, rs.nameEs, locale)}</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
       )}

@@ -3,6 +3,7 @@ import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
 import Link from "next/link";
 import { ServiceIcon } from "@/lib/service-icons";
 import { DashboardCharts } from "@/components/admin/DashboardCharts";
+import { LiveClock } from "@/components/admin/LiveClock";
 import { todayStartET, tomorrowStartET, monthStartET, monthStartOffsetET } from "@/lib/timezone";
 
 const fetchRecentBookings = () =>
@@ -74,6 +75,12 @@ async function fetchRevenueByService() {
     .slice(0, 7);
 }
 
+const timeLabels: Record<string, string> = {
+  morning: "8:00 AM",
+  afternoon: "12:00 PM",
+  evening: "5:00 PM",
+};
+
 export default async function AdminDashboard() {
   const startOfMonth = monthStartET();
   const todayStart = todayStartET();
@@ -91,6 +98,8 @@ export default async function AdminDashboard() {
   let monthlyRevenue: { month: string; revenue: number; bookings: number }[] = [];
   let bookingsByStatus: { status: string; count: number }[] = [];
   let revenueByService: { service: string; revenue: number }[] = [];
+  let todaysJobs: { id: string; customerName: string; serviceName: string; time: string; cleaner: string; status: string }[] = [];
+  let activeEmployees: { name: string; clockIn: string }[] = [];
 
   try {
     const [
@@ -106,6 +115,8 @@ export default async function AdminDashboard() {
       _monthlyRevenue,
       _bookingsByStatus,
       _revenueByService,
+      _todaysJobs,
+      _activeClocks,
     ] = await Promise.all([
       prisma.booking.count(),
       prisma.booking.count({ where: { status: "PENDING" } }),
@@ -127,6 +138,23 @@ export default async function AdminDashboard() {
       fetchMonthlyRevenue(),
       fetchBookingsByStatus(),
       fetchRevenueByService(),
+      prisma.booking.findMany({
+        where: {
+          scheduledDate: { gte: todayStart, lt: tomorrowStart },
+          status: { in: ["CONFIRMED", "IN_PROGRESS", "COMPLETED", "PENDING"] },
+        },
+        include: {
+          customer: { select: { name: true } },
+          service: { select: { name: true } },
+          assignments: { include: { employee: { select: { name: true } } } },
+        },
+        orderBy: { scheduledTime: "asc" },
+      }),
+      prisma.timeEntry.findMany({
+        where: { clockOut: null },
+        include: { employee: { select: { name: true } } },
+        orderBy: { clockIn: "asc" },
+      }),
     ]);
 
     totalBookings = _totalBookings;
@@ -141,6 +169,22 @@ export default async function AdminDashboard() {
     monthlyRevenue = _monthlyRevenue;
     bookingsByStatus = _bookingsByStatus;
     revenueByService = _revenueByService;
+    todaysJobs = _todaysJobs.map((b) => {
+      const primary = b.assignments.find((a) => a.isPrimary);
+      const cleaner = primary?.employee.name ?? b.assignments[0]?.employee.name ?? "—";
+      return {
+        id: b.id,
+        customerName: b.customer.name ?? "Unknown",
+        serviceName: b.service.name,
+        time: timeLabels[b.scheduledTime] ?? b.scheduledTime,
+        cleaner,
+        status: b.status,
+      };
+    });
+    activeEmployees = _activeClocks.map((e) => ({
+      name: e.employee.name ?? "Unknown",
+      clockIn: e.clockIn.toISOString(),
+    }));
   } catch (error) {
     console.error("Failed to fetch dashboard data:", error);
   }
@@ -165,6 +209,70 @@ export default async function AdminDashboard() {
             <div className={`font-display text-2xl font-bold mt-1 ${stat.color}`}>{stat.value}</div>
           </Link>
         ))}
+      </div>
+
+      {/* Today's Jobs + Live Clock */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+        <div className="bg-white rounded-xl p-5 border border-[#ece6d9]">
+          <h3 className="font-display text-base mb-4">Today&apos;s Jobs</h3>
+          {todaysJobs.length === 0 ? (
+            <p className="text-gray-400 text-sm">No jobs scheduled for today.</p>
+          ) : (
+            <>
+              {/* Desktop table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-[0.82rem]">
+                  <thead>
+                    <tr className="text-left text-[0.7rem] uppercase tracking-wider text-gray-400 border-b border-gray-100">
+                      <th className="pb-2 font-medium">Client</th>
+                      <th className="pb-2 font-medium">Service</th>
+                      <th className="pb-2 font-medium">Time</th>
+                      <th className="pb-2 font-medium">Cleaner</th>
+                      <th className="pb-2 font-medium">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {todaysJobs.map((job) => (
+                      <tr key={job.id} className="border-b border-gray-50 last:border-0">
+                        <td className="py-2.5 font-medium text-tobacco">{job.customerName}</td>
+                        <td className="py-2.5">{job.serviceName}</td>
+                        <td className="py-2.5">{job.time}</td>
+                        <td className="py-2.5">{job.cleaner}</td>
+                        <td className="py-2.5">
+                          <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${
+                            job.status === "COMPLETED" ? "bg-green/10 text-green" :
+                            job.status === "IN_PROGRESS" ? "bg-teal/10 text-teal" :
+                            job.status === "CONFIRMED" ? "bg-green/10 text-green" :
+                            "bg-amber/10 text-amber"
+                          }`}>{formatStatus(job.status)}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {/* Mobile cards */}
+              <div className="md:hidden space-y-3">
+                {todaysJobs.map((job) => (
+                  <div key={job.id} className="border border-gray-100 rounded-lg p-3">
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="font-medium text-tobacco text-[0.85rem]">{job.customerName}</span>
+                      <span className={`text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${
+                        job.status === "COMPLETED" ? "bg-green/10 text-green" :
+                        job.status === "IN_PROGRESS" ? "bg-teal/10 text-teal" :
+                        job.status === "CONFIRMED" ? "bg-green/10 text-green" :
+                        "bg-amber/10 text-amber"
+                      }`}>{formatStatus(job.status)}</span>
+                    </div>
+                    <div className="text-gray-500 text-[0.78rem]">{job.serviceName} &middot; {job.time}</div>
+                    <div className="text-gray-400 text-[0.75rem] mt-0.5">Cleaner: {job.cleaner}</div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+        <LiveClock activeEmployees={activeEmployees} />
       </div>
 
       {/* Charts */}

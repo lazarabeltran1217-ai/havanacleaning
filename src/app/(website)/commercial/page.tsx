@@ -4,11 +4,13 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { buildContentMap } from "@/lib/i18n-content";
 import { PageHeroImage } from "@/components/website/PageHeroImage";
+import { JsonLd } from "@/components/website/JsonLd";
+import { serviceSchema, breadcrumbSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
-  title: "Commercial Cleaning",
+  title: "Commercial Cleaning Services — Office & Business Cleaning",
   description:
-    "Professional commercial cleaning services for businesses. Offices, retail, medical, restaurants. Get a custom quote today.",
+    "Professional commercial cleaning services for offices, retail spaces, medical facilities, and restaurants in Miami. Insured, vetted teams. Get a free custom quote today.",
   alternates: { canonical: "/commercial" },
 };
 
@@ -33,6 +35,8 @@ export default async function CommercialPage() {
 
   return (
     <>
+      <JsonLd data={serviceSchema({ name: "Commercial Cleaning", description: "Professional commercial cleaning services for offices, retail, medical facilities, and restaurants. Insured and vetted teams.", basePrice: 0, slug: "commercial-cleaning" })} />
+      <JsonLd data={breadcrumbSchema([{ name: "Home", url: "/" }, { name: "Commercial Cleaning", url: "/commercial" }])} />
       {/* HERO */}
       <section className="bg-tobacco pt-36 pb-16 px-6 md:px-20 text-center relative overflow-hidden">
         {heroImageUrl && <PageHeroImage imageUrl={heroImageUrl} />}

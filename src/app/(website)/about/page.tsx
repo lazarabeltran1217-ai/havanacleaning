@@ -7,9 +7,9 @@ import { buildContentMap } from "@/lib/i18n-content";
 import { PageHeroImage } from "@/components/website/PageHeroImage";
 
 export const metadata: Metadata = {
-  title: "About Us — Our Story",
+  title: "About Havana Cleaning — Family-Owned Cleaning Company in Miami",
   description:
-    "Family-owned professional cleaning service. Learn about Havana Cleaning — trusted for quality residential and commercial cleaning since day one.",
+    "Family-owned professional cleaning company in Miami. Background-checked, bilingual cleaners for residential and commercial cleaning. Trusted by 500+ homes.",
   alternates: { canonical: "/about" },
 };
 

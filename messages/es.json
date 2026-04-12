@@ -63,7 +63,8 @@
     "addOnsNote": "Extras adicionales disponibles durante la reserva",
     "readyToBook": "¿Listo para Reservar su {service}?",
     "bookOnline": "Reserve en línea en minutos. Elija su horario y nosotros nos encargamos del resto.",
-    "serviceFaq": "Preguntas Frecuentes — {service}"
+    "serviceFaq": "Preguntas Frecuentes — {service}",
+    "otherServices": "Explore Nuestros Otros Servicios"
   },
   "pricing": {
     "label": "Precios Transparentes",
