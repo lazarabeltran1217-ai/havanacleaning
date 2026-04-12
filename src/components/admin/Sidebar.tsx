@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -8,7 +9,7 @@ import {
   LayoutDashboard, CalendarCheck, Wrench, Calendar, Clock, ClipboardList,
   Building2, CreditCard, TrendingUp, Users, Home, Package,
   DollarSign, Sparkles, PenLine, Share2, FileText, Search, Settings,
-  ClipboardCheck,
+  ClipboardCheck, MessageCircle,
 } from "lucide-react";
 
 const navGroups: { category: string; items: { label: string; href: string; icon: LucideIcon }[] }[] = [
@@ -32,6 +33,7 @@ const navGroups: { category: string; items: { label: string; href: string; icon:
     items: [
       { label: "Applicants", href: "/admin/applicants", icon: ClipboardList },
       { label: "Commercial", href: "/admin/commercial", icon: Building2 },
+      { label: "Support", href: "/admin/support", icon: MessageCircle },
     ],
   },
   {
@@ -76,6 +78,14 @@ interface SidebarProps {
 
 export function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/support/unread")
+      .then((r) => r.json())
+      .then((d) => setUnreadCount(d.count || 0))
+      .catch(() => {});
+  }, [pathname]);
 
   return (
     <aside
@@ -115,6 +125,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 >
                   <item.icon className="w-4 h-4 shrink-0" />
                   {item.label}
+                  {item.label === "Support" && unreadCount > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                      {unreadCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}

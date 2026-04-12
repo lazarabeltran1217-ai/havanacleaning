@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { SERVICE_AREAS } from "@/lib/constants";
+import { SERVICE_AREAS, NYC_SERVICE_AREAS } from "@/lib/constants";
 import type { Metadata } from "next";
 import { getTranslations, getLocale } from "next-intl/server";
 import { localized } from "@/lib/i18n-content";
@@ -40,7 +40,8 @@ export default async function AreasPage() {
         </p>
       </section>
 
-      {/* Area Grid */}
+      {/* Miami / South Florida */}
+      <h2 className="font-display text-2xl text-tobacco mb-4">{t("miamiHeading")}</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {SERVICE_AREAS.map((area) => {
           const slug = area.toLowerCase().replace(/\s+/g, "-") + "-cleaning";
@@ -74,6 +75,30 @@ export default async function AreasPage() {
             </div>
           );
         })}
+      </div>
+
+      {/* New York City */}
+      <h2 className="font-display text-2xl text-tobacco mt-12 mb-4">{t("nycHeading")}</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {NYC_SERVICE_AREAS.map((borough) => (
+          <div
+            key={borough}
+            className="bg-white rounded-xl border border-gray-100 p-5 text-center"
+          >
+            <div className="font-display text-lg text-tobacco">{borough}</div>
+            <p className="text-gray-400 text-[0.78rem] mt-1">
+              {t("handymanAvailable")}
+            </p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-6 text-center">
+        <Link
+          href="/handyman#book"
+          className="inline-block bg-tobacco text-white px-8 py-3 rounded-xl font-semibold hover:bg-tobacco/90 transition-colors"
+        >
+          {locale === "es" ? "Reserve Su Handyman" : "Book a Handyman"}
+        </Link>
       </div>
 
       {/* CTA */}

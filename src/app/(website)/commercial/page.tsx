@@ -6,6 +6,7 @@ import { buildContentMap } from "@/lib/i18n-content";
 import { PageHeroImage } from "@/components/website/PageHeroImage";
 import { JsonLd } from "@/components/website/JsonLd";
 import { serviceSchema, breadcrumbSchema } from "@/lib/schema";
+import { Check } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Commercial Cleaning Services — Office & Business Cleaning",
@@ -69,8 +70,49 @@ export default async function CommercialPage() {
         </div>
       </section>
 
+      {/* INDUSTRIES WE SERVE */}
+      <section className="bg-cream py-16 px-6 md:px-20">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="font-display text-center mb-2" style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)" }}>
+            {t("industriesTitle")}
+          </h2>
+          <p className="text-center text-[#7a6555] text-[0.9rem] mb-10">
+            {t("industriesSubtitle")}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {([
+              { title: t("industry1Title"), desc: t("industry1Desc") },
+              { title: t("industry2Title"), desc: t("industry2Desc") },
+              { title: t("industry3Title"), desc: t("industry3Desc") },
+              { title: t("industry4Title"), desc: t("industry4Desc") },
+              { title: t("industry5Title"), desc: t("industry5Desc") },
+            ]).map((ind, i) => (
+              <div key={i} className="bg-white border border-tobacco/10 rounded-lg p-6">
+                <h3 className="font-display text-[0.95rem] mb-2">{ind.title}</h3>
+                <p className="text-[#7a6555] text-[0.85rem] leading-relaxed">{ind.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* WHY BUSINESSES CHOOSE US */}
+      <section className="bg-ivory py-12 px-6 md:px-20">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-center mb-8 text-xl">{t("whyBusinessTitle")}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {[t("whyBiz1"), t("whyBiz2"), t("whyBiz3"), t("whyBiz4"), t("whyBiz5")].map((item) => (
+              <div key={item} className="flex items-start gap-2.5 text-[0.9rem] text-[#5a4535]">
+                <Check className="w-4 h-4 text-green mt-0.5 shrink-0" />
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FORM */}
-      <section className="bg-ivory py-16 px-6 md:px-20">
+      <section className="bg-cream py-16 px-6 md:px-20">
         <div className="max-w-3xl mx-auto">
           <h2
             className="font-display text-center mb-2"

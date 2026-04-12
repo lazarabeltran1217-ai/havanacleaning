@@ -5,11 +5,12 @@ import type { Metadata } from "next";
 import { ServiceIcon } from "@/lib/service-icons";
 import { getTranslations, getLocale } from "next-intl/server";
 import { localized } from "@/lib/i18n-content";
+import { Check } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Home Cleaning Prices & Instant Quote — No Hidden Fees",
   description:
-    "Get a home cleaning quote in minutes. Transparent pricing by bedroom and bathroom count for residential, deep clean, and move-in/out services. No hidden fees, no contracts.",
+    "Get a home cleaning quote in minutes. Transparent pricing for weekly house cleaning, deep clean, move-in/out, and recurring plans. No hidden fees, no contracts.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -54,6 +55,15 @@ export default async function PricingPage() {
         <p className="text-sand max-w-[600px] mx-auto leading-relaxed">
           {t("pricing.heroSubtitle")}
         </p>
+      </section>
+
+      {/* INTRO TEXT */}
+      <section className="bg-cream py-12 px-6 md:px-20">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-[#5a4535] text-[0.95rem] leading-relaxed text-center">
+            {t("pricing.introText")}
+          </p>
+        </div>
       </section>
 
       {/* SERVICES PRICING */}
@@ -160,6 +170,28 @@ export default async function PricingPage() {
                 <span className="text-amber font-semibold text-[0.9rem]">
                   +{formatCurrency(addon.price)}
                 </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* WHAT'S INCLUDED */}
+      <section className="bg-ivory py-12 px-6 md:px-20">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-center text-xl mb-6">{t("pricing.includedTitle")}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {[
+              t("pricing.included1"),
+              t("pricing.included2"),
+              t("pricing.included3"),
+              t("pricing.included4"),
+              t("pricing.included5"),
+              t("pricing.included6"),
+            ].map((item) => (
+              <div key={item} className="flex items-start gap-2.5 text-[0.9rem] text-[#5a4535]">
+                <Check className="w-4 h-4 text-green mt-0.5 shrink-0" />
+                {item}
               </div>
             ))}
           </div>

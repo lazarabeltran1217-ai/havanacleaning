@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { SERVICE_AREAS } from "@/lib/constants";
+import { SERVICE_AREAS, NYC_SERVICE_AREAS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import { JsonLd } from "@/components/website/JsonLd";
 import { aggregateRatingSchema, reviewSchema, faqPageSchema } from "@/lib/schema";
@@ -184,6 +184,37 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* WHY CHOOSE HAVANA CLEANING */}
+      <section className="bg-ivory py-24 px-6 md:px-20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center gap-3">
+            <span className="w-8 h-px bg-green" />{t("homepage.whyChooseTitle")}
+          </div>
+          <h2 className="font-display mb-3" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>
+            {t("homepage.whyChooseTitle")}
+          </h2>
+          <p className="text-[#7a6555] max-w-[600px] leading-relaxed mb-12">
+            {t("homepage.whyChooseSubtitle")}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {([
+              { title: t("homepage.why1Title"), desc: t("homepage.why1Desc") },
+              { title: t("homepage.why2Title"), desc: t("homepage.why2Desc") },
+              { title: t("homepage.why3Title"), desc: t("homepage.why3Desc") },
+              { title: t("homepage.why4Title"), desc: t("homepage.why4Desc") },
+            ]).map((item, i) => (
+              <div key={i} className="bg-white border border-tobacco/10 rounded-lg p-7">
+                <div className="w-10 h-10 rounded-full bg-green/10 flex items-center justify-center text-green font-bold text-lg mb-4">
+                  {i + 1}
+                </div>
+                <h3 className="font-display text-[0.95rem] mb-2">{item.title}</h3>
+                <p className="text-[#7a6555] text-[0.85rem] leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ABOUT */}
       <section id="about" className="bg-cream py-24 px-6 md:px-20">
         <div className="max-w-4xl mx-auto">
@@ -216,6 +247,36 @@ export default async function HomePage() {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* HOW OUR CLEANING SERVICE WORKS */}
+      <section className="bg-ivory py-24 px-6 md:px-20">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="text-[0.72rem] tracking-[0.25em] uppercase text-green mb-4 flex items-center justify-center gap-3">
+            <span className="w-8 h-px bg-green" />{t("homepage.processTitle")}
+            <span className="w-8 h-px bg-green" />
+          </div>
+          <h2 className="font-display mb-3" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>
+            {t("homepage.processTitle")}
+          </h2>
+          <p className="text-[#7a6555] max-w-[550px] mx-auto leading-relaxed mb-14">
+            {t("homepage.processSubtitle")}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+            {([
+              { title: t("homepage.step1Title"), desc: t("homepage.step1Desc") },
+              { title: t("homepage.step2Title"), desc: t("homepage.step2Desc") },
+              { title: t("homepage.step3Title"), desc: t("homepage.step3Desc") },
+              { title: t("homepage.step4Title"), desc: t("homepage.step4Desc") },
+            ]).map((step, i) => (
+              <div key={i} className="relative">
+                <div className="text-green/20 font-display text-5xl font-black mb-3">{`0${i + 1}`}</div>
+                <h3 className="font-display text-[0.95rem] mb-2">{step.title}</h3>
+                <p className="text-[#7a6555] text-[0.85rem] leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -324,6 +385,9 @@ export default async function HomePage() {
         </div>
         <h2 className="font-display mb-2" style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}>{t("areas.title")}</h2>
         <p className="text-[#7a6555] max-w-[500px] leading-relaxed mb-10">{t("areas.bodySubtitle")}</p>
+
+        {/* Miami / South Florida */}
+        <h3 className="font-display text-tobacco text-xl mb-4">{t("areas.miamiHeading")}</h3>
         <div className="flex flex-wrap gap-2.5">
           {SERVICE_AREAS.map((area) => {
             const slug = area.toLowerCase().replace(/\s+/g, "-");
@@ -348,7 +412,30 @@ export default async function HomePage() {
             );
           })}
         </div>
-        <div className="mt-6">
+
+        {/* New York City */}
+        <h3 className="font-display text-tobacco text-xl mt-10 mb-4">{t("areas.nycHeading")}</h3>
+        <div className="flex flex-wrap gap-2.5">
+          {NYC_SERVICE_AREAS.map((borough) => (
+            <span
+              key={borough}
+              className="bg-white border border-tobacco/10 px-5 py-2.5 rounded-full text-[0.85rem] text-tobacco/70"
+            >
+              {borough}
+            </span>
+          ))}
+        </div>
+        <p className="text-[#7a6555] text-[0.85rem] mt-3">{t("areas.nycHandymanNote")}</p>
+        <div className="mt-4">
+          <Link
+            href="/handyman#book"
+            className="inline-block bg-tobacco text-white px-7 py-3 text-[0.85rem] font-semibold tracking-[0.06em] uppercase rounded-[3px] hover:bg-tobacco/90 hover:-translate-y-0.5 transition-all"
+          >
+            {t("areas.bookHandyman")}
+          </Link>
+        </div>
+
+        <div className="mt-8">
           <Link href="/areas" className="text-green font-medium hover:underline text-[0.9rem]">
             {t("areas.viewAll")}
           </Link>

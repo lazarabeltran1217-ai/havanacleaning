@@ -28,6 +28,14 @@ export const SERVICE_AREAS = [
   "Westchester",
 ] as const;
 
+export const NYC_SERVICE_AREAS = [
+  "Manhattan",
+  "Brooklyn",
+  "Queens",
+  "The Bronx",
+  "Staten Island",
+] as const;
+
 export const TIME_SLOTS = [
   { label: "Morning (8am - 11am)", value: "morning" },
   { label: "Midday (11am - 2pm)", value: "midday" },

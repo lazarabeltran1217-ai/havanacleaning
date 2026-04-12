@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { BookingWizard } from "@/components/website/BookingWizard";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { Check } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Book Professional Cleaners Near Me — Online Scheduling",
@@ -59,6 +60,39 @@ export default async function BookPage() {
         <p className="text-sand max-w-md mx-auto">
           {t("heroSubtitle")}
         </p>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="bg-cream py-12 px-6 md:px-20">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="font-display text-center text-xl mb-8">{t("howItWorksTitle")}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {([
+              { title: t("hiw1Title"), desc: t("hiw1Desc"), num: "1" },
+              { title: t("hiw2Title"), desc: t("hiw2Desc"), num: "2" },
+              { title: t("hiw3Title"), desc: t("hiw3Desc"), num: "3" },
+            ]).map((step) => (
+              <div key={step.num} className="text-center">
+                <div className="w-10 h-10 rounded-full bg-green text-white flex items-center justify-center font-bold mx-auto mb-3">
+                  {step.num}
+                </div>
+                <h3 className="font-display text-[0.95rem] mb-1.5">{step.title}</h3>
+                <p className="text-[#7a6555] text-[0.85rem] leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TRUST SIGNALS */}
+      <section className="bg-green py-5 px-6 md:px-20">
+        <div className="max-w-4xl mx-auto flex flex-wrap justify-center gap-8 text-white text-[0.85rem] font-medium">
+          {[t("trustItem1"), t("trustItem2"), t("trustItem3"), t("trustItem4")].map((item) => (
+            <div key={item} className="flex items-center gap-2">
+              <Check className="w-4 h-4 shrink-0" /> {item}
+            </div>
+          ))}
+        </div>
       </section>
 
       <section className="bg-ivory py-12 px-6 md:px-20">

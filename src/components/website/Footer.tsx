@@ -13,19 +13,6 @@ export function Footer() {
             Havana <span className="text-green-light italic">Cleaning</span>
           </span>
           <p className="text-sand text-[0.88rem] leading-relaxed">{t("tagline")}</p>
-          {/* Social Icons */}
-          <div className="flex gap-3 mt-5">
-            {["Facebook", "Instagram", "TikTok", "Yelp", "Google"].map((name) => (
-              <a
-                key={name}
-                href="#"
-                aria-label={name}
-                className="w-9 h-9 rounded-full bg-white/[0.08] border border-white/[0.12] flex items-center justify-center hover:bg-green hover:border-green transition-colors group"
-              >
-                <span className="text-sand text-xs group-hover:text-white transition-colors">{name[0]}</span>
-              </a>
-            ))}
-          </div>
         </div>
 
         {/* Services */}

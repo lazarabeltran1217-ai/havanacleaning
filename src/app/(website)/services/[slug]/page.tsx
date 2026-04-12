@@ -17,6 +17,18 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+// SEO-optimized titles targeting high-value keywords
+const SERVICE_TITLE_MAP: Record<string, string> = {
+  "deep-cleaning": "Deep Cleaning Service in Miami — Professional Deep Clean",
+  "move-in-move-out": "Move Out Cleaning & Move-In Cleaning Service in Miami",
+  "recurring-plans": "Weekly House Cleaning & Recurring Cleaning Service Miami",
+  "residential-cleaning": "Professional House Cleaning Service in Miami",
+  "commercial-cleaning": "Commercial Cleaning Service — Office & Business Cleaning",
+  "airbnb-turnover": "Airbnb Turnover Cleaning Service — Vacation Rental Cleaning",
+  "post-construction": "Post-Construction Cleaning Service in Miami",
+  "green-clean": "Eco-Friendly Green Cleaning Service — Non-Toxic House Cleaning",
+};
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const { slug } = await params;
@@ -28,8 +40,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       baseDesc.length >= 120
         ? baseDesc
         : `Professional ${service.name.toLowerCase()} services. ${baseDesc || "Trusted by local families and businesses."} Book online with Havana Cleaning today.`;
+    const title = SERVICE_TITLE_MAP[slug] || `Professional ${service.name} Services`;
     return {
-      title: `Professional ${service.name} Services`,
+      title,
       description: description.slice(0, 160),
       alternates: { canonical: `/services/${slug}` },
     };

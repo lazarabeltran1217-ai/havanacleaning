@@ -80,6 +80,33 @@ export default async function ReviewsPage() {
         </div>
       </section>
 
+      {/* INTRO + STATS */}
+      <section className="bg-cream py-12 px-6 md:px-20">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-[#5a4535] text-[0.92rem] leading-relaxed mb-8">
+            {t("testimonials.introText")}
+          </p>
+          {testimonials.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-10">
+              <div className="text-center">
+                <div className="font-display text-3xl font-black text-green">
+                  {(Math.round(avgRating * 10) / 10).toFixed(1)}
+                </div>
+                <div className="text-sand text-[0.78rem] uppercase tracking-wider mt-1">{t("hero.avgRating")}</div>
+              </div>
+              <div className="text-center">
+                <div className="font-display text-3xl font-black text-green">{testimonials.length}</div>
+                <div className="text-sand text-[0.78rem] uppercase tracking-wider mt-1">{t("testimonials.label")}</div>
+              </div>
+              <div className="text-center">
+                <div className="font-display text-3xl font-black text-green">99%</div>
+                <div className="text-sand text-[0.78rem] uppercase tracking-wider mt-1">{t("testimonials.satisfactionRate")}</div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* REVIEWS GRID */}
       <section className="bg-ivory py-20 px-6 md:px-20">
         <div className="max-w-6xl mx-auto">
