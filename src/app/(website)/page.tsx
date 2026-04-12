@@ -100,6 +100,11 @@ export default async function HomePage() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/palm-tree.svg" alt="Decorative palm tree silhouette" className="absolute right-0 bottom-0 hidden md:block md:w-[380px] h-auto pointer-events-none opacity-50 -scale-x-100 z-[1]" />
 
+        {/* TEST BANNER - REMOVE AFTER VERIFYING DEPLOYMENT */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-red-600 text-white px-6 py-2 rounded-full font-bold text-sm">
+          DEPLOYMENT TEST - April 11
+        </div>
+
         <div className="max-w-[800px] relative z-10 text-center px-6 pt-36 pb-20 mx-auto">
           <div className="text-[0.75rem] tracking-[0.25em] uppercase text-green-light mb-6 flex items-center justify-center gap-3">
             <span className="w-10 h-px bg-green-light" />
