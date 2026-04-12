@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { AdminBottomNav } from "./AdminBottomNav";
+import { AdminNotepad } from "./AdminNotepad";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -38,6 +39,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       </main>
 
       <AdminBottomNav onMenuOpen={() => setSidebarOpen(true)} />
+      <AdminNotepad />
     </div>
   );
 }
