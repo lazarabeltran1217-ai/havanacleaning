@@ -58,11 +58,29 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Booking not found" }, { status: 404 });
   }
 
-  // Only owner can update any booking; customer can only cancel their own
+  // Only owner can update any booking; customer can only cancel or edit (when allowed)
   if (session.user.role === "CUSTOMER") {
     if (booking.customerId !== session.user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
+
+    // Customer edit flow — only when admin has enabled editing
+    if (body.customerEdit) {
+      if (!booking.customerCanEdit) {
+        return NextResponse.json({ error: "Editing is not enabled for this booking" }, { status: 403 });
+      }
+      const editData: Record<string, unknown> = {
+        customerCanEdit: false,
+        status: "PENDING",
+      };
+      if (body.customerNotes !== undefined) editData.customerNotes = body.customerNotes;
+      if (body.scheduledDate) editData.scheduledDate = new Date(body.scheduledDate);
+      if (body.scheduledTime) editData.scheduledTime = body.scheduledTime;
+
+      const updated = await prisma.booking.update({ where: { id }, data: editData });
+      return NextResponse.json({ booking: updated });
+    }
+
     // Customers can only cancel
     if (body.status && body.status !== "CANCELLED") {
       return NextResponse.json(
@@ -80,6 +98,13 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
   if (body.rating !== undefined) updateData.rating = body.rating;
   if (body.review !== undefined) updateData.review = body.review;
   if (body.status === "COMPLETED") updateData.completedAt = new Date();
+
+  // Admin reply
+  if (body.adminReply !== undefined) {
+    updateData.adminReply = body.adminReply;
+    updateData.adminRepliedAt = new Date();
+    updateData.customerCanEdit = true;
+  }
 
   const updated = await prisma.booking.update({
     where: { id },

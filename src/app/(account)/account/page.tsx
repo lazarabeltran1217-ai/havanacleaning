@@ -18,6 +18,8 @@ import {
   CheckCircle,
   Wrench,
   Zap,
+  MessageSquare,
+  Pencil,
 } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
 import { BookingPayment } from "@/components/website/BookingPayment";
@@ -67,6 +69,10 @@ interface BookingData {
   address: { street: string; unit: string | null; city: string; state: string; zipCode: string } | null;
   payments: { status: string }[];
   assignments: { employee: { name: string } }[];
+  adminReply?: string | null;
+  adminRepliedAt?: string | null;
+  customerCanEdit?: boolean;
+  customerNotes?: string | null;
 }
 
 interface AddressData {
@@ -116,6 +122,9 @@ interface HandymanInquiryData {
   estimatedTotal: number | null;
   createdAt: string;
   payments: { status: string }[];
+  adminReply?: string | null;
+  adminRepliedAt?: string | null;
+  customerCanEdit?: boolean;
 }
 
 interface DashboardData {
@@ -190,6 +199,13 @@ export default function CustomerDashboard() {
 
   // Handyman payment
   const [payingHandyman, setPayingHandyman] = useState<HandymanInquiryData | null>(null);
+
+  // Editing booking
+  const [editingBooking, setEditingBooking] = useState<BookingData | null>(null);
+  const [editDate, setEditDate] = useState("");
+  const [editTime, setEditTime] = useState("");
+  const [editNotes, setEditNotes] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
 
   // Address form
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -278,6 +294,34 @@ export default function CustomerDashboard() {
       setAddrZip("");
     }
     setAddrSaving(false);
+  };
+
+  /* ─── Edit Booking (customer) ─── */
+  const startEditBooking = (b: BookingData) => {
+    setEditingBooking(b);
+    setEditDate(b.scheduledDate.slice(0, 10));
+    setEditTime(b.scheduledTime || "morning");
+    setEditNotes((b as BookingData & { customerNotes?: string }).customerNotes || "");
+  };
+
+  const handleEditBooking = async () => {
+    if (!editingBooking) return;
+    setEditSaving(true);
+    const res = await fetch(`/api/bookings/${editingBooking.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        customerEdit: true,
+        scheduledDate: editDate,
+        scheduledTime: editTime,
+        customerNotes: editNotes || undefined,
+      }),
+    });
+    setEditSaving(false);
+    if (res.ok) {
+      setEditingBooking(null);
+      fetchDashboard();
+    }
   };
 
   /* ─── Derived ─── */
@@ -566,6 +610,25 @@ export default function CustomerDashboard() {
                         )}
                       </div>
                     </div>
+                    {/* Admin reply */}
+                    {b.adminReply && (
+                      <div className="mt-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 rounded-lg px-3 py-2">
+                        <div className="flex items-center gap-1 text-[0.68rem] text-blue-500 dark:text-blue-400 font-medium mb-0.5">
+                          <MessageSquare className="w-3 h-3" />
+                          {t("adminReply")} {b.adminRepliedAt && `— ${new Date(b.adminRepliedAt).toLocaleDateString(dateLocale, { month: "short", day: "numeric" })}`}
+                        </div>
+                        <div className={`text-[0.78rem] ${TEXT_PRIMARY}`}>{b.adminReply}</div>
+                      </div>
+                    )}
+                    {/* Edit button */}
+                    {b.customerCanEdit && (
+                      <button
+                        onClick={() => startEditBooking(b)}
+                        className="mt-2 w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg text-[0.78rem] font-medium hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                      >
+                        <Pencil className="w-3 h-3" /> {t("editBooking")}
+                      </button>
+                    )}
                   </div>
                 );
               })}
@@ -736,6 +799,16 @@ export default function CustomerDashboard() {
                       </div>
                     </div>
                   </div>
+                  {/* Admin reply */}
+                  {inq.adminReply && (
+                    <div className="mt-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 rounded-lg px-3 py-2">
+                      <div className="flex items-center gap-1 text-[0.68rem] text-blue-500 dark:text-blue-400 font-medium mb-0.5">
+                        <MessageSquare className="w-3 h-3" />
+                        {t("adminReply")} {inq.adminRepliedAt && `— ${new Date(inq.adminRepliedAt).toLocaleDateString(dateLocale, { month: "short", day: "numeric" })}`}
+                      </div>
+                      <div className={`text-[0.78rem] ${TEXT_PRIMARY}`}>{inq.adminReply}</div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -892,6 +965,61 @@ export default function CustomerDashboard() {
                   fetchDashboard();
                 }}
               />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ EDIT BOOKING MODAL ═══ */}
+      {editingBooking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setEditingBooking(null)} />
+          <div className="relative bg-white dark:bg-[#382618] rounded-2xl border border-gray-200 dark:border-gold/15 shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className={`flex items-center justify-between p-5 border-b ${INNER_BORDER}`}>
+              <h3 className={`font-display text-lg ${TEXT_PRIMARY}`}>{t("editBooking")}</h3>
+              <button onClick={() => setEditingBooking(null)} className={`${TEXT_MUTED} hover:text-tobacco dark:hover:text-cream`}>
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              {editingBooking.adminReply && (
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 rounded-lg px-3 py-2">
+                  <div className="flex items-center gap-1 text-[0.68rem] text-blue-500 dark:text-blue-400 font-medium mb-0.5">
+                    <MessageSquare className="w-3 h-3" /> {t("adminReply")}
+                  </div>
+                  <div className={`text-[0.78rem] ${TEXT_PRIMARY}`}>{editingBooking.adminReply}</div>
+                </div>
+              )}
+              <div>
+                <label className={`text-[0.72rem] font-medium ${TEXT_MUTED} block mb-1`}>{t("editDate")}</label>
+                <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} className={INPUT_CLS} />
+              </div>
+              <div>
+                <label className={`text-[0.72rem] font-medium ${TEXT_MUTED} block mb-1`}>{t("editTime")}</label>
+                <select value={editTime} onChange={(e) => setEditTime(e.target.value)} className={INPUT_CLS}>
+                  <option value="morning">{fmtTime("morning")}</option>
+                  <option value="midday">{fmtTime("midday")}</option>
+                  <option value="afternoon">{fmtTime("afternoon")}</option>
+                </select>
+              </div>
+              <div>
+                <label className={`text-[0.72rem] font-medium ${TEXT_MUTED} block mb-1`}>{t("editNotes")}</label>
+                <textarea
+                  value={editNotes}
+                  onChange={(e) => setEditNotes(e.target.value)}
+                  rows={3}
+                  placeholder={t("editNotesPlaceholder")}
+                  className={`${INPUT_CLS} resize-none`}
+                />
+              </div>
+              <p className={`${TEXT_MUTED} text-[0.72rem]`}>{t("editDisclaimer")}</p>
+              <button
+                onClick={handleEditBooking}
+                disabled={editSaving}
+                className="w-full py-2.5 bg-green text-white rounded-[3px] text-sm font-semibold hover:bg-green-light disabled:opacity-50 transition-colors"
+              >
+                {editSaving ? t("saving") : t("submitEdit")}
+              </button>
             </div>
           </div>
         </div>

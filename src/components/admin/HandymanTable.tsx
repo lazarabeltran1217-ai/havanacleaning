@@ -21,12 +21,12 @@ const SERVICE_LABELS: Record<string, string> = {
 };
 
 const statusColors: Record<string, string> = {
-  PENDING: "bg-amber/10 text-amber",
-  CONFIRMED: "bg-gold/10 text-gold",
+  PENDING: "bg-yellow-100 text-yellow-800",
+  CONFIRMED: "bg-blue-100 text-blue-700",
   IN_PROGRESS: "bg-teal/10 text-teal",
-  COMPLETED: "bg-green/20 text-green",
-  CANCELLED: "bg-red/10 text-red",
-  NO_SHOW: "bg-gray-100 text-gray-400",
+  COMPLETED: "bg-green-100 text-green-700",
+  CANCELLED: "bg-red-100 text-red-700",
+  NO_SHOW: "bg-gray-100 text-gray-500",
 };
 
 type HandymanInquiry = {

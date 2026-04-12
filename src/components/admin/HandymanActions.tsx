@@ -10,6 +10,9 @@ interface Props {
   currentQuotedPrice: number | null;
   assignments: { employeeId: string; employeeName: string }[];
   employees: { id: string; name: string }[];
+  adminReply?: string | null;
+  adminRepliedAt?: string | null;
+  customerCanEdit?: boolean;
 }
 
 const STATUSES: { value: string; label: string }[] = [
@@ -21,13 +24,28 @@ const STATUSES: { value: string; label: string }[] = [
   { value: "NO_SHOW", label: "No Show" },
 ];
 
-export function HandymanActions({ inquiryId, currentStatus, currentNotes, currentQuotedPrice, assignments, employees }: Props) {
+export function HandymanActions({ inquiryId, currentStatus, currentNotes, currentQuotedPrice, assignments, employees, adminReply: existingReply, adminRepliedAt, customerCanEdit }: Props) {
   const router = useRouter();
   const [status, setStatus] = useState(currentStatus);
   const [notes, setNotes] = useState(currentNotes || "");
   const [quotedPrice, setQuotedPrice] = useState(currentQuotedPrice?.toString() || "");
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [loading, setLoading] = useState(false);
+  const [replyText, setReplyText] = useState("");
+  const [replySending, setReplySending] = useState(false);
+
+  async function sendReply() {
+    if (!replyText.trim()) return;
+    setReplySending(true);
+    await fetch(`/api/handyman/${inquiryId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ adminReply: replyText.trim() }),
+    });
+    setReplySending(false);
+    setReplyText("");
+    router.refresh();
+  }
 
   async function updateStatus() {
     setLoading(true);
@@ -147,6 +165,41 @@ export function HandymanActions({ inquiryId, currentStatus, currentNotes, curren
           className="w-full bg-gold text-tobacco py-2.5 text-[0.82rem] font-semibold rounded-lg hover:bg-amber disabled:opacity-50 transition-colors"
         >
           Assign
+        </button>
+      </div>
+
+      {/* REPLY TO CUSTOMER */}
+      <div className="bg-white rounded-xl p-5 border border-[#ece6d9]">
+        <h3 className="font-display text-base mb-3">Reply to Customer</h3>
+        <p className="text-gray-400 text-[0.75rem] mb-3">
+          Send a message to the customer about this inquiry. This will enable them to edit their order.
+        </p>
+
+        {existingReply && (
+          <div className="mb-3 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3">
+            <div className="text-[0.72rem] text-blue-500 uppercase tracking-wider font-medium mb-1">
+              Previous Reply {adminRepliedAt && `— ${new Date(adminRepliedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}`}
+            </div>
+            <div className="text-[0.85rem] text-blue-800">{existingReply}</div>
+            {customerCanEdit && (
+              <div className="text-[0.72rem] text-blue-500 mt-1">Customer can currently edit this inquiry</div>
+            )}
+          </div>
+        )}
+
+        <textarea
+          value={replyText}
+          onChange={(e) => setReplyText(e.target.value)}
+          placeholder="e.g., We need more details about the project scope."
+          rows={3}
+          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-[0.85rem] resize-none mb-3"
+        />
+        <button
+          onClick={sendReply}
+          disabled={replySending || !replyText.trim()}
+          className="w-full bg-blue-600 text-white py-2.5 text-[0.82rem] font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+        >
+          {replySending ? "Sending..." : "Send Reply"}
         </button>
       </div>
     </div>

@@ -98,7 +98,7 @@ export default async function AdminDashboard() {
   let monthlyRevenue: { month: string; revenue: number; bookings: number }[] = [];
   let bookingsByStatus: { status: string; count: number }[] = [];
   let revenueByService: { service: string; revenue: number }[] = [];
-  let todaysJobs: { id: string; customerName: string; serviceName: string; time: string; cleaner: string; status: string }[] = [];
+  let todaysJobs: { id: string; customerName: string; serviceName: string; date: string; time: string; cleaner: string; status: string }[] = [];
   let activeEmployees: { name: string; clockIn: string }[] = [];
 
   try {
@@ -140,7 +140,7 @@ export default async function AdminDashboard() {
       fetchRevenueByService(),
       prisma.booking.findMany({
         where: {
-          scheduledDate: { gte: todayStart, lt: tomorrowStart },
+          scheduledDate: { gte: todayStart },
           status: { in: ["CONFIRMED", "IN_PROGRESS", "COMPLETED", "PENDING"] },
         },
         include: {
@@ -148,7 +148,8 @@ export default async function AdminDashboard() {
           service: { select: { name: true } },
           assignments: { include: { employee: { select: { name: true } } } },
         },
-        orderBy: { scheduledTime: "asc" },
+        orderBy: [{ scheduledDate: "asc" }, { scheduledTime: "asc" }],
+        take: 10,
       }),
       prisma.timeEntry.findMany({
         where: { clockOut: null },
@@ -176,6 +177,7 @@ export default async function AdminDashboard() {
         id: b.id,
         customerName: b.customer.name ?? "Unknown",
         serviceName: b.service.name,
+        date: formatDate(b.scheduledDate),
         time: timeLabels[b.scheduledTime] ?? b.scheduledTime,
         cleaner,
         status: b.status,
@@ -214,9 +216,9 @@ export default async function AdminDashboard() {
       {/* Today's Jobs + Live Clock */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
         <div className="bg-white rounded-xl p-5 border border-[#ece6d9]">
-          <h3 className="font-display text-base mb-4">Today&apos;s Jobs</h3>
+          <h3 className="font-display text-base mb-4">Upcoming Jobs</h3>
           {todaysJobs.length === 0 ? (
-            <p className="text-gray-400 text-sm">No jobs scheduled for today.</p>
+            <p className="text-gray-400 text-sm">No upcoming jobs.</p>
           ) : (
             <>
               {/* Desktop table */}
@@ -226,6 +228,7 @@ export default async function AdminDashboard() {
                     <tr className="text-left text-[0.7rem] uppercase tracking-wider text-gray-400 border-b border-gray-100">
                       <th className="pb-2 font-medium">Client</th>
                       <th className="pb-2 font-medium">Service</th>
+                      <th className="pb-2 font-medium">Date</th>
                       <th className="pb-2 font-medium">Time</th>
                       <th className="pb-2 font-medium">Cleaner</th>
                       <th className="pb-2 font-medium">Status</th>
@@ -236,14 +239,16 @@ export default async function AdminDashboard() {
                       <tr key={job.id} className="border-b border-gray-50 last:border-0">
                         <td className="py-2.5 font-medium text-tobacco">{job.customerName}</td>
                         <td className="py-2.5">{job.serviceName}</td>
+                        <td className="py-2.5 text-gray-500">{job.date}</td>
                         <td className="py-2.5">{job.time}</td>
                         <td className="py-2.5">{job.cleaner}</td>
                         <td className="py-2.5">
                           <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${
-                            job.status === "COMPLETED" ? "bg-green/10 text-green" :
+                            job.status === "COMPLETED" ? "bg-green-100 text-green-700" :
                             job.status === "IN_PROGRESS" ? "bg-teal/10 text-teal" :
-                            job.status === "CONFIRMED" ? "bg-green/10 text-green" :
-                            "bg-amber/10 text-amber"
+                            job.status === "CONFIRMED" ? "bg-blue-100 text-blue-700" :
+                            job.status === "CANCELLED" ? "bg-red-100 text-red-700" :
+                            "bg-yellow-100 text-yellow-800"
                           }`}>{formatStatus(job.status)}</span>
                         </td>
                       </tr>
@@ -258,13 +263,14 @@ export default async function AdminDashboard() {
                     <div className="flex justify-between items-start mb-1">
                       <span className="font-medium text-tobacco text-[0.85rem]">{job.customerName}</span>
                       <span className={`text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${
-                        job.status === "COMPLETED" ? "bg-green/10 text-green" :
+                        job.status === "COMPLETED" ? "bg-green-100 text-green-700" :
                         job.status === "IN_PROGRESS" ? "bg-teal/10 text-teal" :
-                        job.status === "CONFIRMED" ? "bg-green/10 text-green" :
-                        "bg-amber/10 text-amber"
+                        job.status === "CONFIRMED" ? "bg-blue-100 text-blue-700" :
+                        job.status === "CANCELLED" ? "bg-red-100 text-red-700" :
+                        "bg-yellow-100 text-yellow-800"
                       }`}>{formatStatus(job.status)}</span>
                     </div>
-                    <div className="text-gray-500 text-[0.78rem]">{job.serviceName} &middot; {job.time}</div>
+                    <div className="text-gray-500 text-[0.78rem]">{job.serviceName} &middot; {job.date} &middot; {job.time}</div>
                     <div className="text-gray-400 text-[0.75rem] mt-0.5">Cleaner: {job.cleaner}</div>
                   </div>
                 ))}
@@ -303,10 +309,11 @@ export default async function AdminDashboard() {
                   <div className="text-right">
                     <div className="text-[0.82rem] font-medium">{formatCurrency(b.total)}</div>
                     <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${
-                      b.status === "CONFIRMED" ? "bg-green/10 text-green" :
-                      b.status === "COMPLETED" ? "bg-teal/10 text-teal" :
-                      b.status === "CANCELLED" ? "bg-red/10 text-red" :
-                      "bg-amber/10 text-amber"
+                      b.status === "CONFIRMED" ? "bg-blue-100 text-blue-700" :
+                      b.status === "COMPLETED" ? "bg-green-100 text-green-700" :
+                      b.status === "IN_PROGRESS" ? "bg-teal/10 text-teal" :
+                      b.status === "CANCELLED" ? "bg-red-100 text-red-700" :
+                      "bg-yellow-100 text-yellow-800"
                     }`}>{formatStatus(b.status)}</span>
                   </div>
                 </div>

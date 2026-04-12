@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { ClipboardList } from "lucide-react";
+import { ClipboardList, CalendarDays, List } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
 import { formatStatus } from "@/lib/utils";
 import { QuickBookForm } from "./QuickBookForm";
+import { BookingDetailModal } from "./BookingDetailModal";
 
 interface Employee {
   id: string;
@@ -66,18 +67,19 @@ function isSameDay(a: Date, b: Date): boolean {
 }
 
 const statusColors: Record<string, string> = {
-  PENDING: "border-l-amber",
-  CONFIRMED: "border-l-green",
+  PENDING: "border-l-yellow-400",
+  CONFIRMED: "border-l-blue-500",
   IN_PROGRESS: "border-l-teal",
-  COMPLETED: "border-l-green/50",
+  COMPLETED: "border-l-green-500",
+  CANCELLED: "border-l-red-400",
 };
 
 const statusBadgeColors: Record<string, string> = {
-  PENDING: "bg-amber/10 text-amber",
-  CONFIRMED: "bg-green/10 text-green",
+  PENDING: "bg-yellow-100 text-yellow-800",
+  CONFIRMED: "bg-blue-100 text-blue-700",
   IN_PROGRESS: "bg-teal/10 text-teal",
-  COMPLETED: "bg-green/20 text-green",
-  CANCELLED: "bg-red/10 text-red",
+  COMPLETED: "bg-green-100 text-green-700",
+  CANCELLED: "bg-red-100 text-red-700",
 };
 
 function BookingCard({
@@ -87,6 +89,7 @@ function BookingCard({
   assignEmployee,
   unassignEmployee,
   compact,
+  onSelect,
 }: {
   b: BookingItem;
   employees: Employee[];
@@ -94,10 +97,12 @@ function BookingCard({
   assignEmployee: (bookingId: string, employeeId: string) => void;
   unassignEmployee: (bookingId: string, employeeId: string) => void;
   compact?: boolean;
+  onSelect?: (b: BookingItem) => void;
 }) {
   return (
     <div
-      className={`rounded-lg border-l-4 bg-ivory/50 p-2 text-[0.75rem] ${
+      onClick={() => onSelect?.(b)}
+      className={`rounded-lg border-l-4 bg-ivory/50 p-2 text-[0.75rem] cursor-pointer hover:bg-ivory transition-colors ${
         statusColors[b.status] || "border-l-gray-300"
       }`}
     >
@@ -198,6 +203,8 @@ export function ScheduleView() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [assigning, setAssigning] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
+  const [selectedBooking, setSelectedBooking] = useState<BookingItem | null>(null);
 
   const fetchSchedule = useCallback(async () => {
     setLoading(true);
@@ -274,6 +281,20 @@ export function ScheduleView() {
             →
           </button>
           <QuickBookForm onCreated={fetchSchedule} />
+          <div className="flex items-center border rounded-lg overflow-hidden ml-2">
+            <button
+              onClick={() => setViewMode("calendar")}
+              className={`px-2.5 py-1.5 text-sm flex items-center gap-1 transition-colors ${viewMode === "calendar" ? "bg-green text-white" : "hover:bg-ivory"}`}
+            >
+              <CalendarDays className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode("list")}
+              className={`px-2.5 py-1.5 text-sm flex items-center gap-1 transition-colors ${viewMode === "list" ? "bg-green text-white" : "hover:bg-ivory"}`}
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
         </div>
         <div className="font-display text-base sm:text-lg">
           {formatShortDate(weekStart)} — {formatShortDate(weekEndDate)},{" "}
@@ -301,6 +322,62 @@ export function ScheduleView() {
       {loading ? (
         <div className="bg-white rounded-xl border border-[#ece6d9] p-12 text-center text-gray-400">
           Loading schedule...
+        </div>
+      ) : viewMode === "list" ? (
+        /* ═══ LIST VIEW ═══ */
+        <div className="bg-white rounded-xl border border-[#ece6d9] overflow-hidden">
+          <table className="w-full text-left text-[0.85rem]">
+            <thead>
+              <tr className="bg-ivory/50 border-b border-[#ece6d9]">
+                <th className="px-4 py-3 text-[0.7rem] uppercase tracking-wider text-gray-400 font-medium">Date</th>
+                <th className="px-4 py-3 text-[0.7rem] uppercase tracking-wider text-gray-400 font-medium">Time</th>
+                <th className="px-4 py-3 text-[0.7rem] uppercase tracking-wider text-gray-400 font-medium">Service</th>
+                <th className="px-4 py-3 text-[0.7rem] uppercase tracking-wider text-gray-400 font-medium">Customer</th>
+                <th className="px-4 py-3 text-[0.7rem] uppercase tracking-wider text-gray-400 font-medium hidden sm:table-cell">Address</th>
+                <th className="px-4 py-3 text-[0.7rem] uppercase tracking-wider text-gray-400 font-medium">Status</th>
+                <th className="px-4 py-3 text-[0.7rem] uppercase tracking-wider text-gray-400 font-medium hidden sm:table-cell">Assigned</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings
+                .sort((a, b) => new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime())
+                .map((b) => (
+                <tr
+                  key={b.id}
+                  onClick={() => setSelectedBooking(b)}
+                  className="border-b border-gray-50 hover:bg-ivory/30 cursor-pointer transition-colors"
+                >
+                  <td className="px-4 py-3">
+                    <div className="font-medium">{formatShortDate(new Date(b.scheduledDate + "T12:00:00"))}</div>
+                    <div className="text-gray-400 text-[0.72rem]">{new Date(b.scheduledDate + "T12:00:00").toLocaleDateString("en-US", { weekday: "short" })}</div>
+                  </td>
+                  <td className="px-4 py-3 text-gray-500">{TIME_LABELS[b.scheduledTime] || b.scheduledTime}</td>
+                  <td className="px-4 py-3">
+                    <span className="flex items-center gap-1.5">
+                      <ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-green" /> {b.service.name}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">{b.customer.name}</td>
+                  <td className="px-4 py-3 text-gray-400 text-[0.82rem] hidden sm:table-cell">{b.address?.street || "—"}</td>
+                  <td className="px-4 py-3">
+                    <span className={`text-[0.7rem] uppercase tracking-wider px-2.5 py-1 rounded-full font-medium ${statusBadgeColors[b.status] || "bg-gray-100 text-gray-500"}`}>
+                      {formatStatus(b.status)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-[0.82rem] hidden sm:table-cell">
+                    {b.assignments.length > 0
+                      ? b.assignments.map((a) => a.employee.name).join(", ")
+                      : <span className="text-gray-300">Unassigned</span>}
+                  </td>
+                </tr>
+              ))}
+              {bookings.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-4 py-12 text-center text-gray-400">No bookings this week.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       ) : (
         <>
@@ -342,6 +419,7 @@ export function ScheduleView() {
                           assigning={assigning}
                           assignEmployee={assignEmployee}
                           unassignEmployee={unassignEmployee}
+                          onSelect={setSelectedBooking}
                         />
                       ))
                     )}
@@ -390,6 +468,7 @@ export function ScheduleView() {
                         assigning={assigning}
                         assignEmployee={assignEmployee}
                         unassignEmployee={unassignEmployee}
+                        onSelect={setSelectedBooking}
                         compact
                       />
                     ))}
@@ -402,7 +481,7 @@ export function ScheduleView() {
       )}
 
       {/* Empty state message */}
-      {!loading && bookings.length === 0 && (
+      {!loading && bookings.length === 0 && viewMode === "calendar" && (
         <div className="mt-6 bg-white rounded-xl border border-[#ece6d9] p-8 text-center">
           <ClipboardList className="w-8 h-8 text-gray-300 mx-auto mb-3" />
           <p className="text-gray-500 text-[0.9rem] mb-2">
@@ -413,6 +492,14 @@ export function ScheduleView() {
             from the <a href="/admin/bookings" className="text-teal hover:underline">Bookings</a> page.
           </p>
         </div>
+      )}
+
+      {/* Booking Detail Modal */}
+      {selectedBooking && (
+        <BookingDetailModal
+          booking={selectedBooking}
+          onClose={() => setSelectedBooking(null)}
+        />
       )}
     </div>
   );

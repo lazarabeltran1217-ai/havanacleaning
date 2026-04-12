@@ -89,10 +89,11 @@ interface ScheduleJob {
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const statusColors: Record<string, string> = {
-  CONFIRMED: "bg-green/10 text-green",
+  PENDING: "bg-yellow-100 text-yellow-800",
+  CONFIRMED: "bg-blue-100 text-blue-700",
   IN_PROGRESS: "bg-teal/10 text-teal",
-  COMPLETED: "bg-green/20 text-green",
-  PENDING: "bg-amber-100 text-amber-600",
+  COMPLETED: "bg-green-100 text-green-700",
+  CANCELLED: "bg-red-100 text-red-700",
 };
 
 function fmtDate(dateStr: string) {
@@ -132,6 +133,7 @@ export default function EmployeeDashboard() {
   const [clockMessage, setClockMessage] = useState("");
   const [todayJobs, setTodayJobs] = useState<TodayJob[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [selectedJob, setSelectedJob] = useState<TodayJob | null>(null);
   const [showCompletePrompt, setShowCompletePrompt] = useState(false);
 
   // Schedule state
@@ -519,7 +521,7 @@ export default function EmployeeDashboard() {
           )}
         </div>
 
-        {/* ─── TODAY'S JOBS CARD ─── */}
+        {/* ─── UPCOMING JOBS CARD ─── */}
         <div className={CARD}>
           <h3 className={`font-display text-lg ${TEXT_PRIMARY} mb-3 flex items-center gap-2`}>
             <Calendar className="w-4 h-4 text-green" /> {t("jobs_title")}
@@ -540,7 +542,10 @@ export default function EmployeeDashboard() {
                     </span>
                   </div>
                   <div className={`text-gray-500 dark:text-sand/60 text-[0.78rem] space-y-0.5`}>
-                    <div className="capitalize">{j.booking.scheduledTime}</div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-tobacco dark:text-cream">{fmtDate(j.booking.scheduledDate)}</span>
+                      <span className="capitalize">{j.booking.scheduledTime}</span>
+                    </div>
                     <div>{t("jobs_client")}: {j.booking.customer.name}{j.booking.customer.phone && ` — ${j.booking.customer.phone}`}</div>
                     {j.booking.address && (
                       <div className="flex items-start gap-1">
@@ -548,22 +553,25 @@ export default function EmployeeDashboard() {
                         {j.booking.address.street}{j.booking.address.unit && ` ${j.booking.address.unit}`}, {j.booking.address.city}, {j.booking.address.state} {j.booking.address.zipCode}
                       </div>
                     )}
-                    {j.booking.customerNotes && (
-                      <div className="mt-1.5 bg-ivory dark:bg-[#1a1410] rounded-lg px-3 py-2 text-[0.75rem]">
-                        <span className="font-medium">{t("jobs_notes")}:</span> {j.booking.customerNotes}
-                      </div>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <button
+                      onClick={() => setSelectedJob(j)}
+                      className="text-teal text-[0.75rem] font-semibold hover:underline"
+                    >
+                      {t("jobs_view")}
+                    </button>
+                    {j.booking.address && (
+                      <a
+                        href={`https://maps.google.com/?q=${encodeURIComponent(`${j.booking.address.street}, ${j.booking.address.city}, ${j.booking.address.state} ${j.booking.address.zipCode}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-teal text-[0.75rem] font-semibold hover:underline"
+                      >
+                        <MapPin className="w-3 h-3" /> {t("jobs_maps")}
+                      </a>
                     )}
                   </div>
-                  {j.booking.address && (
-                    <a
-                      href={`https://maps.google.com/?q=${encodeURIComponent(`${j.booking.address.street}, ${j.booking.address.city}, ${j.booking.address.state} ${j.booking.address.zipCode}`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-1 text-teal text-[0.75rem] font-semibold hover:underline"
-                    >
-                      <MapPin className="w-3 h-3" /> {t("jobs_maps")}
-                    </a>
-                  )}
                 </div>
               ))}
             </div>
@@ -864,6 +872,83 @@ export default function EmployeeDashboard() {
           </div>
         </div>
       </div>
+
+      {/* ─── JOB DETAIL MODAL ─── */}
+      {selectedJob && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSelectedJob(null)} />
+          <div className="relative bg-white dark:bg-[#382618] rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto">
+            <div className={`flex items-center justify-between p-5 border-b ${INNER_BORDER}`}>
+              <div className="flex items-center gap-3">
+                <ServiceIcon emoji={selectedJob.booking.service.icon} className="w-6 h-6 text-green" />
+                <div>
+                  <h3 className={`font-display text-lg ${TEXT_PRIMARY}`}>{selectedJob.booking.service.name}</h3>
+                  <span className="text-gray-400 text-[0.78rem]">#{selectedJob.booking.bookingNumber}</span>
+                </div>
+              </div>
+              <button onClick={() => setSelectedJob(null)} className="text-gray-400 hover:text-tobacco dark:hover:text-cream">
+                <ChevronDown className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              <span className={`inline-block text-[0.72rem] uppercase tracking-wider px-3 py-1 rounded-full font-medium ${statusColors[selectedJob.booking.status] || "bg-gray-100 text-gray-500"}`}>
+                {fmtStatus(selectedJob.booking.status)}
+              </span>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <Calendar className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                  <div>
+                    <div className={`text-[0.88rem] font-medium ${TEXT_PRIMARY}`}>{fmtDate(selectedJob.booking.scheduledDate)}</div>
+                    <div className="text-gray-400 text-[0.78rem] capitalize">{selectedJob.booking.scheduledTime}</div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <User className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                  <div>
+                    <div className={`text-[0.88rem] ${TEXT_PRIMARY}`}>{selectedJob.booking.customer.name}</div>
+                    {selectedJob.booking.customer.phone && (
+                      <div className="text-gray-400 text-[0.78rem]">{selectedJob.booking.customer.phone}</div>
+                    )}
+                  </div>
+                </div>
+
+                {selectedJob.booking.address && (
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div className={`text-[0.88rem] ${TEXT_PRIMARY}`}>
+                      {selectedJob.booking.address.street}{selectedJob.booking.address.unit && ` ${selectedJob.booking.address.unit}`}<br />
+                      {selectedJob.booking.address.city}, {selectedJob.booking.address.state} {selectedJob.booking.address.zipCode}
+                    </div>
+                  </div>
+                )}
+
+                {selectedJob.booking.customerNotes && (
+                  <div className={`mt-2 bg-ivory dark:bg-[#1a1410] rounded-lg px-4 py-3 text-[0.82rem] ${TEXT_PRIMARY}`}>
+                    <span className="font-semibold text-[0.72rem] uppercase tracking-wider text-gray-400 block mb-1">{t("jobs_notes")}</span>
+                    {selectedJob.booking.customerNotes}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {selectedJob.booking.address && (
+              <div className="px-5 pb-5">
+                <a
+                  href={`https://maps.google.com/?q=${encodeURIComponent(`${selectedJob.booking.address.street}, ${selectedJob.booking.address.city}, ${selectedJob.booking.address.state} ${selectedJob.booking.address.zipCode}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full bg-teal text-white text-center py-2.5 rounded-lg text-[0.85rem] font-semibold hover:bg-teal/90 transition-colors"
+                >
+                  {t("jobs_maps")}
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { todayStartET, tomorrowStartET, weekStartET } from "@/lib/timezone";
+import { todayStartET, weekStartET } from "@/lib/timezone";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +17,6 @@ export async function GET() {
 
     // Today boundaries (Eastern Time)
     const today = todayStartET();
-    const tomorrow = tomorrowStartET();
 
     // This-week start (Monday, Eastern Time)
     const weekStart = weekStartET();
@@ -47,13 +46,13 @@ export async function GET() {
         },
       }),
 
-      // Today's jobs
+      // Upcoming jobs (today and future)
       prisma.jobAssignment.findMany({
         where: {
           employeeId: uid,
           booking: {
-            scheduledDate: { gte: today, lt: tomorrow },
-            status: { in: ["CONFIRMED", "IN_PROGRESS", "COMPLETED"] },
+            scheduledDate: { gte: today },
+            status: { in: ["CONFIRMED", "IN_PROGRESS", "COMPLETED", "PENDING"] },
           },
         },
         include: {
@@ -71,7 +70,8 @@ export async function GET() {
             },
           },
         },
-        orderBy: { booking: { scheduledTime: "asc" } },
+        orderBy: [{ booking: { scheduledDate: "asc" } }, { booking: { scheduledTime: "asc" } }],
+        take: 10,
       }),
 
       // Schedule (all jobs, last 30)

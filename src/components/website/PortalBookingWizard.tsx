@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { X, ChevronLeft, Check } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
 import { ItemIcon } from "@/lib/item-icons";
@@ -84,6 +84,7 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const submittingRef = useRef(false);
 
   // Step 1
   const [serviceId, setServiceId] = useState("");
@@ -108,6 +109,10 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
   const [newCity, setNewCity] = useState("Miami");
   const [newZip, setNewZip] = useState("");
 
+  // Rush booking state
+  const [rush, setRush] = useState(false);
+  const RUSH_FEE = 50;
+
   // Price calculation
   const selectedService = services.find((s) => s.id === serviceId);
   const servicePrice = selectedService
@@ -121,7 +126,8 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
     : 0;
 
   const discountRate = RECURRENCE_DISCOUNT[recurrence];
-  const subtotal = servicePrice + addOnsTotal + itemsExtraCalc;
+  const rushCharge = rush ? RUSH_FEE : 0;
+  const subtotal = servicePrice + addOnsTotal + itemsExtraCalc + rushCharge;
   const discount = Math.round(subtotal * discountRate * 100) / 100;
   const afterDiscount = subtotal - discount;
   const tax = Math.round(afterDiscount * 0.07 * 100) / 100;
@@ -145,16 +151,18 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
     setStep(hasItemsStep ? 2 : 3);
   }
 
-  // Tomorrow's date as minimum (Eastern Time)
+  // Date minimum: today if rush, otherwise tomorrow (Eastern Time)
   const etNow = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
-  const etTomorrow = new Date(etNow.getFullYear(), etNow.getMonth(), etNow.getDate() + 1);
-  const minDate = `${etTomorrow.getFullYear()}-${String(etTomorrow.getMonth() + 1).padStart(2, "0")}-${String(etTomorrow.getDate()).padStart(2, "0")}`;
+  const etMinDay = new Date(etNow.getFullYear(), etNow.getMonth(), etNow.getDate() + (rush ? 0 : 1));
+  const minDate = `${etMinDay.getFullYear()}-${String(etMinDay.getMonth() + 1).padStart(2, "0")}-${String(etMinDay.getDate()).padStart(2, "0")}`;
 
   function toggleAddOn(id: string) {
     setSelectedAddOns((prev) => (prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]));
   }
 
   async function handleSubmit() {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setLoading(true);
     setError("");
 
@@ -164,6 +172,7 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
         bedrooms,
         bathrooms,
         recurrence,
+        rush,
         scheduledDate,
         scheduledTime,
         addOnIds: selectedAddOns,
@@ -187,6 +196,7 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
       if (!res.ok) {
         setError(data.error || "Failed to create booking");
         setLoading(false);
+        submittingRef.current = false;
         return;
       }
 
@@ -194,6 +204,7 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
     } catch {
       setError(t("somethingWrong"));
       setLoading(false);
+      submittingRef.current = false;
     }
   }
 
@@ -405,6 +416,25 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
                 </div>
               </div>
 
+              {/* RUSH OPTION */}
+              <button
+                type="button"
+                onClick={() => setRush((prev) => !prev)}
+                className={`w-full border rounded-xl px-4 py-3.5 text-left transition-all flex items-center justify-between ${
+                  rush
+                    ? "border-amber bg-amber/10 ring-2 ring-amber/30"
+                    : `${INNER_BORDER} hover:border-amber/30`
+                }`}
+              >
+                <div>
+                  <div className={`text-[0.85rem] font-semibold ${TEXT_PRIMARY}`}>{t("rushTitle")}</div>
+                  <div className={`text-[0.72rem] ${TEXT_MUTED} mt-0.5`}>{t("rushDescription")}</div>
+                </div>
+                <span className="text-amber font-bold text-[0.85rem] whitespace-nowrap ml-4">
+                  +{fmtCurrency(RUSH_FEE)}
+                </span>
+              </button>
+
               {addOns.length > 0 && (
                 <div>
                   <label className={`${LABEL_CLS} ${TEXT_MUTED}`}>{t("addOnServices")}</label>
@@ -521,6 +551,12 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
                     <div className="flex justify-between text-amber">
                       <span>Extra areas</span>
                       <span>+{fmtCurrency(itemsExtraCalc)}</span>
+                    </div>
+                  )}
+                  {rush && (
+                    <div className="flex justify-between text-amber">
+                      <span>{t("rushLabel")}</span>
+                      <span>+{fmtCurrency(RUSH_FEE)}</span>
                     </div>
                   )}
                   {discount > 0 && (

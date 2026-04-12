@@ -262,6 +262,9 @@ model Booking {
   total             Float
   customerNotes     String?
   internalNotes     String?
+  adminReply        String?
+  adminRepliedAt    DateTime?
+  customerCanEdit   Boolean        @default(false)
   completedAt       DateTime?
   rating            Int?
   review            String?
@@ -673,6 +676,9 @@ model HandymanInquiry {
   spamScore          Float                 @default(0)
   status             BookingStatus         @default(PENDING)
   notes              String?
+  adminReply         String?
+  adminRepliedAt     DateTime?
+  customerCanEdit    Boolean               @default(false)
   assignedEmployees  Json?
   quotedPrice        Float?
   estimatedTotal     Float?

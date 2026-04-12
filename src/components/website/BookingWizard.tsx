@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
 import { ServiceIcon } from "@/lib/service-icons";
@@ -68,6 +68,7 @@ export function BookingWizard({ services, addOns }: Props) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const submittingRef = useRef(false);
 
   // Step 1 — Service selection (multi-select)
   const [serviceIds, setServiceIds] = useState<string[]>(preselected ? [preselected.id] : []);
@@ -167,6 +168,8 @@ export function BookingWizard({ services, addOns }: Props) {
   ];
 
   async function handleSubmit() {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setLoading(true);
     setError("");
 
@@ -198,6 +201,7 @@ export function BookingWizard({ services, addOns }: Props) {
       if (!res.ok) {
         setError(data.error || t("failedCreate"));
         setLoading(false);
+        submittingRef.current = false;
         return;
       }
 
@@ -208,6 +212,7 @@ export function BookingWizard({ services, addOns }: Props) {
     } catch {
       setError(t("somethingWrong"));
       setLoading(false);
+      submittingRef.current = false;
     }
   }
 

@@ -129,6 +129,9 @@ export default async function HomePage() {
             <Link href={heroCta2.href || "/pricing"} className="border-[1.5px] border-cream/30 text-cream px-9 py-4 text-[0.9rem] font-medium tracking-[0.08em] uppercase rounded-[3px] hover:border-cream transition-colors">
               {heroCta2.text}
             </Link>
+            <Link href="/handyman" className="border-[1.5px] border-amber/40 text-amber px-9 py-4 text-[0.9rem] font-medium tracking-[0.08em] uppercase rounded-[3px] hover:border-amber hover:bg-amber/10 transition-all">
+              {t("hero.handymanCta")}
+            </Link>
           </div>
           <div className="flex gap-12 mt-12 pt-10 border-t border-cream/[0.12] justify-center">
             {(heroStats.items as { value: string; label: string }[]).map((stat: { value: string; label: string }, i: number) => (

@@ -54,6 +54,13 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
   if (body.notes !== undefined) updateData.notes = body.notes;
   if (body.quotedPrice !== undefined) updateData.quotedPrice = body.quotedPrice;
 
+  // Admin reply
+  if (body.adminReply !== undefined) {
+    updateData.adminReply = body.adminReply;
+    updateData.adminRepliedAt = new Date();
+    updateData.customerCanEdit = true;
+  }
+
   const updated = await prisma.handymanInquiry.update({
     where: { id },
     data: updateData,
