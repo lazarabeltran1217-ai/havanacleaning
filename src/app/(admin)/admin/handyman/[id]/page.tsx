@@ -175,6 +175,8 @@ export default async function AdminHandymanDetailPage({ params }: Props) {
             adminReply={inquiry.adminReply}
             adminRepliedAt={inquiry.adminRepliedAt?.toISOString()}
             customerCanEdit={inquiry.customerCanEdit}
+            customerReply={inquiry.customerReply}
+            customerRepliedAt={inquiry.customerRepliedAt?.toISOString()}
           />
         </div>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Search } from "lucide-react";
 
@@ -41,10 +42,11 @@ function timeAgo(dateStr: string) {
   if (hours < 24) return `${hours}h ago`;
   const days = Math.floor(hours / 24);
   if (days < 30) return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString();
+  return new Date(dateStr).toLocaleDateString("en-US", { timeZone: "America/New_York" });
 }
 
 export function SupportTable({ tickets }: { tickets: Ticket[] }) {
+  const router = useRouter();
   const [filter, setFilter] = useState<string>("All");
   const [search, setSearch] = useState("");
 
@@ -115,11 +117,10 @@ export function SupportTable({ tickets }: { tickets: Ticket[] }) {
               </tr>
             ) : (
               filtered.map((t) => (
-                <Link
+                <tr
                   key={t.id}
-                  href={`/admin/support/${t.id}`}
-                  prefetch={false}
-                  className={`table-row border-b border-[#ece6d9]/50 hover:bg-ivory/50 transition-colors cursor-pointer ${
+                  onClick={() => router.push(`/admin/support/${t.id}`)}
+                  className={`border-b border-[#ece6d9]/50 hover:bg-ivory/50 transition-colors cursor-pointer ${
                     !t.isRead ? "bg-blue-50/40" : ""
                   }`}
                 >
@@ -135,7 +136,7 @@ export function SupportTable({ tickets }: { tickets: Ticket[] }) {
                     {t.name}
                   </td>
                   <td className="px-4 py-3 text-tobacco/60">
-                    {t.category ? categoryLabel[t.category] || t.category : "—"}
+                    {t.category ? categoryLabel[t.category] || t.category : "\u2014"}
                   </td>
                   <td className="px-4 py-3">
                     <span className={`inline-block px-2 py-0.5 rounded-full text-[0.72rem] font-medium ${statusColor[t.status] || ""}`}>
@@ -145,7 +146,7 @@ export function SupportTable({ tickets }: { tickets: Ticket[] }) {
                   <td className="px-4 py-3 text-right text-tobacco/60">
                     {timeAgo(t.createdAt)}
                   </td>
-                </Link>
+                </tr>
               ))
             )}
           </tbody>

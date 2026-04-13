@@ -124,6 +124,8 @@ interface HandymanInquiryData {
   payments: { status: string }[];
   adminReply?: string | null;
   adminRepliedAt?: string | null;
+  customerReply?: string | null;
+  customerRepliedAt?: string | null;
   customerCanEdit?: boolean;
 }
 
@@ -199,6 +201,29 @@ export default function CustomerDashboard() {
 
   // Handyman payment
   const [payingHandyman, setPayingHandyman] = useState<HandymanInquiryData | null>(null);
+
+  // Handyman customer reply
+  const [replyingHandymanId, setReplyingHandymanId] = useState<string | null>(null);
+  const [handymanReplyText, setHandymanReplyText] = useState("");
+  const [handymanReplySending, setHandymanReplySending] = useState(false);
+
+  async function sendHandymanReply(inquiryId: string) {
+    if (!handymanReplyText.trim()) return;
+    setHandymanReplySending(true);
+    try {
+      const res = await fetch(`/api/account/handyman/${inquiryId}/reply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: handymanReplyText.trim() }),
+      });
+      if (res.ok) {
+        setReplyingHandymanId(null);
+        setHandymanReplyText("");
+        fetchDashboard();
+      }
+    } catch { /* ignore */ }
+    setHandymanReplySending(false);
+  }
 
   // Editing booking
   const [editingBooking, setEditingBooking] = useState<BookingData | null>(null);
@@ -333,7 +358,7 @@ export default function CustomerDashboard() {
   const locale = data?.profile?.locale || "en";
   const dateLocale = locale === "es" ? "es-ES" : "en-US";
   const capitalize = (s: string) => s.replace(/(^|\s)[a-záéíóúñü]/gi, (c) => c.toUpperCase());
-  const fmtDate = (dateStr: string) => capitalize(new Date(dateStr).toLocaleDateString(dateLocale, { month: "short", day: "numeric", year: "numeric" }));
+  const fmtDate = (dateStr: string) => capitalize(new Date(dateStr).toLocaleDateString(dateLocale, { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" }));
   const fmtStatus = (status: string) => t(STATUS_KEY[status] || "status_pending");
   const loc = (en: string, es?: string | null) => (locale === "es" && es ? es : en);
   const TIME_KEY: Record<string, string> = { morning: "time_morning", midday: "time_midday", afternoon: "time_afternoon" };
@@ -374,7 +399,7 @@ export default function CustomerDashboard() {
           {greeting}, {firstName}
         </h1>
         <p className="text-white/70 text-sm mt-1">
-          {capitalize(now.toLocaleDateString(dateLocale, { weekday: "long", month: "long", day: "numeric" }))}
+          {capitalize(now.toLocaleDateString(dateLocale, { weekday: "long", month: "long", day: "numeric", timeZone: "America/New_York" }))}
         </p>
         <div className="flex flex-wrap justify-center gap-2 mt-3">
           {data.upcomingBookings.length > 0 && (
@@ -615,7 +640,7 @@ export default function CustomerDashboard() {
                       <div className="mt-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 rounded-lg px-3 py-2">
                         <div className="flex items-center gap-1 text-[0.68rem] text-blue-500 dark:text-blue-400 font-medium mb-0.5">
                           <MessageSquare className="w-3 h-3" />
-                          {t("adminReply")} {b.adminRepliedAt && `— ${new Date(b.adminRepliedAt).toLocaleDateString(dateLocale, { month: "short", day: "numeric" })}`}
+                          {t("adminReply")} {b.adminRepliedAt && `— ${new Date(b.adminRepliedAt).toLocaleDateString(dateLocale, { month: "short", day: "numeric", timeZone: "America/New_York" })}`}
                         </div>
                         <div className={`text-[0.78rem] ${TEXT_PRIMARY}`}>{b.adminReply}</div>
                       </div>
@@ -804,10 +829,56 @@ export default function CustomerDashboard() {
                     <div className="mt-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 rounded-lg px-3 py-2">
                       <div className="flex items-center gap-1 text-[0.68rem] text-blue-500 dark:text-blue-400 font-medium mb-0.5">
                         <MessageSquare className="w-3 h-3" />
-                        {t("adminReply")} {inq.adminRepliedAt && `— ${new Date(inq.adminRepliedAt).toLocaleDateString(dateLocale, { month: "short", day: "numeric" })}`}
+                        {t("adminReply")} {inq.adminRepliedAt && `— ${new Date(inq.adminRepliedAt).toLocaleDateString(dateLocale, { month: "short", day: "numeric", timeZone: "America/New_York" })}`}
                       </div>
                       <div className={`text-[0.78rem] ${TEXT_PRIMARY}`}>{inq.adminReply}</div>
                     </div>
+                  )}
+                  {/* Customer reply */}
+                  {inq.customerReply && (
+                    <div className="mt-2 bg-green/5 dark:bg-green/10 border border-green/20 dark:border-green/30 rounded-lg px-3 py-2">
+                      <div className="flex items-center gap-1 text-[0.68rem] text-green dark:text-green font-medium mb-0.5">
+                        <MessageSquare className="w-3 h-3" />
+                        {t("yourReply")} {inq.customerRepliedAt && `— ${new Date(inq.customerRepliedAt).toLocaleDateString(dateLocale, { month: "short", day: "numeric", timeZone: "America/New_York" })}`}
+                      </div>
+                      <div className={`text-[0.78rem] ${TEXT_PRIMARY}`}>{inq.customerReply}</div>
+                    </div>
+                  )}
+                  {/* Reply button / form */}
+                  {inq.adminReply && inq.status !== "COMPLETED" && inq.status !== "CANCELLED" && (
+                    replyingHandymanId === inq.id ? (
+                      <div className="mt-2 space-y-2">
+                        <textarea
+                          value={handymanReplyText}
+                          onChange={(e) => setHandymanReplyText(e.target.value)}
+                          rows={2}
+                          placeholder={t("replyPlaceholder")}
+                          className={`${INPUT_CLS} resize-none`}
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => sendHandymanReply(inq.id)}
+                            disabled={handymanReplySending || !handymanReplyText.trim()}
+                            className="px-4 py-1.5 bg-green text-white text-[0.78rem] font-medium rounded-lg hover:bg-green-light disabled:opacity-40 transition-colors"
+                          >
+                            {handymanReplySending ? t("sending") : t("sendReply")}
+                          </button>
+                          <button
+                            onClick={() => { setReplyingHandymanId(null); setHandymanReplyText(""); }}
+                            className={`px-4 py-1.5 text-[0.78rem] font-medium rounded-lg ${TEXT_MUTED} hover:bg-gray-100 dark:hover:bg-white/5 transition-colors`}
+                          >
+                            {t("cancel")}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => { setReplyingHandymanId(inq.id); setHandymanReplyText(inq.customerReply || ""); }}
+                        className="mt-2 w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-green/5 dark:bg-green/10 text-green rounded-lg text-[0.78rem] font-medium hover:bg-green/10 dark:hover:bg-green/20 transition-colors"
+                      >
+                        <MessageSquare className="w-3 h-3" /> {inq.customerReply ? t("editReply") : t("replyToAdmin")}
+                      </button>
+                    )
                   )}
                 </div>
               ))}

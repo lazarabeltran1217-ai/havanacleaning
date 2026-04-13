@@ -171,7 +171,7 @@ export async function POST(req: NextRequest) {
         customerId,
         serviceId: sid,
         addressId: addressId || null,
-        scheduledDate: new Date(scheduledDate),
+        scheduledDate: new Date(scheduledDate + "T12:00:00"),
         scheduledTime,
         bedrooms: bedrooms || null,
         bathrooms: bathrooms || null,

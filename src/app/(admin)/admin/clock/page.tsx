@@ -8,6 +8,7 @@ export default async function AdminClockPage() {
       include: {
         employee: { select: { name: true } },
         booking: { select: { bookingNumber: true, service: { select: { name: true } } } },
+        handymanInquiry: { select: { bookingNumber: true } },
       },
       orderBy: { clockIn: "desc" },
       take: 50,
@@ -43,7 +44,11 @@ export default async function AdminClockPage() {
     notes: e.notes,
     bookingId: e.bookingId,
     employeeName: e.employee.name ?? "",
-    jobInfo: e.booking ? `${e.booking.bookingNumber} \u2014 ${e.booking.service.name}` : null,
+    jobInfo: e.booking
+      ? `${e.booking.bookingNumber} \u2014 ${e.booking.service.name}`
+      : e.handymanInquiry
+        ? `${e.handymanInquiry.bookingNumber} \u2014 Handyman Service`
+        : null,
   }));
 
   return (

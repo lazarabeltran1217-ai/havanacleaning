@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Zap, CheckCircle } from "lucide-react";
+import { Zap, CheckCircle, Clock } from "lucide-react";
 import { formatDate, formatCurrency } from "@/lib/utils";
 import { useAdminTable, TableSearch, SortHeader, PlainHeader } from "./AdminTable";
 
@@ -20,13 +20,13 @@ const SERVICE_LABELS: Record<string, string> = {
   closetShelving: "Closet & Storage Shelving",
 };
 
-const statusColors: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800",
-  CONFIRMED: "bg-blue-100 text-blue-700",
-  IN_PROGRESS: "bg-teal/10 text-teal",
-  COMPLETED: "bg-green-100 text-green-700",
-  CANCELLED: "bg-red-100 text-red-700",
-  NO_SHOW: "bg-gray-100 text-gray-500",
+const rowColors: Record<string, string> = {
+  PENDING: "bg-yellow-50",
+  CONFIRMED: "bg-blue-50",
+  IN_PROGRESS: "bg-teal-50",
+  COMPLETED: "bg-green-50",
+  CANCELLED: "bg-red-50",
+  NO_SHOW: "bg-gray-50",
 };
 
 type HandymanInquiry = {
@@ -45,6 +45,7 @@ type HandymanInquiry = {
   customerEmail: string;
   customerPhone: string | null;
   isPaid: boolean;
+  isClockedIn?: boolean;
   price: number | null;
 };
 
@@ -69,16 +70,21 @@ export function HandymanTable({ inquiries }: { inquiries: HandymanInquiry[] }) {
       {/* Mobile card view */}
       <div className="md:hidden space-y-3">
         {filteredData.map((inq) => (
-          <div key={inq.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div key={inq.id} className={`rounded-xl border border-[#ece6d9] p-4 ${rowColors[inq.status] || "bg-white"}`}>
             <div className="flex items-center justify-between mb-3">
               <span className="text-[0.8rem] tracking-wide font-medium">{inq.bookingNumber}</span>
               <div className="flex items-center gap-1.5">
+                {inq.isClockedIn && (
+                  <span className="inline-flex items-center gap-0.5 text-[0.68rem] text-teal font-medium">
+                    <Clock className="w-3 h-3" /> Clocked In
+                  </span>
+                )}
                 {inq.isPaid && (
                   <span className="text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium bg-green/10 text-green flex items-center gap-0.5">
                     <CheckCircle className="w-3 h-3" /> Paid
                   </span>
                 )}
-                <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[inq.status] || ""}`}>
+                <span className="text-[0.68rem] uppercase tracking-wider font-medium text-tobacco/70">
                   {inq.status.replace("_", " ")}
                 </span>
                 {inq.rush && (
@@ -156,7 +162,7 @@ export function HandymanTable({ inquiries }: { inquiries: HandymanInquiry[] }) {
           </thead>
           <tbody>
             {filteredData.map((inq) => (
-              <tr key={inq.id} className="border-b border-gray-50 hover:bg-ivory/30">
+              <tr key={inq.id} className={`border-b border-gray-50 ${rowColors[inq.status] || ""} hover:brightness-95`}>
                 <td className="px-4 py-3 text-[0.8rem] tracking-wide">{inq.bookingNumber}</td>
                 <td className="px-4 py-3">
                   <div>{inq.customerName}</div>
@@ -182,10 +188,13 @@ export function HandymanTable({ inquiries }: { inquiries: HandymanInquiry[] }) {
                     <span className="text-gray-300">Not set</span>
                   )}
                 </td>
-                <td className="px-4 py-3">
-                  <span className={`text-[0.7rem] uppercase tracking-wider px-2.5 py-1 rounded-full font-medium ${statusColors[inq.status] || ""}`}>
-                    {inq.status.replace("_", " ")}
-                  </span>
+                <td className="px-4 py-3 text-[0.82rem]">
+                  <div className="capitalize">{inq.status.replace(/_/g, " ").toLowerCase()}</div>
+                  {inq.isClockedIn && (
+                    <span className="inline-flex items-center gap-0.5 text-[0.68rem] text-teal font-medium mt-0.5">
+                      <Clock className="w-3 h-3" /> Clocked In
+                    </span>
+                  )}
                 </td>
                 <td className="px-4 py-3">
                   {inq.price != null ? (

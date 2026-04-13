@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, ChevronLeft, Zap, MapPin } from "lucide-react";
 import {
   Wrench, Package, Tv, DoorOpen, Lightbulb, Grid3x3,
@@ -37,6 +37,7 @@ export function PortalHandymanWizard({ onClose, onSuccess, handymanPrices }: Pro
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const submittingRef = useRef(false);
 
   // Step 1 — Services
   const [serviceCategories, setServiceCategories] = useState<string[]>([]);
@@ -80,6 +81,8 @@ export function PortalHandymanWizard({ onClose, onSuccess, handymanPrices }: Pro
   ];
 
   async function handleSubmit() {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setLoading(true);
     setError("");
 
@@ -107,14 +110,15 @@ export function PortalHandymanWizard({ onClose, onSuccess, handymanPrices }: Pro
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || t("failedCreate"));
-        setLoading(false);
         return;
       }
 
       onSuccess();
     } catch {
       setError(t("somethingWrong"));
+    } finally {
       setLoading(false);
+      submittingRef.current = false;
     }
   }
 
@@ -319,7 +323,7 @@ export function PortalHandymanWizard({ onClose, onSuccess, handymanPrices }: Pro
                   {scheduledDate && (
                     <div className={`${TEXT_MUTED} text-[0.82rem] mt-2 pt-2 border-t border-gray-200 dark:border-gold/15`}>
                       {new Date(scheduledDate + "T12:00:00").toLocaleDateString("en-US", {
-                        weekday: "long", month: "long", day: "numeric",
+                        weekday: "long", month: "long", day: "numeric", timeZone: "America/New_York",
                       })}{" "}
                       &middot; {timeSlots.find((s) => s.value === scheduledTime)?.label}
                     </div>

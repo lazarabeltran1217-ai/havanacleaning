@@ -38,10 +38,10 @@ export function StaffTable({ employees }: { employees: Employee[] }) {
       {/* Mobile card view */}
       <div className="md:hidden space-y-3">
         {filteredData.map((emp) => (
-          <div key={emp.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div key={emp.id} className={`rounded-xl border border-[#ece6d9] p-4 ${emp.isActive ? "bg-green/5" : "bg-red/5"}`}>
             <div className="flex items-center justify-between mb-3">
               <span className="font-medium">{emp.name}</span>
-              <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${emp.isActive ? "bg-green/10 text-green" : "bg-red/10 text-red"}`}>
+              <span className={`text-[0.68rem] uppercase tracking-wider font-medium ${emp.isActive ? "text-green" : "text-red"}`}>
                 {emp.isActive ? "Active" : "Inactive"}
               </span>
             </div>
@@ -106,7 +106,7 @@ export function StaffTable({ employees }: { employees: Employee[] }) {
           </thead>
           <tbody>
             {filteredData.map((emp) => (
-              <tr key={emp.id} className="border-b border-gray-50 hover:bg-ivory/30">
+              <tr key={emp.id} className={`border-b border-gray-50 ${emp.isActive ? "bg-green/5 hover:bg-green/10" : "bg-red/5 hover:bg-red/10"}`}>
                 <td className="px-4 py-3 font-medium">{emp.name}</td>
                 <td className="px-4 py-3 text-gray-500">{emp.email}</td>
                 <td className="px-4 py-3 text-gray-500">{emp.phone || "\u2014"}</td>
@@ -115,15 +115,15 @@ export function StaffTable({ employees }: { employees: Employee[] }) {
                 <td className="px-4 py-3">{emp.jobCount}</td>
                 <td className="px-4 py-3">
                   {emp.stripeConnectOnboarded ? (
-                    <span className="text-[0.7rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium bg-green/10 text-green">Ready</span>
+                    <span className="text-[0.7rem] uppercase tracking-wider font-medium text-green">Ready</span>
                   ) : emp.stripeConnectAccountId ? (
-                    <span className="text-[0.7rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium bg-amber/10 text-amber">Pending</span>
+                    <span className="text-[0.7rem] uppercase tracking-wider font-medium text-amber">Pending</span>
                   ) : (
                     <span className="text-gray-300">{"\u2014"}</span>
                   )}
                 </td>
                 <td className="px-4 py-3">
-                  <span className={`text-[0.7rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${emp.isActive ? "bg-green/10 text-green" : "bg-red/10 text-red"}`}>
+                  <span className={`text-[0.7rem] uppercase tracking-wider font-medium ${emp.isActive ? "text-green" : "text-red"}`}>
                     {emp.isActive ? "Active" : "Inactive"}
                   </span>
                 </td>

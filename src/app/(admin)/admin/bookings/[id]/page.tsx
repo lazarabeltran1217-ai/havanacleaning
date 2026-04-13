@@ -4,6 +4,7 @@ import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
 import { ServiceIcon } from "@/lib/service-icons";
 import { BookingActions } from "@/components/admin/BookingActions";
 import Link from "next/link";
+import { MapPin, Navigation } from "lucide-react";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -42,6 +43,28 @@ export default async function AdminBookingDetailPage({ params }: Props) {
     console.error("Failed to fetch booking:", error);
     notFound();
   }
+
+  // Fetch first assigned employee's home address
+  const firstAssignedId = booking.assignments[0]?.employee.id;
+  const employeeAddress = firstAssignedId
+    ? await prisma.address.findFirst({
+        where: { userId: firstAssignedId },
+        select: { street: true, unit: true, city: true, state: true, zipCode: true },
+        orderBy: { createdAt: "desc" },
+      })
+    : null;
+
+  const jobAddress = booking.address;
+  const fromStr = employeeAddress
+    ? `${employeeAddress.street}${employeeAddress.unit ? ` ${employeeAddress.unit}` : ""}, ${employeeAddress.city}, ${employeeAddress.state} ${employeeAddress.zipCode}`
+    : null;
+  const toStr = jobAddress
+    ? `${jobAddress.street}${jobAddress.unit ? ` ${jobAddress.unit}` : ""}, ${jobAddress.city}, ${jobAddress.state} ${jobAddress.zipCode}`
+    : null;
+  const mapsUrl =
+    fromStr && toStr
+      ? `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(fromStr)}&destination=${encodeURIComponent(toStr)}`
+      : null;
 
   const statusColors: Record<string, string> = {
     PENDING: "bg-yellow-100 text-yellow-800",
@@ -113,6 +136,47 @@ export default async function AdminBookingDetailPage({ params }: Props) {
             )}
           </div>
 
+          {/* DIRECTIONS */}
+          {(fromStr || toStr) && (
+            <div className="bg-white rounded-xl p-6 border border-[#ece6d9]">
+              <h3 className="font-display text-base mb-3">Directions</h3>
+              <div className="space-y-3">
+                {fromStr && (
+                  <div className="flex items-start gap-2.5">
+                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
+                      <MapPin className="w-3 h-3 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="text-[0.72rem] uppercase tracking-wider text-gray-400 mb-0.5">From (Employee)</div>
+                      <div className="text-[0.85rem]">{fromStr}</div>
+                    </div>
+                  </div>
+                )}
+                {toStr && (
+                  <div className="flex items-start gap-2.5">
+                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                      <MapPin className="w-3 h-3 text-green" />
+                    </div>
+                    <div>
+                      <div className="text-[0.72rem] uppercase tracking-wider text-gray-400 mb-0.5">To (Job)</div>
+                      <div className="text-[0.85rem]">{toStr}</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {mapsUrl && (
+                <a
+                  href={mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex items-center gap-1.5 bg-green text-white px-4 py-2 rounded-lg text-[0.82rem] font-semibold hover:bg-green/90 transition-colors"
+                >
+                  <Navigation className="w-4 h-4" /> Get Directions
+                </a>
+              )}
+            </div>
+          )}
+
           {/* FINANCIALS */}
           <div className="bg-white rounded-xl p-6 border border-[#ece6d9]">
             <h3 className="font-display text-base mb-3">Financial Summary</h3>
@@ -162,6 +226,8 @@ export default async function AdminBookingDetailPage({ params }: Props) {
           <BookingActions
             bookingId={booking.id}
             currentStatus={booking.status}
+            currentDate={booking.scheduledDate.toISOString().slice(0, 10)}
+            currentTime={booking.scheduledTime}
             assignments={booking.assignments.map((a) => ({
               employeeId: a.employee.id,
               employeeName: a.employee.name,

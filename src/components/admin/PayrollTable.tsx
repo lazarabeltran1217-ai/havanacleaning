@@ -22,10 +22,16 @@ type PayrollRecord = {
   stripeConnectOnboarded: boolean;
 };
 
-const statusColors: Record<string, string> = {
-  DRAFT: "bg-amber/10 text-amber",
-  APPROVED: "bg-teal/10 text-teal",
-  PAID: "bg-green/10 text-green",
+const rowColors: Record<string, string> = {
+  DRAFT: "bg-amber-50",
+  APPROVED: "bg-teal-50",
+  PAID: "bg-green-50",
+};
+
+const statusTextColors: Record<string, string> = {
+  DRAFT: "text-amber",
+  APPROVED: "text-teal",
+  PAID: "text-green",
 };
 
 export function PayrollTable({ payrolls }: { payrolls: PayrollRecord[] }) {
@@ -51,10 +57,10 @@ export function PayrollTable({ payrolls }: { payrolls: PayrollRecord[] }) {
         {filteredData.map((p) => {
           const adjustments = p.bonuses + p.tips + p.mileageReimbursement - p.deductions;
           return (
-            <div key={p.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
+            <div key={p.id} className={`rounded-xl border border-[#ece6d9] p-4 ${rowColors[p.status] || "bg-white"}`}>
               <div className="flex items-center justify-between mb-3">
                 <span className="font-medium">{p.employeeName}</span>
-                <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[p.status] || ""}`}>
+                <span className={`text-[0.75rem] uppercase tracking-wider font-medium ${statusTextColors[p.status] || ""}`}>
                   {p.status}
                 </span>
               </div>
@@ -127,7 +133,7 @@ export function PayrollTable({ payrolls }: { payrolls: PayrollRecord[] }) {
             {filteredData.map((p) => {
               const adjustments = p.bonuses + p.tips + p.mileageReimbursement - p.deductions;
               return (
-                <tr key={p.id} className="border-b border-gray-50 hover:bg-ivory/30">
+                <tr key={p.id} className={`border-b border-gray-50 ${rowColors[p.status] || ""} hover:brightness-95`}>
                   <td className="px-4 py-3 font-medium">{p.employeeName}</td>
                   <td className="px-4 py-3 text-gray-500">
                     {formatDate(p.periodStart)} &mdash; {formatDate(p.periodEnd)}
@@ -146,8 +152,8 @@ export function PayrollTable({ payrolls }: { payrolls: PayrollRecord[] }) {
                   </td>
                   <td className="px-4 py-3 text-right font-medium text-green">{formatCurrency(p.netPay)}</td>
                   <td className="px-4 py-3">
-                    <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[p.status] || ""}`}>
-                      {p.status}
+                    <span className={`text-[0.82rem] capitalize font-medium ${statusTextColors[p.status] || ""}`}>
+                      {p.status.toLowerCase()}
                     </span>
                   </td>
                   <td className="px-4 py-3">

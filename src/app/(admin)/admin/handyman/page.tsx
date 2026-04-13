@@ -14,8 +14,14 @@ export default async function AdminHandymanPage() {
     });
 
   let inquiries: Awaited<ReturnType<typeof fetchInquiries>> = [];
+  let clockedInInquiryIds: string[] = [];
   try {
     inquiries = await fetchInquiries();
+    const activeClocks = await prisma.timeEntry.findMany({
+      where: { clockOut: null, handymanInquiryId: { not: null } },
+      select: { handymanInquiryId: true },
+    });
+    clockedInInquiryIds = activeClocks.map((c) => c.handymanInquiryId!);
   } catch (error) {
     console.error("Failed to fetch handyman inquiries:", error);
   }
@@ -43,6 +49,7 @@ export default async function AdminHandymanPage() {
       customerEmail: inq.user?.email || inq.email,
       customerPhone: inq.user?.phone || inq.phone,
       isPaid: inq.payments.length > 0,
+      isClockedIn: clockedInInquiryIds.includes(inq.id),
       price,
     };
   });

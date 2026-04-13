@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
+import { formatCurrency, formatDate, formatDateShort, formatStatus } from "@/lib/utils";
 import Link from "next/link";
 import { ServiceIcon } from "@/lib/service-icons";
 import { DashboardCharts } from "@/components/admin/DashboardCharts";
@@ -16,7 +16,7 @@ const fetchRecentBookings = () =>
     take: 5,
   });
 
-/** Build 6-month revenue + booking count data */
+/** Build 6-month revenue + booking count data (includes handyman) */
 async function fetchMonthlyRevenue() {
   const months: { month: string; revenue: number; bookings: number }[] = [];
 
@@ -25,7 +25,7 @@ async function fetchMonthlyRevenue() {
     const end = monthStartOffsetET(-i + 1);
     const label = start.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
 
-    const [rev, count] = await Promise.all([
+    const [rev, count, hmCount] = await Promise.all([
       prisma.payment.aggregate({
         where: { status: "SUCCEEDED", paidAt: { gte: start, lt: end } },
         _sum: { amount: true },
@@ -33,40 +33,63 @@ async function fetchMonthlyRevenue() {
       prisma.booking.count({
         where: { scheduledDate: { gte: start, lt: end } },
       }),
+      prisma.handymanInquiry.count({
+        where: { preferredDate: { gte: start, lt: end }, status: { not: "CANCELLED" } },
+      }),
     ]);
 
-    months.push({ month: label, revenue: rev._sum.amount ?? 0, bookings: count });
+    months.push({ month: label, revenue: rev._sum.amount ?? 0, bookings: count + hmCount });
   }
   return months;
 }
 
-/** Booking counts grouped by status */
+/** Booking counts grouped by status (includes handyman) */
 async function fetchBookingsByStatus() {
-  const grouped = await prisma.booking.groupBy({
-    by: ["status"],
-    _count: true,
-  });
-  return grouped.map((g) => ({ status: g.status, count: g._count }));
+  const [grouped, hmGrouped] = await Promise.all([
+    prisma.booking.groupBy({ by: ["status"], _count: true }),
+    prisma.handymanInquiry.groupBy({ by: ["status"], _count: true }),
+  ]);
+
+  const map = new Map<string, number>();
+  for (const g of grouped) map.set(g.status, (map.get(g.status) ?? 0) + g._count);
+  for (const g of hmGrouped) map.set(g.status, (map.get(g.status) ?? 0) + g._count);
+
+  return Array.from(map.entries()).map(([status, count]) => ({ status, count }));
 }
 
-/** Revenue totals per service */
+/** Revenue totals per service (includes handyman) */
 async function fetchRevenueByService() {
-  const bookingsWithPayments = await prisma.booking.findMany({
-    where: { payments: { some: { status: "SUCCEEDED" } } },
-    select: {
-      service: { select: { name: true } },
-      payments: {
-        where: { status: "SUCCEEDED" },
-        select: { amount: true },
+  const [bookingsWithPayments, hmWithPayments] = await Promise.all([
+    prisma.booking.findMany({
+      where: { payments: { some: { status: "SUCCEEDED" } } },
+      select: {
+        service: { select: { name: true } },
+        payments: {
+          where: { status: "SUCCEEDED" },
+          select: { amount: true },
+        },
       },
-    },
-  });
+    }),
+    prisma.handymanInquiry.findMany({
+      where: { payments: { some: { status: "SUCCEEDED" } } },
+      select: {
+        payments: {
+          where: { status: "SUCCEEDED" },
+          select: { amount: true },
+        },
+      },
+    }),
+  ]);
 
   const map = new Map<string, number>();
   for (const b of bookingsWithPayments) {
     const name = b.service.name;
     const total = b.payments.reduce((s, p) => s + p.amount, 0);
     map.set(name, (map.get(name) ?? 0) + total);
+  }
+  for (const hm of hmWithPayments) {
+    const total = hm.payments.reduce((s, p) => s + p.amount, 0);
+    map.set("Handyman Service", (map.get("Handyman Service") ?? 0) + total);
   }
 
   return Array.from(map.entries())
@@ -117,6 +140,10 @@ export default async function AdminDashboard() {
       _revenueByService,
       _todaysJobs,
       _activeClocks,
+      _hmTotal,
+      _hmPending,
+      _hmConfirmedToday,
+      _hmTodaysJobs,
     ] = await Promise.all([
       prisma.booking.count(),
       prisma.booking.count({ where: { status: "PENDING" } }),
@@ -156,11 +183,31 @@ export default async function AdminDashboard() {
         include: { employee: { select: { name: true } } },
         orderBy: { clockIn: "asc" },
       }),
+      // Handyman counts
+      prisma.handymanInquiry.count({ where: { status: { not: "CANCELLED" } } }),
+      prisma.handymanInquiry.count({ where: { status: "PENDING" } }),
+      prisma.handymanInquiry.count({
+        where: {
+          status: { in: ["CONFIRMED", "IN_PROGRESS"] },
+          preferredDate: { gte: todayStart, lt: tomorrowStart },
+        },
+      }),
+      prisma.handymanInquiry.findMany({
+        where: {
+          preferredDate: { gte: todayStart },
+          status: { in: ["CONFIRMED", "IN_PROGRESS", "COMPLETED", "PENDING"] },
+        },
+        include: {
+          user: { select: { name: true } },
+        },
+        orderBy: [{ preferredDate: "asc" }, { preferredTime: "asc" }],
+        take: 10,
+      }),
     ]);
 
-    totalBookings = _totalBookings;
-    pendingBookings = _pendingBookings;
-    confirmedToday = _confirmedToday;
+    totalBookings = _totalBookings + _hmTotal;
+    pendingBookings = _pendingBookings + _hmPending;
+    confirmedToday = _confirmedToday + _hmConfirmedToday;
     employeeCount = _employeeCount;
     customerCount = _customerCount;
     revenue = monthRevenue._sum.amount ?? 0;
@@ -170,19 +217,37 @@ export default async function AdminDashboard() {
     monthlyRevenue = _monthlyRevenue;
     bookingsByStatus = _bookingsByStatus;
     revenueByService = _revenueByService;
-    todaysJobs = _todaysJobs.map((b) => {
+
+    // Transform regular bookings
+    const regularJobs = _todaysJobs.map((b) => {
       const primary = b.assignments.find((a) => a.isPrimary);
-      const cleaner = primary?.employee.name ?? b.assignments[0]?.employee.name ?? "—";
+      const cleaner = primary?.employee.name ?? b.assignments[0]?.employee.name ?? "\u2014";
       return {
         id: b.id,
         customerName: b.customer.name ?? "Unknown",
         serviceName: b.service.name,
-        date: formatDate(b.scheduledDate),
+        date: formatDateShort(b.scheduledDate),
         time: timeLabels[b.scheduledTime] ?? b.scheduledTime,
         cleaner,
         status: b.status,
       };
     });
+
+    // Transform handyman jobs for upcoming table
+    const hmJobs = _hmTodaysJobs.map((hm) => ({
+      id: hm.id,
+      customerName: hm.user?.name || hm.fullName || "Unknown",
+      serviceName: "Handyman Service",
+      date: hm.preferredDate ? formatDateShort(hm.preferredDate) : "\u2014",
+      time: timeLabels[hm.preferredTime || ""] ?? (hm.preferredTime || "\u2014"),
+      cleaner: "\u2014",
+      status: hm.status,
+    }));
+
+    todaysJobs = [...regularJobs, ...hmJobs]
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(0, 10);
+
     activeEmployees = _activeClocks.map((e) => ({
       name: e.employee.name ?? "Unknown",
       clockIn: e.clockIn.toISOString(),
@@ -230,25 +295,31 @@ export default async function AdminDashboard() {
                       <th className="pb-2 font-medium">Service</th>
                       <th className="pb-2 font-medium">Date</th>
                       <th className="pb-2 font-medium">Time</th>
-                      <th className="pb-2 font-medium">Cleaner</th>
+                      <th className="pb-2 font-medium text-center">Cleaner</th>
                       <th className="pb-2 font-medium">Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {todaysJobs.map((job) => (
-                      <tr key={job.id} className="border-b border-gray-50 last:border-0">
+                      <tr key={job.id} className={`border-b border-gray-50 last:border-0 ${
+                        job.status === "COMPLETED" ? "bg-green-50" :
+                        job.status === "IN_PROGRESS" ? "bg-teal-50" :
+                        job.status === "CONFIRMED" ? "bg-blue-50" :
+                        job.status === "CANCELLED" ? "bg-red-50" :
+                        "bg-yellow-50"
+                      }`}>
                         <td className="py-2.5 font-medium text-tobacco">{job.customerName}</td>
                         <td className="py-2.5">{job.serviceName}</td>
                         <td className="py-2.5 text-gray-500">{job.date}</td>
                         <td className="py-2.5">{job.time}</td>
-                        <td className="py-2.5">{job.cleaner}</td>
+                        <td className="py-2.5 text-center">{job.cleaner}</td>
                         <td className="py-2.5">
-                          <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${
-                            job.status === "COMPLETED" ? "bg-green-100 text-green-700" :
-                            job.status === "IN_PROGRESS" ? "bg-teal/10 text-teal" :
-                            job.status === "CONFIRMED" ? "bg-blue-100 text-blue-700" :
-                            job.status === "CANCELLED" ? "bg-red-100 text-red-700" :
-                            "bg-yellow-100 text-yellow-800"
+                          <span className={`text-[0.78rem] font-medium ${
+                            job.status === "COMPLETED" ? "text-green-700" :
+                            job.status === "IN_PROGRESS" ? "text-teal" :
+                            job.status === "CONFIRMED" ? "text-blue-700" :
+                            job.status === "CANCELLED" ? "text-red-700" :
+                            "text-yellow-800"
                           }`}>{formatStatus(job.status)}</span>
                         </td>
                       </tr>
@@ -259,15 +330,21 @@ export default async function AdminDashboard() {
               {/* Mobile cards */}
               <div className="md:hidden space-y-3">
                 {todaysJobs.map((job) => (
-                  <div key={job.id} className="border border-gray-100 rounded-lg p-3">
+                  <div key={job.id} className={`border border-gray-100 rounded-lg p-3 ${
+                    job.status === "COMPLETED" ? "bg-green-50" :
+                    job.status === "IN_PROGRESS" ? "bg-teal-50" :
+                    job.status === "CONFIRMED" ? "bg-blue-50" :
+                    job.status === "CANCELLED" ? "bg-red-50" :
+                    "bg-yellow-50"
+                  }`}>
                     <div className="flex justify-between items-start mb-1">
                       <span className="font-medium text-tobacco text-[0.85rem]">{job.customerName}</span>
-                      <span className={`text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${
-                        job.status === "COMPLETED" ? "bg-green-100 text-green-700" :
-                        job.status === "IN_PROGRESS" ? "bg-teal/10 text-teal" :
-                        job.status === "CONFIRMED" ? "bg-blue-100 text-blue-700" :
-                        job.status === "CANCELLED" ? "bg-red-100 text-red-700" :
-                        "bg-yellow-100 text-yellow-800"
+                      <span className={`text-[0.75rem] font-medium ${
+                        job.status === "COMPLETED" ? "text-green-700" :
+                        job.status === "IN_PROGRESS" ? "text-teal" :
+                        job.status === "CONFIRMED" ? "text-blue-700" :
+                        job.status === "CANCELLED" ? "text-red-700" :
+                        "text-yellow-800"
                       }`}>{formatStatus(job.status)}</span>
                     </div>
                     <div className="text-gray-500 text-[0.78rem]">{job.serviceName} &middot; {job.date} &middot; {job.time}</div>
@@ -299,21 +376,27 @@ export default async function AdminDashboard() {
           {recentBookings.length === 0 ? (
             <p className="text-gray-400 text-sm">No bookings yet.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-1">
               {recentBookings.map((b) => (
-                <div key={b.id} className="flex items-center justify-between border-b border-gray-100 pb-3 last:border-0">
+                <div key={b.id} className={`flex items-center justify-between rounded-lg px-3 py-2.5 ${
+                  b.status === "COMPLETED" ? "bg-green-50" :
+                  b.status === "IN_PROGRESS" ? "bg-teal-50" :
+                  b.status === "CONFIRMED" ? "bg-blue-50" :
+                  b.status === "CANCELLED" ? "bg-red-50" :
+                  "bg-yellow-50"
+                }`}>
                   <div>
                     <div className="text-[0.85rem] font-medium flex items-center gap-1.5"><ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-green" /> {b.service.name}</div>
                     <div className="text-gray-400 text-[0.78rem]">{b.customer.name} &middot; {formatDate(b.scheduledDate)}</div>
                   </div>
                   <div className="text-right">
                     <div className="text-[0.82rem] font-medium">{formatCurrency(b.total)}</div>
-                    <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${
-                      b.status === "CONFIRMED" ? "bg-blue-100 text-blue-700" :
-                      b.status === "COMPLETED" ? "bg-green-100 text-green-700" :
-                      b.status === "IN_PROGRESS" ? "bg-teal/10 text-teal" :
-                      b.status === "CANCELLED" ? "bg-red-100 text-red-700" :
-                      "bg-yellow-100 text-yellow-800"
+                    <span className={`text-[0.78rem] font-medium ${
+                      b.status === "COMPLETED" ? "text-green-700" :
+                      b.status === "IN_PROGRESS" ? "text-teal" :
+                      b.status === "CONFIRMED" ? "text-blue-700" :
+                      b.status === "CANCELLED" ? "text-red-700" :
+                      "text-yellow-800"
                     }`}>{formatStatus(b.status)}</span>
                   </div>
                 </div>

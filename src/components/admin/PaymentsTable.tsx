@@ -14,12 +14,20 @@ type Payment = {
   bookingInfo: string | null;
 };
 
-const statusColors: Record<string, string> = {
-  PENDING: "bg-amber/10 text-amber",
-  PROCESSING: "bg-teal/10 text-teal",
-  SUCCEEDED: "bg-green/10 text-green",
-  FAILED: "bg-red/10 text-red",
-  REFUNDED: "bg-gray-100 text-gray-500",
+const rowColors: Record<string, string> = {
+  PENDING: "bg-amber-50",
+  PROCESSING: "bg-teal-50",
+  SUCCEEDED: "bg-green-50",
+  FAILED: "bg-red-50",
+  REFUNDED: "bg-gray-50",
+};
+
+const statusTextColors: Record<string, string> = {
+  PENDING: "text-amber",
+  PROCESSING: "text-teal",
+  SUCCEEDED: "text-green",
+  FAILED: "text-red-500",
+  REFUNDED: "text-gray-500",
 };
 
 export function PaymentsTable({ payments }: { payments: Payment[] }) {
@@ -43,10 +51,10 @@ export function PaymentsTable({ payments }: { payments: Payment[] }) {
       {/* Mobile card view */}
       <div className="md:hidden space-y-3">
         {filteredData.map((p) => (
-          <div key={p.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div key={p.id} className={`rounded-xl border border-[#ece6d9] p-4 ${rowColors[p.status] || "bg-white"}`}>
             <div className="flex items-center justify-between mb-3">
               <span className="font-medium">{p.customerName}</span>
-              <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[p.status] || ""}`}>
+              <span className={`text-[0.68rem] uppercase tracking-wider font-medium ${statusTextColors[p.status] || ""}`}>
                 {formatStatus(p.status)}
               </span>
             </div>
@@ -92,14 +100,12 @@ export function PaymentsTable({ payments }: { payments: Payment[] }) {
           </thead>
           <tbody>
             {filteredData.map((p) => (
-              <tr key={p.id} className="border-b border-gray-50 hover:bg-ivory/30">
+              <tr key={p.id} className={`border-b border-gray-50 ${rowColors[p.status] || ""} hover:brightness-95`}>
                 <td className="px-4 py-3 font-medium">{p.customerName}</td>
                 <td className="px-4 py-3 text-gray-500">{p.bookingInfo || "\u2014"}</td>
                 <td className="px-4 py-3 capitalize">{p.method.toLowerCase()}</td>
-                <td className="px-4 py-3">
-                  <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[p.status] || ""}`}>
-                    {p.status}
-                  </span>
+                <td className={`px-4 py-3 text-[0.82rem] font-medium ${statusTextColors[p.status] || ""}`}>
+                  {formatStatus(p.status)}
                 </td>
                 <td className="px-4 py-3 text-gray-500">{formatDate(p.paidAt || p.createdAt)}</td>
                 <td className="px-4 py-3 text-right font-medium text-green">{formatCurrency(p.amount)}</td>

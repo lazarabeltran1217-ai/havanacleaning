@@ -249,6 +249,7 @@ export function BlogManager({ initialPosts }: Props) {
                         month: "short",
                         day: "numeric",
                         year: "numeric",
+                        timeZone: "America/New_York",
                       })}
                     </span>
                   )}

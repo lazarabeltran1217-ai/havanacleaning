@@ -62,10 +62,10 @@ export async function GET() {
         // Total bookings count
         prisma.booking.count({ where: { customerId: uid } }),
 
-        // Total spent (sum of completed booking totals)
-        prisma.booking.aggregate({
-          where: { customerId: uid, status: "COMPLETED" },
-          _sum: { total: true },
+        // Total spent (sum of succeeded payments)
+        prisma.payment.aggregate({
+          where: { customerId: uid, status: "SUCCEEDED" },
+          _sum: { amount: true },
         }),
 
         // Stripe publishable key
@@ -112,6 +112,8 @@ export async function GET() {
             createdAt: true,
             adminReply: true,
             adminRepliedAt: true,
+            customerReply: true,
+            customerRepliedAt: true,
             customerCanEdit: true,
             payments: { select: { status: true } },
           },
@@ -138,7 +140,7 @@ export async function GET() {
       addresses,
       stats: {
         totalBookings: totalCount,
-        totalSpent: totalSpent._sum.total || 0,
+        totalSpent: totalSpent._sum.amount || 0,
       },
       stripeKey,
       services,

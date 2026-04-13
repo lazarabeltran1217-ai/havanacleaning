@@ -10,6 +10,7 @@ const CLEANING_TYPES = [
   "Airbnb/Vacation Rental",
   "Deep Clean",
   "Move-In/Move-Out",
+  "Handyman",
 ];
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];

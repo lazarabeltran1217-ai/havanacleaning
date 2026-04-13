@@ -24,39 +24,45 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Employee not found" }, { status: 404 });
   }
 
-  const stripe = await getStripe();
+  try {
+    const stripe = await getStripe();
 
-  // If they already have an account, just generate a new onboarding link
-  let accountId = employee.stripeConnectAccountId;
+    // If they already have an account, just generate a new onboarding link
+    let accountId = employee.stripeConnectAccountId;
 
-  if (!accountId) {
-    const account = await stripe.accounts.create({
-      type: "express",
-      country: "US",
-      email: employee.email,
-      capabilities: {
-        transfers: { requested: true },
-      },
-      business_type: "individual",
-      metadata: { employeeId: employee.id },
+    if (!accountId) {
+      const account = await stripe.accounts.create({
+        type: "express",
+        country: "US",
+        email: employee.email,
+        capabilities: {
+          transfers: { requested: true },
+        },
+        business_type: "individual",
+        metadata: { employeeId: employee.id },
+      });
+
+      accountId = account.id;
+
+      await prisma.user.update({
+        where: { id: employee.id },
+        data: { stripeConnectAccountId: accountId },
+      });
+    }
+
+    const origin = req.headers.get("origin") || process.env.NEXTAUTH_URL || "";
+
+    const accountLink = await stripe.accountLinks.create({
+      account: accountId,
+      refresh_url: `${origin}/admin/staff/connect/refresh?accountId=${accountId}`,
+      return_url: `${origin}/admin/staff/connect/complete?accountId=${accountId}`,
+      type: "account_onboarding",
     });
 
-    accountId = account.id;
-
-    await prisma.user.update({
-      where: { id: employee.id },
-      data: { stripeConnectAccountId: accountId },
-    });
+    return NextResponse.json({ url: accountLink.url, accountId });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("Stripe Connect error:", message);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
-
-  const origin = req.headers.get("origin") || process.env.NEXTAUTH_URL || "";
-
-  const accountLink = await stripe.accountLinks.create({
-    account: accountId,
-    refresh_url: `${origin}/admin/staff/connect/refresh?accountId=${accountId}`,
-    return_url: `${origin}/admin/staff/connect/complete?accountId=${accountId}`,
-    type: "account_onboarding",
-  });
-
-  return NextResponse.json({ url: accountLink.url, accountId });
 }

@@ -74,7 +74,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
         status: "PENDING",
       };
       if (body.customerNotes !== undefined) editData.customerNotes = body.customerNotes;
-      if (body.scheduledDate) editData.scheduledDate = new Date(body.scheduledDate);
+      if (body.scheduledDate) editData.scheduledDate = new Date(body.scheduledDate + "T12:00:00");
       if (body.scheduledTime) editData.scheduledTime = body.scheduledTime;
 
       const updated = await prisma.booking.update({ where: { id }, data: editData });
@@ -98,6 +98,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
   if (body.rating !== undefined) updateData.rating = body.rating;
   if (body.review !== undefined) updateData.review = body.review;
   if (body.status === "COMPLETED") updateData.completedAt = new Date();
+  if (body.scheduledDate) updateData.scheduledDate = new Date(body.scheduledDate + "T12:00:00");
+  if (body.scheduledTime) updateData.scheduledTime = body.scheduledTime;
 
   // Admin reply
   if (body.adminReply !== undefined) {

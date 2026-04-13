@@ -75,6 +75,7 @@ export default async function BlogPage() {
                       month: "short",
                       day: "numeric",
                       year: "numeric",
+                      timeZone: "America/New_York",
                     })}
                   </span>
                 )}

@@ -15,45 +15,50 @@ export async function POST(req: NextRequest) {
 
   // Portal path: user is already logged in
   if (isPortal) {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    try {
+      const session = await getServerSession(authOptions);
+      if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+
+      if (!body.address || !body.serviceCategories?.length) {
+        return NextResponse.json({ error: "Please fill in all required fields" }, { status: 400 });
+      }
+
+      const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+      if (!user) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+      }
+
+      // Server-side price calculation
+      const prices = await prisma.handymanServicePrice.findMany({ where: { isActive: true } });
+      const serverPricing = calculateHandymanTotal(prices, body.serviceCategories, body.rush || false);
+
+      const bookingNumber = await generateHandymanBookingNumber();
+      const inquiry = await prisma.handymanInquiry.create({
+        data: {
+          bookingNumber,
+          fullName: user.name,
+          email: user.email,
+          phone: user.phone || "",
+          borough: body.borough || null,
+          address: body.address,
+          serviceCategories: body.serviceCategories || [],
+          projectDescription: body.projectDescription || "",
+          preferredDate: body.preferredDate ? new Date(body.preferredDate + "T12:00:00") : null,
+          preferredTime: body.preferredTime || null,
+          rush: body.rush || false,
+          estimatedTotal: serverPricing.total,
+          spamScore: 0,
+          userId: user.id,
+        },
+      });
+
+      return NextResponse.json({ id: inquiry.id });
+    } catch (err) {
+      console.error("Handyman portal POST error:", err);
+      return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });
     }
-
-    if (!body.address || !body.serviceCategories?.length) {
-      return NextResponse.json({ error: "Please fill in all required fields" }, { status: 400 });
-    }
-
-    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    // Server-side price calculation
-    const prices = await prisma.handymanServicePrice.findMany({ where: { isActive: true } });
-    const serverPricing = calculateHandymanTotal(prices, body.serviceCategories, body.rush || false);
-
-    const bookingNumber = await generateHandymanBookingNumber();
-    const inquiry = await prisma.handymanInquiry.create({
-      data: {
-        bookingNumber,
-        fullName: user.name,
-        email: user.email,
-        phone: user.phone || "",
-        borough: body.borough || null,
-        address: body.address,
-        serviceCategories: body.serviceCategories || [],
-        projectDescription: body.projectDescription || "",
-        preferredDate: body.preferredDate ? new Date(body.preferredDate) : null,
-        preferredTime: body.preferredTime || null,
-        rush: body.rush || false,
-        estimatedTotal: serverPricing.total,
-        spamScore: 0,
-        userId: user.id,
-      },
-    });
-
-    return NextResponse.json({ id: inquiry.id });
   }
 
   // Public path: validate required fields
@@ -131,7 +136,7 @@ export async function POST(req: NextRequest) {
       address: body.address,
       serviceCategories: body.serviceCategories || [],
       projectDescription: body.projectDescription || "",
-      preferredDate: body.preferredDate ? new Date(body.preferredDate) : null,
+      preferredDate: body.preferredDate ? new Date(body.preferredDate + "T12:00:00") : null,
       preferredTime: body.preferredTime || null,
       rush: body.rush || false,
       estimatedTotal: serverPricing.total,

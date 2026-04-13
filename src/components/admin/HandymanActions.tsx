@@ -13,6 +13,8 @@ interface Props {
   adminReply?: string | null;
   adminRepliedAt?: string | null;
   customerCanEdit?: boolean;
+  customerReply?: string | null;
+  customerRepliedAt?: string | null;
 }
 
 const STATUSES: { value: string; label: string }[] = [
@@ -24,7 +26,7 @@ const STATUSES: { value: string; label: string }[] = [
   { value: "NO_SHOW", label: "No Show" },
 ];
 
-export function HandymanActions({ inquiryId, currentStatus, currentNotes, currentQuotedPrice, assignments, employees, adminReply: existingReply, adminRepliedAt, customerCanEdit }: Props) {
+export function HandymanActions({ inquiryId, currentStatus, currentNotes, currentQuotedPrice, assignments, employees, adminReply: existingReply, adminRepliedAt, customerCanEdit, customerReply, customerRepliedAt }: Props) {
   const router = useRouter();
   const [status, setStatus] = useState(currentStatus);
   const [notes, setNotes] = useState(currentNotes || "");
@@ -178,12 +180,21 @@ export function HandymanActions({ inquiryId, currentStatus, currentNotes, curren
         {existingReply && (
           <div className="mb-3 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3">
             <div className="text-[0.72rem] text-blue-500 uppercase tracking-wider font-medium mb-1">
-              Previous Reply {adminRepliedAt && `— ${new Date(adminRepliedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}`}
+              Your Reply {adminRepliedAt && `— ${new Date(adminRepliedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })}`}
             </div>
             <div className="text-[0.85rem] text-blue-800">{existingReply}</div>
             {customerCanEdit && (
               <div className="text-[0.72rem] text-blue-500 mt-1">Customer can currently edit this inquiry</div>
             )}
+          </div>
+        )}
+
+        {customerReply && (
+          <div className="mb-3 bg-green-50 border border-green-100 rounded-lg px-4 py-3">
+            <div className="text-[0.72rem] text-green-600 uppercase tracking-wider font-medium mb-1">
+              Customer Reply {customerRepliedAt && `— ${new Date(customerRepliedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })}`}
+            </div>
+            <div className="text-[0.85rem] text-green-800">{customerReply}</div>
           </div>
         )}
 

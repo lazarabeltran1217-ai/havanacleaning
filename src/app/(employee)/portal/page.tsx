@@ -2,14 +2,21 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { ChevronDown, ChevronUp, MapPin, Clock, Package, DollarSign, Calendar, User } from "lucide-react";
+import { ChevronDown, ChevronUp, MapPin, Clock, Package, DollarSign, Calendar, User, Landmark } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
 import { useTranslations } from "next-intl";
+import dynamic from "next/dynamic";
+
+const StripePayoutModal = dynamic(
+  () => import("@/components/portal/StripePayoutModal").then((m) => m.StripePayoutModal),
+  { ssr: false }
+);
 
 /* ─── Type Definitions ─── */
 
 interface TodayJob {
   id: string;
+  isHandyman?: boolean;
   booking: {
     id: string;
     bookingNumber: string;
@@ -47,6 +54,7 @@ interface TimeEntryData {
   clockOut: string | null;
   hoursWorked: number | null;
   booking: { bookingNumber: string; service: { name: string } } | null;
+  handymanInquiry?: { bookingNumber: string } | null;
 }
 
 interface HoursSummary {
@@ -74,6 +82,7 @@ interface PayStub {
 
 interface ScheduleJob {
   id: string;
+  isHandyman?: boolean;
   booking: {
     bookingNumber: string;
     scheduledDate: string;
@@ -97,7 +106,7 @@ const statusColors: Record<string, string> = {
 };
 
 function fmtDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
 }
 
 function fmtStatus(status: string) {
@@ -160,6 +169,11 @@ export default function EmployeeDashboard() {
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMessage, setProfileMessage] = useState("");
 
+  // Stripe state
+  const [stripeOnboarded, setStripeOnboarded] = useState(false);
+  const [stripePublishableKey, setStripePublishableKey] = useState("");
+  const [showStripeModal, setShowStripeModal] = useState(false);
+
   /* ─── Live Clock (Eastern Time) ─── */
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }))), 1000);
@@ -209,7 +223,9 @@ export default function EmployeeDashboard() {
           setProfileName(d.profile.name || "");
           setProfilePhone(d.profile.phone || "");
           setProfileLocale(d.profile.locale || "en");
+          setStripeOnboarded(d.profile.stripeConnectOnboarded || false);
         }
+        if (d.stripePublishableKey) setStripePublishableKey(d.stripePublishableKey);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -244,10 +260,16 @@ export default function EmployeeDashboard() {
     setClockMessage("");
     const { lat, lng } = await getGPS();
     const job = todayJobs.find((j) => j.booking.id === selectedJobId);
+    const isHm = job?.isHandyman;
     const res = await fetch("/api/clock", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "clock-in", lat, lng, bookingId: selectedJobId }),
+      body: JSON.stringify({
+        action: "clock-in",
+        lat,
+        lng,
+        ...(isHm ? { handymanInquiryId: selectedJobId } : { bookingId: selectedJobId }),
+      }),
     });
     const data = await res.json();
     setClockLoading(false);
@@ -358,7 +380,7 @@ export default function EmployeeDashboard() {
   const formatWeekRange = () => {
     const end = new Date(weekStart);
     end.setDate(end.getDate() + 6);
-    const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
+    const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric", timeZone: "America/New_York" };
     return `${weekStart.toLocaleDateString("en-US", opts)} — ${end.toLocaleDateString("en-US", opts)}`;
   };
 
@@ -366,7 +388,7 @@ export default function EmployeeDashboard() {
   const groupedHours = useMemo(() => {
     const groups: Record<string, TimeEntryData[]> = {};
     for (const entry of hoursEntries) {
-      const date = new Date(entry.clockIn).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+      const date = new Date(entry.clockIn).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "America/New_York" });
       if (!groups[date]) groups[date] = [];
       groups[date].push(entry);
     }
@@ -394,7 +416,7 @@ export default function EmployeeDashboard() {
           {greeting}, {firstName}
         </h1>
         <p className="text-white/70 text-sm mt-1">
-          {time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+          {time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "America/New_York" })}
         </p>
         <div className="flex flex-wrap justify-center gap-2 mt-3">
           {todayJobs.length > 0 && (
@@ -424,7 +446,7 @@ export default function EmployeeDashboard() {
 
           <div className="text-center mb-4">
             <div className={`font-display text-3xl font-bold ${TEXT_PRIMARY}`}>
-              {time.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" })}
+              {time.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit", timeZone: "America/New_York" })}
             </div>
           </div>
 
@@ -491,9 +513,10 @@ export default function EmployeeDashboard() {
                             </span>
                             <span className={`${TEXT_MUTED} text-[0.72rem] capitalize`}>{j.booking.scheduledTime}</span>
                           </div>
-                          {j.booking.address && (
-                            <div className={`${TEXT_MUTED} text-[0.72rem] mt-0.5 ml-5`}>{j.booking.address.street}, {j.booking.address.city}</div>
-                          )}
+                          <div className={`${TEXT_MUTED} text-[0.72rem] mt-0.5 ml-5`}>
+                            {fmtDate(j.booking.scheduledDate)}
+                            {j.booking.address && <> &middot; {j.booking.address.street}, {j.booking.address.city}</>}
+                          </div>
                         </button>
                       ))}
                     </div>
@@ -537,7 +560,7 @@ export default function EmployeeDashboard() {
                     <span className={`font-medium text-[0.85rem] flex items-center gap-1.5 ${TEXT_PRIMARY}`}>
                       <ServiceIcon emoji={j.booking.service.icon} className="w-4 h-4 text-green" /> {j.booking.service.name}
                     </span>
-                    <span className={`text-[0.65rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[j.booking.status] || "bg-gray-100 text-gray-500"}`}>
+                    <span className={`text-[0.68rem] uppercase tracking-wider font-medium ${statusColors[j.booking.status]?.split(" ").find(c => c.startsWith("text-")) || "text-gray-500"}`}>
                       {fmtStatus(j.booking.status)}
                     </span>
                   </div>
@@ -601,7 +624,7 @@ export default function EmployeeDashboard() {
                     <span className={`text-[0.65rem] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded-full ${today ? "bg-green text-white" : "bg-gray-100 dark:bg-[#1a1410] text-gray-500 dark:text-sand/70"}`}>
                       {DAY_NAMES[day.getDay()]}
                     </span>
-                    <span className={`${TEXT_MUTED} text-[0.72rem]`}>{day.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+                    <span className={`${TEXT_MUTED} text-[0.72rem]`}>{day.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" })}</span>
                     {today && <span className="text-green text-[0.65rem] font-medium">{t("schedule_today")}</span>}
                   </div>
                   {dayJobs.length === 0 ? (
@@ -680,12 +703,14 @@ export default function EmployeeDashboard() {
                       {dayEntries.map((entry) => (
                         <div key={entry.id} className={`px-3 py-2 flex items-center justify-between text-[0.78rem] ${TEXT_PRIMARY}`}>
                           <div>
-                            {new Date(entry.clockIn).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                            {new Date(entry.clockIn).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })}
                             {" — "}
-                            {entry.clockOut ? new Date(entry.clockOut).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) : "Active"}
-                            {entry.booking && (
+                            {entry.clockOut ? new Date(entry.clockOut).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) : "Active"}
+                            {entry.booking ? (
                               <span className={`${TEXT_MUTED} text-[0.68rem] ml-1`}>({entry.booking.service.name})</span>
-                            )}
+                            ) : entry.handymanInquiry ? (
+                              <span className={`${TEXT_MUTED} text-[0.68rem] ml-1`}>(Handyman)</span>
+                            ) : null}
                           </div>
                           {entry.hoursWorked ? (
                             <span className="font-medium">{entry.hoursWorked.toFixed(1)}h</span>
@@ -754,6 +779,16 @@ export default function EmployeeDashboard() {
                 <div className={`${TEXT_MUTED} text-[0.68rem]`}>{t("pay_count")}</div>
               </div>
             </div>
+          )}
+
+          {stripeOnboarded && stripePublishableKey && (
+            <button
+              onClick={() => setShowStripeModal(true)}
+              className="w-full mb-3 px-3 py-2.5 bg-green/10 text-green rounded-xl text-[0.82rem] font-medium hover:bg-green/20 flex items-center justify-center gap-2"
+            >
+              <Landmark className="w-3.5 h-3.5" />
+              Manage Bank Account & Payouts
+            </button>
           )}
 
           {payStubs.length === 0 ? (
@@ -948,6 +983,14 @@ export default function EmployeeDashboard() {
             )}
           </div>
         </div>
+      )}
+
+      {/* ─── STRIPE PAYOUT MODAL ─── */}
+      {showStripeModal && stripePublishableKey && (
+        <StripePayoutModal
+          publishableKey={stripePublishableKey}
+          onClose={() => setShowStripeModal(false)}
+        />
       )}
     </div>
   );

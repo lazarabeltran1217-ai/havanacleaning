@@ -53,6 +53,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
   if (body.status) updateData.status = body.status;
   if (body.notes !== undefined) updateData.notes = body.notes;
   if (body.quotedPrice !== undefined) updateData.quotedPrice = body.quotedPrice;
+  if (body.preferredDate !== undefined) updateData.preferredDate = new Date(body.preferredDate + "T12:00:00");
+  if (body.preferredTime !== undefined) updateData.preferredTime = body.preferredTime;
 
   // Admin reply
   if (body.adminReply !== undefined) {

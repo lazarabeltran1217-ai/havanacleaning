@@ -450,6 +450,7 @@ export function HandymanBookingWizard({ handymanPrices }: { handymanPrices: Hand
                     weekday: "long",
                     month: "long",
                     day: "numeric",
+                    timeZone: "America/New_York",
                   })}{" "}
                   &middot; {timeSlots.find((s) => s.value === scheduledTime)?.label}
                 </div>

@@ -10,10 +10,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { action, lat, lng, bookingId, completeJob } = await req.json();
+  const { action, lat, lng, bookingId, handymanInquiryId, completeJob } = await req.json();
 
   if (action === "clock-in") {
-    if (!bookingId) {
+    if (!bookingId && !handymanInquiryId) {
       return NextResponse.json(
         { error: "You must select a job to clock in" },
         { status: 400 }
@@ -32,7 +32,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create time entry and update booking status to IN_PROGRESS
+    if (handymanInquiryId) {
+      // Clock in for handyman job
+      const [entry] = await prisma.$transaction([
+        prisma.timeEntry.create({
+          data: {
+            employeeId: session.user.id,
+            handymanInquiryId,
+            clockIn: new Date(),
+            clockInLat: lat || null,
+            clockInLng: lng || null,
+          },
+        }),
+        prisma.handymanInquiry.update({
+          where: { id: handymanInquiryId },
+          data: { status: "IN_PROGRESS" },
+        }),
+      ]);
+      return NextResponse.json({ entry, status: "clocked-in" });
+    }
+
+    // Clock in for regular booking
     const [entry] = await prisma.$transaction([
       prisma.timeEntry.create({
         data: {
@@ -78,12 +98,19 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // If employee marks job as completed, update booking status
-    if (completeJob && openEntry.bookingId) {
-      await prisma.booking.update({
-        where: { id: openEntry.bookingId },
-        data: { status: "COMPLETED", completedAt: clockOut },
-      });
+    // If employee marks job as completed, update the relevant record
+    if (completeJob) {
+      if (openEntry.bookingId) {
+        await prisma.booking.update({
+          where: { id: openEntry.bookingId },
+          data: { status: "COMPLETED", completedAt: clockOut },
+        });
+      } else if (openEntry.handymanInquiryId) {
+        await prisma.handymanInquiry.update({
+          where: { id: openEntry.handymanInquiryId },
+          data: { status: "COMPLETED" },
+        });
+      }
     }
 
     return NextResponse.json({ entry, status: "clocked-out" });

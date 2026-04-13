@@ -130,6 +130,7 @@ model User {
   inventoryCheckouts   InventoryCheckout[]
   handymanInquiries    HandymanInquiry[]
   deviceTokens         DeviceToken[]
+  expenses             Expense[]            @relation("ExpenseCreator")
 
   @@index([role])
   @@index([email])
@@ -317,29 +318,32 @@ model JobAssignment {
 }
 
 model TimeEntry {
-  id           String    @id @default(cuid())
-  employeeId   String
-  bookingId    String?
-  clockIn      DateTime
-  clockOut     DateTime?
-  clockInLat   Float?
-  clockInLng   Float?
-  clockOutLat  Float?
-  clockOutLng  Float?
-  hoursWorked  Float?
-  breakMinutes Int       @default(0)
-  notes        String?
-  isEdited     Boolean   @default(false)
-  editedById   String?
-  editReason   String?
-  createdAt    DateTime  @default(now())
+  id                String    @id @default(cuid())
+  employeeId        String
+  bookingId         String?
+  handymanInquiryId String?
+  clockIn           DateTime
+  clockOut          DateTime?
+  clockInLat        Float?
+  clockInLng        Float?
+  clockOutLat       Float?
+  clockOutLng       Float?
+  hoursWorked       Float?
+  breakMinutes      Int       @default(0)
+  notes             String?
+  isEdited          Boolean   @default(false)
+  editedById        String?
+  editReason        String?
+  createdAt         DateTime  @default(now())
 
-  employee User     @relation("EmployeeTimeEntries", fields: [employeeId], references: [id])
-  editedBy User?    @relation("EditedByUser", fields: [editedById], references: [id])
-  booking  Booking? @relation(fields: [bookingId], references: [id])
+  employee        User              @relation("EmployeeTimeEntries", fields: [employeeId], references: [id])
+  editedBy        User?             @relation("EditedByUser", fields: [editedById], references: [id])
+  booking         Booking?          @relation(fields: [bookingId], references: [id])
+  handymanInquiry HandymanInquiry?  @relation(fields: [handymanInquiryId], references: [id])
 
   @@index([employeeId])
   @@index([clockIn])
+  @@index([handymanInquiryId])
 }
 
 model Payment {
@@ -678,6 +682,8 @@ model HandymanInquiry {
   notes              String?
   adminReply         String?
   adminRepliedAt     DateTime?
+  customerReply      String?
+  customerRepliedAt  DateTime?
   customerCanEdit    Boolean               @default(false)
   assignedEmployees  Json?
   quotedPrice        Float?
@@ -685,6 +691,7 @@ model HandymanInquiry {
   userId             String?
   user               User?                 @relation(fields: [userId], references: [id])
   payments           Payment[]
+  timeEntries        TimeEntry[]
   createdAt          DateTime              @default(now())
   updatedAt          DateTime              @updatedAt
 
@@ -929,4 +936,20 @@ model SupportTicket {
   @@index([status])
   @@index([isRead])
   @@index([createdAt])
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  date        DateTime
+  amount      Float
+  category    String
+  description String?
+  vendor      String?
+  createdBy   String
+  creator     User     @relation("ExpenseCreator", fields: [createdBy], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([date])
+  @@index([category])
 }

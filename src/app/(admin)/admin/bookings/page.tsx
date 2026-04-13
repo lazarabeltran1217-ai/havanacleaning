@@ -18,8 +18,14 @@ export default async function AdminBookingsPage() {
     });
 
   let bookings: Awaited<ReturnType<typeof fetchBookings>> = [];
+  let clockedInBookingIds: string[] = [];
   try {
     bookings = await fetchBookings();
+    const activeClocks = await prisma.timeEntry.findMany({
+      where: { clockOut: null, bookingId: { not: null } },
+      select: { bookingId: true },
+    });
+    clockedInBookingIds = activeClocks.map((c) => c.bookingId!);
   } catch (error) {
     console.error("Failed to fetch bookings:", error);
   }
@@ -48,6 +54,7 @@ export default async function AdminBookingsPage() {
     customer: b.customer,
     assignments: b.assignments,
     isPaid: b.payments.length > 0,
+    isClockedIn: clockedInBookingIds.includes(b.id),
   }));
 
   return (

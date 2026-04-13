@@ -7,6 +7,7 @@ const fetchPayments = () =>
     include: {
       customer: { select: { name: true } },
       booking: { select: { bookingNumber: true, service: { select: { name: true } } } },
+      handymanInquiry: { select: { bookingNumber: true } },
     },
     orderBy: { createdAt: "desc" },
     take: 50,
@@ -39,7 +40,11 @@ export default async function AdminPaymentsPage() {
     paidAt: p.paidAt?.toISOString() ?? null,
     createdAt: p.createdAt.toISOString(),
     customerName: p.customer.name ?? "",
-    bookingInfo: p.booking ? `${p.booking.bookingNumber} \u2014 ${p.booking.service.name}` : null,
+    bookingInfo: p.booking
+      ? `${p.booking.bookingNumber} \u2014 ${p.booking.service.name}`
+      : p.handymanInquiry
+        ? `${p.handymanInquiry.bookingNumber} \u2014 Handyman`
+        : null,
   }));
 
   return (

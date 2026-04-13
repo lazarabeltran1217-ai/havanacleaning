@@ -576,7 +576,7 @@ export function PortalBookingWizard({ services, addOns, addresses, locale = "en"
                 </div>
 
                 <div className="mt-3 text-gray-500 dark:text-sand/60 text-[0.72rem] space-y-0.5">
-                  <div>{scheduledDate && new Date(scheduledDate + "T12:00:00").toLocaleDateString(dateLocale, { weekday: "long", month: "long", day: "numeric", year: "numeric" })} &middot; <span className="capitalize">{t(`time_${scheduledTime}` as "time_morning")}</span></div>
+                  <div>{scheduledDate && new Date(scheduledDate + "T12:00:00").toLocaleDateString(dateLocale, { weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone: "America/New_York" })} &middot; <span className="capitalize">{t(`time_${scheduledTime}` as "time_morning")}</span></div>
                   {!useNewAddress && addresses.find((a) => a.id === addressId) && (
                     <div>{addresses.find((a) => a.id === addressId)!.street}, {addresses.find((a) => a.id === addressId)!.city}</div>
                   )}

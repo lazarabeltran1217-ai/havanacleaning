@@ -137,7 +137,7 @@ export function InventoryActions({ items }: Props) {
   };
 
   const formatDate = (d: string) => {
-    return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" });
   };
 
   return (

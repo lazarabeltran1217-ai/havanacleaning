@@ -19,6 +19,16 @@ export function formatDate(date: Date | string, locale = "en-US"): string {
     year: "numeric",
     month: "long",
     day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(date));
+}
+
+export function formatDateShort(date: Date | string, locale = "en-US"): string {
+  return new Intl.DateTimeFormat(locale, {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
   }).format(new Date(date));
 }
 
@@ -27,6 +37,7 @@ export function formatTime(date: Date | string, locale = "en-US"): string {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
+    timeZone: "America/New_York",
   }).format(new Date(date));
 }
 

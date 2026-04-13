@@ -62,7 +62,7 @@ export function SupportDetail({ ticket }: { ticket: Ticket }) {
   };
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-3xl mx-auto">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Link
@@ -103,7 +103,7 @@ export function SupportDetail({ ticket }: { ticket: Ticket }) {
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-sand" />
             <span className="text-tobacco/60">Received:</span>
-            <span className="font-medium">{new Date(ticket.createdAt).toLocaleString()}</span>
+            <span className="font-medium">{new Date(ticket.createdAt).toLocaleString("en-US", { timeZone: "America/New_York" })}</span>
           </div>
         </div>
       </div>

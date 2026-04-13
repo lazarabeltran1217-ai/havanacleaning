@@ -43,7 +43,7 @@ export function LiveClock({ activeEmployees }: { activeEmployees: ActiveEmployee
       <div className="text-gray-400 text-sm mt-1">{date}</div>
 
       {activeEmployees.length > 0 && (
-        <div className="mt-5 text-left space-y-1.5">
+        <div className="mt-5 space-y-1.5">
           {activeEmployees.map((e) => {
             const clockInTime = new Date(e.clockIn).toLocaleTimeString("en-US", {
               hour: "numeric",
@@ -52,8 +52,8 @@ export function LiveClock({ activeEmployees }: { activeEmployees: ActiveEmployee
               timeZone: "America/New_York",
             });
             return (
-              <div key={e.name + e.clockIn} className="text-[0.82rem] text-gray-500">
-                {e.name} — In {clockInTime}
+              <div key={e.name + e.clockIn} className="text-[0.82rem] text-gray-500 text-center">
+                {e.name} — <span className="text-green font-medium">In</span> {clockInTime}
               </div>
             );
           })}

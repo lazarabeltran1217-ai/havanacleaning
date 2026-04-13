@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Clock } from "lucide-react";
 import { ServiceIcon } from "@/lib/service-icons";
 import { formatCurrency, formatDate, formatStatus } from "@/lib/utils";
 import { useAdminTable, TableSearch, SortHeader, PlainHeader } from "./AdminTable";
@@ -17,15 +17,16 @@ type Booking = {
   customer: { name: string; email: string; phone: string | null };
   assignments: { employee: { name: string } }[];
   isPaid: boolean;
+  isClockedIn?: boolean;
 };
 
-const statusColors: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800",
-  CONFIRMED: "bg-blue-100 text-blue-700",
-  IN_PROGRESS: "bg-teal/10 text-teal",
-  COMPLETED: "bg-green-100 text-green-700",
-  CANCELLED: "bg-red-100 text-red-700",
-  NO_SHOW: "bg-gray-100 text-gray-500",
+const rowColors: Record<string, string> = {
+  PENDING: "bg-yellow-50",
+  CONFIRMED: "bg-blue-50",
+  IN_PROGRESS: "bg-teal-50",
+  COMPLETED: "bg-green-50",
+  CANCELLED: "bg-red-50",
+  NO_SHOW: "bg-gray-50",
 };
 
 export function BookingsTable({ bookings }: { bookings: Booking[] }) {
@@ -49,12 +50,19 @@ export function BookingsTable({ bookings }: { bookings: Booking[] }) {
       {/* Mobile card view */}
       <div className="md:hidden space-y-3">
         {filteredData.map((b) => (
-          <div key={b.id} className="bg-white rounded-xl border border-[#ece6d9] p-4">
+          <div key={b.id} className={`rounded-xl border border-[#ece6d9] p-4 ${rowColors[b.status] || "bg-white"}`}>
             <div className="flex items-center justify-between mb-3">
               <span className="text-[0.8rem] tracking-wide font-medium">{b.bookingNumber}</span>
-              <span className={`text-[0.68rem] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${statusColors[b.status] || ""}`}>
-                {formatStatus(b.status)}
-              </span>
+              <div className="flex items-center gap-1.5">
+                {b.isClockedIn && (
+                  <span className="inline-flex items-center gap-0.5 text-[0.68rem] text-teal font-medium">
+                    <Clock className="w-3 h-3" /> Clocked In
+                  </span>
+                )}
+                <span className="text-[0.75rem] capitalize font-medium">
+                  {formatStatus(b.status)}
+                </span>
+              </div>
             </div>
             <div className="text-[0.88rem] font-medium mb-1 flex items-center gap-1.5">
               <ServiceIcon emoji={b.service.icon} className="w-4 h-4 text-green" /> {b.service.name}
@@ -123,7 +131,7 @@ export function BookingsTable({ bookings }: { bookings: Booking[] }) {
           </thead>
           <tbody>
             {filteredData.map((b) => (
-              <tr key={b.id} className="border-b border-gray-50 hover:bg-ivory/30">
+              <tr key={b.id} className={`border-b border-gray-50 ${rowColors[b.status] || ""} hover:brightness-95`}>
                 <td className="px-4 py-3 text-[0.8rem] tracking-wide">{b.bookingNumber}</td>
                 <td className="px-4 py-3">
                   <span className="flex items-center gap-1.5">
@@ -138,10 +146,13 @@ export function BookingsTable({ bookings }: { bookings: Booking[] }) {
                   <div>{formatDate(b.scheduledDate)}</div>
                   <div className="text-gray-400 text-[0.75rem] capitalize">{b.scheduledTime}</div>
                 </td>
-                <td className="px-4 py-3">
-                  <span className={`text-[0.7rem] uppercase tracking-wider px-2.5 py-1 rounded-full font-medium ${statusColors[b.status] || ""}`}>
-                    {b.status}
-                  </span>
+                <td className="px-4 py-3 text-[0.82rem]">
+                  <div className="capitalize">{formatStatus(b.status)}</div>
+                  {b.isClockedIn && (
+                    <span className="inline-flex items-center gap-0.5 text-[0.68rem] text-teal font-medium mt-0.5">
+                      <Clock className="w-3 h-3" /> Clocked In
+                    </span>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-[0.82rem]">
                   {b.assignments.length > 0

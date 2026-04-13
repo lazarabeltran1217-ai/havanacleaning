@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 interface Props {
   bookingId: string;
   currentStatus: string;
+  currentDate: string;
+  currentTime: string;
   assignments: { employeeId: string; employeeName: string }[];
   employees: { id: string; name: string }[];
   adminReply?: string | null;
@@ -22,7 +24,13 @@ const STATUSES: { value: string; label: string }[] = [
   { value: "NO_SHOW", label: "No Show" },
 ];
 
-export function BookingActions({ bookingId, currentStatus, assignments, employees, adminReply: existingReply, adminRepliedAt, customerCanEdit }: Props) {
+const TIME_OPTIONS = [
+  { value: "morning", label: "Morning (8 AM – 12 PM)" },
+  { value: "afternoon", label: "Afternoon (12 – 5 PM)" },
+  { value: "evening", label: "Evening (5 – 8 PM)" },
+];
+
+export function BookingActions({ bookingId, currentStatus, currentDate, currentTime, assignments, employees, adminReply: existingReply, adminRepliedAt, customerCanEdit }: Props) {
   const router = useRouter();
   const [status, setStatus] = useState(currentStatus);
   const [notes, setNotes] = useState("");
@@ -30,6 +38,9 @@ export function BookingActions({ bookingId, currentStatus, assignments, employee
   const [loading, setLoading] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [replySending, setReplySending] = useState(false);
+  const [rescheduleDate, setRescheduleDate] = useState(currentDate);
+  const [rescheduleTime, setRescheduleTime] = useState(currentTime);
+  const [rescheduleSaving, setRescheduleSaving] = useState(false);
 
   async function sendReply() {
     if (!replyText.trim()) return;
@@ -41,6 +52,18 @@ export function BookingActions({ bookingId, currentStatus, assignments, employee
     });
     setReplySending(false);
     setReplyText("");
+    router.refresh();
+  }
+
+  async function reschedule() {
+    if (rescheduleDate === currentDate && rescheduleTime === currentTime) return;
+    setRescheduleSaving(true);
+    await fetch(`/api/bookings/${bookingId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scheduledDate: rescheduleDate, scheduledTime: rescheduleTime }),
+    });
+    setRescheduleSaving(false);
     router.refresh();
   }
 
@@ -109,6 +132,35 @@ export function BookingActions({ bookingId, currentStatus, assignments, employee
         </button>
       </div>
 
+      {/* RESCHEDULE */}
+      <div className="bg-white rounded-xl p-5 border border-[#ece6d9]">
+        <h3 className="font-display text-base mb-3">Reschedule</h3>
+        <label className="block text-[0.75rem] text-gray-400 uppercase tracking-wider mb-1">Date</label>
+        <input
+          type="date"
+          value={rescheduleDate}
+          onChange={(e) => setRescheduleDate(e.target.value)}
+          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-[0.85rem] mb-3"
+        />
+        <label className="block text-[0.75rem] text-gray-400 uppercase tracking-wider mb-1">Time</label>
+        <select
+          value={rescheduleTime}
+          onChange={(e) => setRescheduleTime(e.target.value)}
+          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-[0.85rem] mb-3"
+        >
+          {TIME_OPTIONS.map((t) => (
+            <option key={t.value} value={t.value}>{t.label}</option>
+          ))}
+        </select>
+        <button
+          onClick={reschedule}
+          disabled={rescheduleSaving || (rescheduleDate === currentDate && rescheduleTime === currentTime)}
+          className="w-full bg-amber text-white py-2.5 text-[0.82rem] font-semibold rounded-lg hover:bg-amber/90 disabled:opacity-50 transition-colors"
+        >
+          {rescheduleSaving ? "Saving..." : "Update Schedule"}
+        </button>
+      </div>
+
       {/* ASSIGN EMPLOYEE */}
       <div className="bg-white rounded-xl p-5 border border-[#ece6d9]">
         <h3 className="font-display text-base mb-3">Assign Employee</h3>
@@ -162,7 +214,7 @@ export function BookingActions({ bookingId, currentStatus, assignments, employee
         {existingReply && (
           <div className="mb-3 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3">
             <div className="text-[0.72rem] text-blue-500 uppercase tracking-wider font-medium mb-1">
-              Previous Reply {adminRepliedAt && `— ${new Date(adminRepliedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}`}
+              Previous Reply {adminRepliedAt && `— ${new Date(adminRepliedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })}`}
             </div>
             <div className="text-[0.85rem] text-blue-800">{existingReply}</div>
             {customerCanEdit && (

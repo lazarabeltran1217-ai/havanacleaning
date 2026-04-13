@@ -2,6 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+
+const StripePayoutModal = dynamic(
+  () => import("@/components/portal/StripePayoutModal").then((m) => ({ default: m.StripePayoutModal })),
+  { ssr: false }
+);
 
 interface EmployeeData {
   id: string;
@@ -29,50 +35,9 @@ export function StaffEditButton({ employee }: { employee: EmployeeData }) {
   const [password, setPassword] = useState("");
   const [stripeLoading, setStripeLoading] = useState(false);
   const [stripeOnboarded, setStripeOnboarded] = useState(employee.stripeConnectOnboarded);
-  const [stripeAccountId, setStripeAccountId] = useState(employee.stripeConnectAccountId);
-
-  const handleStripeSetup = async () => {
-    setStripeLoading(true);
-    setMessage("");
-    try {
-      const res = await fetch("/api/stripe/connect", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ employeeId: employee.id }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setMessage(data.error || "Failed to create Stripe account");
-        return;
-      }
-      setStripeAccountId(data.accountId);
-      window.open(data.url, "_blank");
-    } catch {
-      setMessage("Failed to setup Stripe");
-    } finally {
-      setStripeLoading(false);
-    }
-  };
-
-  const handleStripeRefresh = async () => {
-    if (!stripeAccountId) return;
-    setStripeLoading(true);
-    setMessage("");
-    try {
-      const res = await fetch("/api/stripe/connect/onboarding", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accountId: stripeAccountId }),
-      });
-      const data = await res.json();
-      if (res.ok) window.open(data.url, "_blank");
-      else setMessage(data.error || "Failed to generate link");
-    } catch {
-      setMessage("Failed to refresh link");
-    } finally {
-      setStripeLoading(false);
-    }
-  };
+  const [stripeAccountId] = useState(employee.stripeConnectAccountId);
+  const [showPayoutModal, setShowPayoutModal] = useState(false);
+  const [publishableKey, setPublishableKey] = useState("");
 
   const handleStripeCheckStatus = async () => {
     if (!stripeAccountId) return;
@@ -89,6 +54,31 @@ export function StaffEditButton({ employee }: { employee: EmployeeData }) {
       }
     } catch {
       setMessage("Failed to check status");
+    } finally {
+      setStripeLoading(false);
+    }
+  };
+
+  const handleStripeSetup = async () => {
+    setStripeLoading(true);
+    setMessage("");
+    try {
+      // Ensure account exists and get publishable key
+      const res = await fetch("/api/stripe/connect/onboard-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employeeId: employee.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setMessage(data.error || "Failed to setup Stripe");
+        return;
+      }
+      // Open the same modal used in the employee portal
+      setPublishableKey(data.publishableKey);
+      setShowPayoutModal(true);
+    } catch {
+      setMessage("Failed to setup Stripe");
     } finally {
       setStripeLoading(false);
     }
@@ -214,11 +204,11 @@ export function StaffEditButton({ employee }: { employee: EmployeeData }) {
                     Pending
                   </span>
                   <button
-                    onClick={handleStripeRefresh}
+                    onClick={handleStripeSetup}
                     disabled={stripeLoading}
                     className="text-[0.78rem] text-teal hover:underline disabled:opacity-50"
                   >
-                    {stripeLoading ? "..." : "Resend Link"}
+                    {stripeLoading ? "..." : "Continue Setup"}
                   </button>
                   <button
                     onClick={handleStripeCheckStatus}
@@ -274,6 +264,17 @@ export function StaffEditButton({ employee }: { employee: EmployeeData }) {
             )}
           </div>
         </div>
+      )}
+
+      {showPayoutModal && publishableKey && (
+        <StripePayoutModal
+          publishableKey={publishableKey}
+          employeeId={employee.id}
+          onClose={() => {
+            setShowPayoutModal(false);
+            router.refresh();
+          }}
+        />
       )}
     </>
   );
